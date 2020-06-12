@@ -79,7 +79,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 {
 	ChangeWindowMode(TRUE);//ウィンドウモードで起動
 	SetMainWindowText("");//タイトルを設定
-	SetGraphMode(1024, 7, 16);
+	SetGraphMode(1024, 700, 16);
 
 
 	if (DxLib_Init() == -1) {                    //DXライブラリ初期化処理
