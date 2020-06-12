@@ -1,6 +1,14 @@
 #include"DxLib.h"
 #include <math.h>
 
+#include "GameMain.h"
+#include "GameTitle.h"
+#include "GameEnd.h"
+#include "GameInit.h"
+#include "GameHelp.h"
+#include "GameMenu.h"
+#include "Map.h"
+
 #define HEIGHT 100
 #define WIDTH 100
 #define STAGE 10
@@ -40,9 +48,10 @@ int g_KeyFlg2;
 int g_MouseX;//マウスｘ座標
 int g_MouseY;//マウスｙ座標
 
-int g_GameState = GAME_TITLE;//ゲームモード
+int g_GameState = GAME_MAIN;//ゲームモード
 
 
+int g_MapChip[SCREEN_HEIGHT_MAX][SCREEN_WIDTH_MAX];
 
 /***************************************
 *サウンド用変数
@@ -53,14 +62,6 @@ int g_GameState = GAME_TITLE;//ゲームモード
 /*********************************************
 *関数のプロトタイプ宣言
 *********************************************/
-void DrawGameTitle(void);
-void DrawGameMain(void);
-void DrawEnd(void);
-void DrawMenu(void);
-void DrawInit(void);
-void DrawClear(void);
-void DrawGameOver(void);//ゲームオーバー描画処理
-void DrawHelp(void);
 
 
 int LoadImages();//画像読み込み
@@ -151,15 +152,6 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	return 0;
 }
 
-
-void DrawGameTitle(){}
-void DrawGameMain(){}
-void DrawEnd(){}
-void DrawMenu(){}
-void DrawInit(void){}
-void DrawClear(void){}
-void DrawGameOver(void) {}//ゲームオーバー描画処理
-void DrawHelp(void){}
 
 
 int LoadImages() {
