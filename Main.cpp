@@ -6,12 +6,12 @@
 #define STAGE 10
 
 /****************************************************
-*—ñ‹“‘Ì‚ÌéŒ¾
+*åˆ—æŒ™ä½“ã®å®£è¨€
 ****************************************************/
 typedef enum MENU_MODE {
-	GAME_TITLE,//‚O
-	GAME_MAIN,//‚P
-	GAME_END,//‚Q
+	GAME_TITLE,//ï¼
+	GAME_MAIN,//ï¼‘
+	GAME_END,//ï¼’
 	GAME_MENU,//3
 	GAME_INIT,//4
 	GAME_CLEAR,//5
@@ -23,12 +23,12 @@ typedef enum MENU_MODE {
 
 
 /****************************************************
-*’è”‚ÌéŒ¾
+*å®šæ•°ã®å®£è¨€
 ****************************************************/
 
 
 /****************************************************
-*•Ï”‚ÌéŒ¾
+*å¤‰æ•°ã®å®£è¨€
 ****************************************************/
 
 int g_OldKey;
@@ -37,21 +37,21 @@ int g_KeyFlg;
 int g_OldKey2;
 int g_NowKey2;
 int g_KeyFlg2;
-int g_MouseX;//ƒ}ƒEƒX‚˜À•W
-int g_MouseY;//ƒ}ƒEƒX‚™À•W
+int g_MouseX;//ãƒã‚¦ã‚¹ï½˜åº§æ¨™
+int g_MouseY;//ãƒã‚¦ã‚¹ï½™åº§æ¨™
 
-int g_GameState = GAME_TITLE;//ƒQ[ƒ€ƒ‚[ƒh
+int g_GameState = GAME_TITLE;//ã‚²ãƒ¼ãƒ ãƒ¢ãƒ¼ãƒ‰
 
 
 
 /***************************************
-*ƒTƒEƒ“ƒh—p•Ï”
+*ã‚µã‚¦ãƒ³ãƒ‰ç”¨å¤‰æ•°
 ***************************************/
 
 
 
 /*********************************************
-*ŠÖ”‚Ìƒvƒƒgƒ^ƒCƒvéŒ¾
+*é–¢æ•°ã®ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
 *********************************************/
 void DrawGameTitle(void);
 void DrawGameMain(void);
@@ -59,39 +59,39 @@ void DrawEnd(void);
 void DrawMenu(void);
 void DrawInit(void);
 void DrawClear(void);
-void DrawGameOver(void);//ƒQ[ƒ€ƒI[ƒo[•`‰æˆ—
+void DrawGameOver(void);//ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æç”»å‡¦ç†
 void DrawHelp(void);
 
 
-int LoadImages();//‰æ‘œ“Ç‚İ‚İ
-int LoadSounds();//‰¹º“Ç‚İ‚İ
+int LoadImages();//ç”»åƒèª­ã¿è¾¼ã¿
+int LoadSounds();//éŸ³å£°èª­ã¿è¾¼ã¿
 
 void DrawStage(void);
 
 
 
 /******************************************************
-*ƒvƒƒOƒ‰ƒ€‚ÌŠJn
+*ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®é–‹å§‹
 ******************************************************/
 
-//ƒvƒƒOƒ‰ƒ€‚ÍWinMain‚©‚çn‚Ü‚è‚Ü‚·//
+//ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯WinMainã‹ã‚‰å§‹ã¾ã‚Šã¾ã™//
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
-	ChangeWindowMode(TRUE);//ƒEƒBƒ“ƒhƒEƒ‚[ƒh‚Å‹N“®
-	SetMainWindowText("");//ƒ^ƒCƒgƒ‹‚ğİ’è
-	SetGraphMode(1024, 768, 16);
+	ChangeWindowMode(TRUE);//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰ã§èµ·å‹•
+	SetMainWindowText("");//ã‚¿ã‚¤ãƒˆãƒ«ã‚’è¨­å®š
+	SetGraphMode(1024, 7, 16);
 
 
-	if (DxLib_Init() == -1) {                    //DXƒ‰ƒCƒuƒ‰ƒŠ‰Šú‰»ˆ—
+	if (DxLib_Init() == -1) {                    //DXãƒ©ã‚¤ãƒ–ãƒ©ãƒªåˆæœŸåŒ–å‡¦ç†
 
-		return -1;								//ƒGƒ‰[‚ª‹N‚«‚½‚ç’¼‚¿‚ÉI—¹
+		return -1;								//ã‚¨ãƒ©ãƒ¼ãŒèµ·ããŸã‚‰ç›´ã¡ã«çµ‚äº†
 	}
-	//‰æ‘œ“Ç‚İ‚İŠÖ”‚ğŒÄ‚Ño‚µ
+	//ç”»åƒèª­ã¿è¾¼ã¿é–¢æ•°ã‚’å‘¼ã³å‡ºã—
 	if (LoadImages() == -1) {
 		return -1;
 	}
 
-	//ƒTƒEƒ“ƒh“Ç‚İ‚İŠÖ”‚ğŒÄ‚Ño‚µ
+	//ã‚µã‚¦ãƒ³ãƒ‰èª­ã¿è¾¼ã¿é–¢æ•°ã‚’å‘¼ã³å‡ºã—
 	if (LoadSounds() == -1) {
 		return -1;
 	}
@@ -113,12 +113,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		g_NowKey2 = GetMouseInput();
 		g_KeyFlg2 = g_NowKey2 & g_OldKey2;
 
-		//ƒ}ƒEƒX‚ÌˆÊ’u‚ğæ“¾
+		//ãƒã‚¦ã‚¹ã®ä½ç½®ã‚’å–å¾—
 		GetMousePoint(&g_MouseX, &g_MouseY);
 
 		ClearDrawScreen();
-		DrawBox(0, 0, 1050, 620, 0x2f4f4f, TRUE); // ‰æ–Ê‘S‘Ì‚ğŠó–]‚ÌF‚Å“h‚è‚Â‚Ô‚·
-		//DrawBox(0, 0, 1050, 620, 0xffffff, TRUE); // ‰æ–Ê‘S‘Ì‚ğŠó–]‚ÌF‚Å“h‚è‚Â‚Ô‚·
+		DrawBox(0, 0, 1050, 620, 0x2f4f4f, TRUE); // ç”»é¢å…¨ä½“ã‚’å¸Œæœ›ã®è‰²ã§å¡—ã‚Šã¤ã¶ã™
+		//DrawBox(0, 0, 1050, 620, 0xffffff, TRUE); // ç”»é¢å…¨ä½“ã‚’å¸Œæœ›ã®è‰²ã§å¡—ã‚Šã¤ã¶ã™
 
 		switch (g_GameState) {
 		case GAME_TITLE:
@@ -158,7 +158,7 @@ void DrawEnd(){}
 void DrawMenu(){}
 void DrawInit(void){}
 void DrawClear(void){}
-void DrawGameOver(void) {}//ƒQ[ƒ€ƒI[ƒo[•`‰æˆ—
+void DrawGameOver(void) {}//ã‚²ãƒ¼ãƒ ã‚ªãƒ¼ãƒãƒ¼æç”»å‡¦ç†
 void DrawHelp(void){}
 
 
