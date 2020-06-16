@@ -9,34 +9,15 @@
 #include "GameMenu.h"
 #include "Map.h"
 
-#define HEIGHT 100
-#define WIDTH 100
-#define STAGE 10
-
-/****************************************************
-*åˆ—æŒ™ä½“ã®å®£è¨€
-****************************************************/
-typedef enum MENU_MODE {
-	GAME_TITLE,//ï¼
-	GAME_MAIN,//ï¼‘
-	GAME_END,//ï¼’
-	GAME_MENU,//3
-	GAME_INIT,//4
-	GAME_CLEAR,//5
-	GAME_HELP,//6
-
-
-	END = 99
-};
 
 
 /****************************************************
-*å®šæ•°ã®å®£è¨€
+*’è”‚ÌéŒ¾
 ****************************************************/
 
 
 /****************************************************
-*å¤‰æ•°ã®å®£è¨€
+*•Ï”‚ÌéŒ¾
 ****************************************************/
 
 int g_OldKey;
@@ -45,54 +26,55 @@ int g_KeyFlg;
 int g_OldKey2;
 int g_NowKey2;
 int g_KeyFlg2;
-int g_MouseX;//ãƒã‚¦ã‚¹ï½˜åº§æ¨™
-int g_MouseY;//ãƒã‚¦ã‚¹ï½™åº§æ¨™
+int g_MouseX;//ƒ}ƒEƒX‚˜À•W
+int g_MouseY;//ƒ}ƒEƒX‚™À•W
 
-int g_GameState = GAME_MAIN;//ã‚²ãƒ¼ãƒ ãƒ¢ãƒ¼ãƒ‰
+int g_GameState = GAME_MAIN;//ƒQ[ƒ€ƒ‚[ƒh
 
 
-int g_MapChip[SCREEN_HEIGHT_MAX][SCREEN_WIDTH_MAX];
+
+//int g_MapChip[HEIGHT * 2][WIDTH];
 
 /***************************************
-*ã‚µã‚¦ãƒ³ãƒ‰ç”¨å¤‰æ•°
+*ƒTƒEƒ“ƒh—p•Ï”
 ***************************************/
 
 
 
 /*********************************************
-*é–¢æ•°ã®ãƒ—ãƒ­ãƒˆã‚¿ã‚¤ãƒ—å®£è¨€
+*ŠÖ”‚Ìƒvƒƒgƒ^ƒCƒvéŒ¾
 *********************************************/
 
 
-int LoadImages();//ç”»åƒèª­ã¿è¾¼ã¿
-int LoadSounds();//éŸ³å£°èª­ã¿è¾¼ã¿
+int LoadImages();//‰æ‘œ“Ç‚İ‚İ
+int LoadSounds();//‰¹º“Ç‚İ‚İ
 
-void DrawStage(void);
+
 
 
 
 /******************************************************
-*ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®é–‹å§‹
+*ƒvƒƒOƒ‰ƒ€‚ÌŠJn
 ******************************************************/
 
-//ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã¯WinMainã‹ã‚‰å§‹ã¾ã‚Šã¾ã™//
+//ƒvƒƒOƒ‰ƒ€‚ÍWinMain‚©‚çn‚Ü‚è‚Ü‚·//
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
-	ChangeWindowMode(TRUE);//ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒ¢ãƒ¼ãƒ‰ã§èµ·å‹•
-	SetMainWindowText("");//ã‚¿ã‚¤ãƒˆãƒ«ã‚’è¨­å®š
+	ChangeWindowMode(TRUE);//ƒEƒBƒ“ƒhƒEƒ‚[ƒh‚Å‹N“®
+	SetMainWindowText("");//ƒ^ƒCƒgƒ‹‚ğİ’è
 	SetGraphMode(1024, 700, 16);
 
 
-	if (DxLib_Init() == -1) {                    //DXãƒ©ã‚¤ãƒ–ãƒ©ãƒªåˆæœŸåŒ–å‡¦ç†
+	if (DxLib_Init() == -1) {                    //DXƒ‰ƒCƒuƒ‰ƒŠ‰Šú‰»ˆ—
 
-		return -1;								//ã‚¨ãƒ©ãƒ¼ãŒèµ·ããŸã‚‰ç›´ã¡ã«çµ‚äº†
+		return -1;								//ƒGƒ‰[‚ª‹N‚«‚½‚ç’¼‚¿‚ÉI—¹
 	}
-	//ç”»åƒèª­ã¿è¾¼ã¿é–¢æ•°ã‚’å‘¼ã³å‡ºã—
+	//‰æ‘œ“Ç‚İ‚İŠÖ”‚ğŒÄ‚Ño‚µ
 	if (LoadImages() == -1) {
 		return -1;
 	}
 
-	//ã‚µã‚¦ãƒ³ãƒ‰èª­ã¿è¾¼ã¿é–¢æ•°ã‚’å‘¼ã³å‡ºã—
+	//ƒTƒEƒ“ƒh“Ç‚İ‚İŠÖ”‚ğŒÄ‚Ño‚µ
 	if (LoadSounds() == -1) {
 		return -1;
 	}
@@ -114,12 +96,12 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		g_NowKey2 = GetMouseInput();
 		g_KeyFlg2 = g_NowKey2 & g_OldKey2;
 
-		//ãƒã‚¦ã‚¹ã®ä½ç½®ã‚’å–å¾—
+		//ƒ}ƒEƒX‚ÌˆÊ’u‚ğæ“¾
 		GetMousePoint(&g_MouseX, &g_MouseY);
 
 		ClearDrawScreen();
-		DrawBox(0, 0, 1050, 620, 0x2f4f4f, TRUE); // ç”»é¢å…¨ä½“ã‚’å¸Œæœ›ã®è‰²ã§å¡—ã‚Šã¤ã¶ã™
-		//DrawBox(0, 0, 1050, 620, 0xffffff, TRUE); // ç”»é¢å…¨ä½“ã‚’å¸Œæœ›ã®è‰²ã§å¡—ã‚Šã¤ã¶ã™
+		DrawBox(0, 0, 1050, 620, 0x2f4f4f, TRUE); // ‰æ–Ê‘S‘Ì‚ğŠó–]‚ÌF‚Å“h‚è‚Â‚Ô‚·
+		//DrawBox(0, 0, 1050, 620, 0xffffff, TRUE); // ‰æ–Ê‘S‘Ì‚ğŠó–]‚ÌF‚Å“h‚è‚Â‚Ô‚·
 
 		switch (g_GameState) {
 		case GAME_TITLE:
@@ -160,5 +142,3 @@ int LoadImages() {
 int LoadSounds() {
 	return 0;
 }
-
-void DrawStage(void){}

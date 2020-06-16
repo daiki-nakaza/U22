@@ -1,17 +1,12 @@
 /*#include "DxLib.h"
 #include "Map.h"
-
 /**********************************************************************
 *defineの宣言
 ***********************************************************************/
 /*#define SCREEN_WIDTH_MAX 32		//横のマップチップの最大数
 #define SCREEN_HEIGHT_MAX 24		//縦のマップチップの最大数
-
 #define ChipSize 32		//マップチップのサイズ
-//#define 
-
-
-
+//#define
 */
 
 /*****************************************************
@@ -21,41 +16,25 @@
 {
 	ChangeWindowMode(TRUE);
 	if (DxLib_Init() == -1) return -1;
-
 	SetMainWindowText("U22");		//タイトルを設定
-
 	SetWindowSize(1024, 768);			//ウィンドウの大きさ設定
-
 	ChangeWindowMode(TRUE);			//ウィンドウモードで起動
-
 	if (DxLib_Init() == -1) return -1;		//DXライブラリ使用の終了処理
-
 	SetDrawScreen(DX_SCREEN_BACK);			//描画先画面を裏にする
-
 	gameInit();
-
 	while (1) {
-
 		MapDisp();
 		MapMove();
-
 		ScreenFlip();			// 裏画面の内容を表画面に反映
 	}
-
 	DxLib_End();	//DXライブラリ使用の終了処理
-
 	return 0;		//ソフトの終了
-
 }
-
 void gameInit() {			//ゲームの初期化処理
 	MapChipInit();
 }
-
 void MapChipInit() {			//マップチップの初期化処理
-
 }
-
 void MapDisp() {			// マップの描画
 	for (int y = 0; y < SCREEN_HEIGHT_MAX; y++) {
 		for (int x = 0; x < SCREEN_WIDTH_MAX; x++) {
@@ -75,10 +54,6 @@ void MapDisp() {			// マップの描画
 		}
 	}
 }
-
 void MapMove() {			//マップのスクロール処理
 
-	
 }
-
-}*/
