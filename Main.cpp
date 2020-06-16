@@ -11,6 +11,7 @@
 
 
 
+
 /****************************************************
 *定数の宣言
 ****************************************************/
@@ -20,6 +21,7 @@
 *変数の宣言
 ****************************************************/
 
+
 int g_OldKey;
 int g_NowKey;
 int g_KeyFlg;
@@ -28,6 +30,7 @@ int g_NowKey2;
 int g_KeyFlg2;
 int g_MouseX;//マウスｘ座標
 int g_MouseY;//マウスｙ座標
+
 
 int g_GameState = GAME_MAIN;//ゲームモード
 
@@ -80,7 +83,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	}
 
 
-
+	//DrawInit();
 
 	SetDrawScreen(DX_SCREEN_BACK);
 

@@ -26,7 +26,7 @@ int g_MapChip[HEIGHT * 2][WIDTH] = {
 { 1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
 { 1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
 { 1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
-{ 1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 },
+{ 1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1 },
 { 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
 { 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
 { 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 },
@@ -68,15 +68,15 @@ void MapDisp() {			// マップの描画
 			// 画面からはみ出た位置なら描画しない
 			if (x + MapX < 0 || y + MapY < 0 || x + MapX >= WIDTH * 2) continue;
 
-			//0～３１までの誤差
-			if (x + MapX - (MapChipNumX) >= WIDTH) {
-				MapChipNumX += WIDTH;
+			//
+			while (x + MapX + (MapChipNumX) >= WIDTH) {
+				MapChipNumX -= WIDTH;
 				MapChipNumY += HEIGHT;
 			}
 
 
 			//DrawFormatString(ChipSize * x, ChipSize * y, 0xffffff, "%d", x);
-			switch (g_MapChip[y + MapY + MapChipNumY][x + MapX - MapChipNumX])
+			switch (g_MapChip[y + MapY + MapChipNumY][x + MapX + MapChipNumX])
 			{
 			case 0:
 				//DrawGraph(TipSize * x, TipSize * y, 画像データ, true);
