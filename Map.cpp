@@ -69,32 +69,26 @@ void MapDisp() {			// マップの描画
 			if (x + MapX < 0 || y + MapY < 0 || x + MapX >= WIDTH * 2) continue;
 
 			//
+			MapChipNumX = 0;
+			MapChipNumY = 0;
 			while (x + MapX + (MapChipNumX) >= WIDTH) {
 				MapChipNumX -= WIDTH;
 				MapChipNumY += HEIGHT;
 			}
 
-
-			//DrawFormatString(ChipSize * x, ChipSize * y, 0xffffff, "%d", x);
 			switch (g_MapChip[y + MapY + MapChipNumY][x + MapX + MapChipNumX])
 			{
 			case 0:
-				//DrawGraph(TipSize * x, TipSize * y, 画像データ, true);
 				DrawBox(x * MAP_SIZE + MapDrawPointX, y * MAP_SIZE + MapDrawPointY,
 					(x + 1) * MAP_SIZE + MapDrawPointX, (y + 1) * MAP_SIZE + MapDrawPointY,
 					GetColor(255, 255, 0), TRUE);
 				break;
 			case 1:
-				//DrawGraph(TipSize * x, TipSize * y, 画像データ, true);
 				DrawBox(x * MAP_SIZE + MapDrawPointX, y * MAP_SIZE + MapDrawPointY,
 					(x + 1) * MAP_SIZE + MapDrawPointX, (y + 1) * MAP_SIZE + MapDrawPointY,
 					GetColor(0, 255, 0), TRUE);
 				break;
 			}
-			//DrawLine(ChipSize * x, ChipSize * y, ChipSize * x, ChipSize * y + ChipSize, 0xffffff, true);
-			//DrawLine(ChipSize * x, ChipSize * y, ChipSize * x + ChipSize, ChipSize * y, 0xffffff, true);
-			MapChipNumX = 0;
-			MapChipNumY = 0;
 		}
 	}
 }

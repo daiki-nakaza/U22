@@ -10,8 +10,8 @@
 extern int PlayerX, PlayerY;              //0～画面半分まで。（プレイヤー位置）
 extern int Map_PlayerX, Map_PlayerY;      //マップ全体のスクロール位置（マップ位置）
 extern int MapX, MapY;                    //マップのｘ、ｙ
-extern int OldX, OldY;	// 移動する前のプレイヤーの位置を保存する変数
-extern int Map_OldX, Map_OldY;	// 移動する前のプレイヤーの位置を保存する変数
+extern int NewX, NewY;	// 移動する前のプレイヤーの位置を保存する変数
+extern int Map_NewX, Map_NewY;	// 移動する前のプレイヤーの位置を保存する変数
 
 
 extern int g_OldKey;
