@@ -9,27 +9,7 @@
 #include "GameMenu.h"
 #include "Map.h"
 
-#define HEIGHT 22 //１画面の高さ
-#define WIDTH 32//１画面の幅
-#define STAGE 10
-#define MAP_SIZE 32//32ビット
-#define CHA_SIZE 48//48ビット
 
-/****************************************************
-*列挙体の宣言
-****************************************************/
-typedef enum MENU_MODE {
-	GAME_TITLE,//０
-	GAME_MAIN,//１
-	GAME_END,//２
-	GAME_MENU,//3
-	GAME_INIT,//4
-	GAME_CLEAR,//5
-	GAME_HELP,//6
-
-
-	END = 99
-};
 
 
 /****************************************************
@@ -41,6 +21,7 @@ typedef enum MENU_MODE {
 *変数の宣言
 ****************************************************/
 
+
 int g_OldKey;
 int g_NowKey;
 int g_KeyFlg;
@@ -50,20 +31,12 @@ int g_KeyFlg2;
 int g_MouseX;//マウスｘ座標
 int g_MouseY;//マウスｙ座標
 
+
 int g_GameState = GAME_MAIN;//ゲームモード
 
-//プレイヤーの位置
-int PlayerX, PlayerY;              //0～画面半分まで。（プレイヤー位置）
-int Map_PlayerX, Map_PlayerY;      //マップ全体のスクロール位置（マップ位置）
-int MapX, MapY;                    //マップのｘ、ｙ
-int OldX, OldY;	// 移動する前のプレイヤーの位置を保存する変数
-int Map_OldX, Map_OldY;	// 移動する前のプレイヤーの位置を保存する変数
-
-int MapDrawPointX, MapDrawPointY;		// 
-int MapChipNumX, MapChipNumY;			//
 
 
-int g_MapChip[HEIGHT*2][WIDTH];
+//int g_MapChip[HEIGHT * 2][WIDTH];
 
 /***************************************
 *サウンド用変数
@@ -110,7 +83,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	}
 
 
-
+	//DrawInit();
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
@@ -172,4 +145,3 @@ int LoadImages() {
 int LoadSounds() {
 	return 0;
 }
-
