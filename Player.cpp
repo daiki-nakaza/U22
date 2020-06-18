@@ -9,6 +9,9 @@ int PlayerX, PlayerY;              //0～画面半分まで。（プレイヤー位置）
 int Map_PlayerX, Map_PlayerY;      //マップ全体のスクロール位置（マップ位置）
 int NewX, NewY;	// 移動する前のプレイヤーの位置を保存する変数
 int Map_NewX, Map_NewY;	// 移動する前のプレイヤーの位置を保存する変数
+int Jump_Flg;
+int y_temp;
+int y_prev;
 
 void PlayerInit() {
 
@@ -17,6 +20,8 @@ void PlayerInit() {
 	PlayerY = 200;
 	Map_PlayerX = 0;
 	Map_PlayerY = 0;
+
+	Jump_Flg = false;
 
 }
 
@@ -38,11 +43,25 @@ void PlayerMove() {
 	// キー入力に応じてプレイヤーの座標を移動
 	if (g_NowKey & PAD_INPUT_LEFT) NewX -= 2;
 	if (g_NowKey & PAD_INPUT_RIGHT) NewX += 2;
-	if (g_NowKey & PAD_INPUT_UP) NewY -= 32;
+	if (g_NowKey & PAD_INPUT_UP) {
+		if (Jump_Flg == 0) {
+			y_prev = PlayerY;
+			NewY -= 16;
+			Jump_Flg = 1;
+		}
+		else if (Jump_Flg == 3) {
+			Jump_Flg = 1;
+		}
+	}
 	if (g_NowKey & PAD_INPUT_DOWN) NewY += 2;
 
 	
+	
+	
+
+	DrawFormatString(0, 0, 0xffffff,"%d", Jump_Flg);
 		
+
 	if (NewX > 500) {
 		NewX = 500;
 		Map_NewX += 2;
@@ -129,7 +148,27 @@ void PlayerGravity() {
 
 	//プレイヤー重力
 	NewY = PlayerY;
-	NewY += GRAVITY;
+
+	if (Jump_Flg == 0 || Jump_Flg == -1) {
+		NewY += GRAVITY;
+	}
+	//ジャンプ処理
+	else if (Jump_Flg == 4 || Jump_Flg == 6) {
+		y_temp = NewY;
+		NewY += (NewY - y_prev) + 2;
+		y_prev = y_temp;
+		Jump_Flg = 5;
+	}
+	else if (Jump_Flg == 2) {
+		y_temp = NewY;
+		NewY += (NewY - y_prev) + 1;
+		y_prev = y_temp;
+		//NewY -= 12;
+		Jump_Flg = 3;
+	}
+	else if(Jump_Flg>0){
+		Jump_Flg++;
+	}
 
 	// スライド用の０から３１までの値
 	MapDrawPointY = -(Map_PlayerY % MAP_SIZE);
@@ -158,7 +197,6 @@ void PlayerGravity() {
 
 
 
-	// 重力が邪魔だったら消す
 	// 進入不可能なマップだった場合は重力を消す
 	if (g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
@@ -168,9 +206,20 @@ void PlayerGravity() {
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX - w] != 1
 		)
 	{
+		if (Jump_Flg == -1) {
+			PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE - MAP_SIZE;
+			Jump_Flg = 0;
+			//(MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY) * 32;
+		}
+		else if(Jump_Flg != 0) 
+		{
+			Jump_Flg = -1;
+		}
+		
 		
 	}
 	else {
 		PlayerY = NewY;
+		
 	}
 }
