@@ -27,8 +27,13 @@ void enemyInfo::WalkInit() {                 // “G‚Ì‰Šú‰»
 }
 
 void enemyInfo::Disp() {
+	int DispX, DispY;
+
+	DispX = x - MapDrawPointX;
+	DispY = y + MapDrawPointY;
+
 	if (DispFlg) {		//“G•\¦
-		DrawBox(x, y, x + w, y + h, 0x000000, true);
+		DrawBox(x,y, x + w, y + h, 0x000000, true);
 	}
 	else {				//“G”ñ•\¦
 
@@ -42,7 +47,7 @@ void enemyInfo::WalkMove(){
 			direct *= -1;			//ˆÚ“®‚ÌŒü‚«‚ğ”½“]‚³‚¹‚é
 		}
 
-		if (g_MapChip[(y / MAP_SIZE) + 1][(x / MAP_SIZE)]) {			//‚P‚Â‰º‚Ìƒ}ƒX‚ğŒ©‚Ä‹ó’†‚¾‚Á‚½‚ç
+		if (g_MapChip[(y / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)]) {			//‚P‚Â‰º‚Ìƒ}ƒX‚ğŒ©‚Ä‹ó’†‚¾‚Á‚½‚ç
 			g_Enemy.y += 4;
 		}
 
@@ -57,6 +62,7 @@ void enemyInfo::WalkMove(){
 ***************************************************/
 void enemyDisp() {
 	g_Enemy.Disp();
+	DrawFormatString(200, 100, 0x000000, "%d",g_Enemy.x / MAP_SIZE + MapX);
 }
 
 void enemyMove() {
@@ -75,10 +81,20 @@ void enemyMove() {
 bool EnemyCheckHit(enemyInfo enemy) {
 	if (enemy.direct == 1)			//‰EŒü‚«‚Ìˆ—
 	{
-		if (g_MapChip[enemy.y / MAP_SIZE][(enemy.x / MAP_SIZE) + enemy.direct] == 0) return TRUE;
+		//if (g_MapChip[enemy.y / MAP_SIZE + MapY][(enemy.x / MAP_SIZE) + enemy.direct + MapX] == 0) return TRUE;
+		if (g_MapChip[(enemy.y + MapDrawPointY) / MAP_SIZE + MapY][((enemy.x - MapDrawPointX) / MAP_SIZE) + enemy.direct + MapX] == 0) return TRUE;
 	}else{							//¶Œü‚«‚Ìˆ—
-		if (g_MapChip[enemy.y / MAP_SIZE][( (enemy.x + (enemy.direct * enemy.speed)) / MAP_SIZE) ] == 0) return TRUE;
+		if (g_MapChip[(enemy.y + MapDrawPointY) / MAP_SIZE + MapY][( (enemy.x - MapDrawPointX + (enemy.direct * enemy.speed)) / MAP_SIZE) + MapX] == 0) return TRUE;
+	
+	/*if (g_MapChip[MapY + ((enemy.y + MapDrawPointY) / MAP_SIZE) + MapChipNumY][MapX + ((enemy.x +MapDrawPointX) / MAP_SIZE) - MapChipNumX] != 1
+		|| g_MapChip[MapY + ((enemy.y + MapDrawPointY + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY][MapX + ((enemy.x + MapDrawPointX) / MAP_SIZE) - MapChipNumX] != 1
+		|| g_MapChip[MapY + ((enemy.y + MapDrawPointY) / MAP_SIZE) + MapChipNumY][MapX + ((enemy.x + MapDrawPointX + CHA_SIZE - 1) / MAP_SIZE) - MapChipNumX] != 1
+		|| g_MapChip[MapY + ((enemy.y + MapDrawPointY + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY][MapX + ((enemy.x + MapDrawPointX + CHA_SIZE - 1) / MAP_SIZE) - MapChipNumX] != 1
+		|| g_MapChip[MapY + ((enemy.y + MapDrawPointY) / MAP_SIZE) + MapChipNumY][MapX + ((enemy.x + MapDrawPointX + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX ] != 1
+		|| g_MapChip[MapY + ((enemy.y + MapDrawPointY + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY][MapX + ((enemy.x + MapDrawPointX + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX] != 1
+		)
+	{*/
+		return false;
 	}
-
-	return FALSE;
+	return false;
 }
