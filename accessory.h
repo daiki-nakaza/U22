@@ -20,9 +20,12 @@ struct partsInfo
 	bool HoldFlg = FALSE;		//“S‹…‚ðŽ‚Á‚Ä‚¢‚é‚©
 	bool ThrowFlg = FALSE;		//“Š‚°‚ç‚ê‚Ä‚¢‚é‚©
 
+	bool HitCheck();			//’n–Ê‚Æ‚Ì“–‚½‚è”»’è@“–‚½‚Á‚Ä‚¢‚ê‚Îtrue “–‚½‚Á‚Ä‚¢‚È‚¯‚ê‚Îfalse
+
 	void Init();			//“S‹…‚Ì‰Šú‰»ˆ—
 	void Disp();				//“S‹…‚Ì•`‰æˆ—
 	void Move();			//“S‹…‚Ìˆ—
+	void Throw();			//“S‹…‚ª”ò‚ñ‚Å‚¢‚­ˆ—
 };
 
 

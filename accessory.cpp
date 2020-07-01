@@ -37,7 +37,7 @@ void partsInfo::Disp() {
 		//DrawBox(x,y, x + w, y + h, 0x000000, true);
 		//DrawRotaGraphFast2(x, y, 0, 0, 1, 0, pic, true, picDir);
 		DrawCircle(x, y, r, 0x000000, true);
-		//DrawFormatString(30, 30, 0x000000, "X = %d\nY = %d\nR = %d", x, y,r);
+		DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", (y + IRONBALL_R) / MAP_SIZE + MapY,(x / MAP_SIZE + MapX));
 	}
 	else {				//鉄球非表示
 
@@ -45,15 +45,50 @@ void partsInfo::Disp() {
 }
 
 void partsInfo::Move() {
-	if (g_MapChip[( (y - (MAP_SIZE - IRONBALL_R)  ) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] == 1) {			//１つ下のマスを見て空中だったら
-		y += GRAVITY;
-	}
+	if (!HitCheck() && !ThrowFlg) y += 4;
+	
 	//x = ((PlayerX / MAP_SIZE) + 4) * MAP_SIZE;
 	if (HoldFlg) {
 		
 	}
+	Throw();
 
 
+}
+
+void partsInfo::Throw(){			//鉄球が飛んでいく処理
+	const int InitPow = -16;
+	static int Pow = InitPow;
+	static int move = 1;
+
+	if (g_NowKey & PAD_INPUT_UP) ThrowFlg = true;
+
+	if (ThrowFlg) {
+		if (Pow++ < abs(InitPow)) {
+			x += 4;
+			y += Pow;
+			if (HitCheck()) {
+				ThrowFlg = false;
+				x -= 4;
+				y -= Pow;
+			}
+		}
+		else { ThrowFlg = false; }
+	}
+	else { Pow = InitPow; }
+}
+
+bool partsInfo::HitCheck() {		//地面との当たり判定　当たっていればtrue 当たっていなければfalse
+	//if (g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] != 1		////１つ下のマスを見て地面だったら
+	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][((x - IRONBALL_R) / MAP_SIZE + MapX)] != 1
+	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][((x + IRONBALL_R) / MAP_SIZE + MapX)] != 1
+	//	
+	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] != 1) {
+	if(g_MapChip[(y + IRONBALL_R  ) / MAP_SIZE + MapY][(x / MAP_SIZE + MapX)] != 1){
+		return true;
+	}
+
+	return false;
 }
 
 
