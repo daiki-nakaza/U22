@@ -61,15 +61,19 @@ void partsInfo::Throw(){			//“S‹…‚ª”ò‚ñ‚Å‚¢‚­ˆ—
 	static int Pow = InitPow;
 	static int move = 1;
 
-	if (g_NowKey & PAD_INPUT_UP) ThrowFlg = true;
+	//if (g_NowKey & PAD_INPUT_UP) ThrowFlg = true;
 
-	if (ThrowFlg) {
+	if (HoldFlg) {
+		IronHold(&x,&y);
+	}
+
+	if (ThrowFlg) {			//“Š‚°‚ç‚ê‚Ä‚¢‚éˆ—
 		if (Pow++ < abs(InitPow)) {
-			x += 4;
+			x += 8;
 			y += Pow;
 			if (HitCheck()) {
 				ThrowFlg = false;
-				x -= 4;
+				x -= 8;
 				y -= Pow;
 			}
 		}

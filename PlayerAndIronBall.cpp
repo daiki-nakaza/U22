@@ -18,3 +18,17 @@ void IronHold(int* ironX, int* ironY, int px, int py) {
 	*ironX = px;
 	*ironY = py;
 }
+
+void IronHoldOrThrow() {
+
+	//ƒvƒŒƒCƒ„[‚ª“S‹…‚ğ‚Â‚©“Š‚°‚éˆ—
+	if (!g_IronBall.HoldFlg && !g_IronBall.ThrowFlg		//“S‹…‚ğ‚Á‚Ä‚¢‚È‚¢‚©‚Â“S‹…‚ª“Š‚°‚ç‚ê‚Ä‚¢‚È‚¢
+		&& g_NowKey & PAD_INPUT_1) {
+		g_IronBall.HoldFlg = true;
+	}
+	else if (g_IronBall.HoldFlg && !g_IronBall.ThrowFlg	//“S‹…‚ğ‚Á‚Ä‚¢‚Ä‚©‚Â“S‹…‚ª“Š‚°‚ç‚ê‚Ä‚¢‚È‚¢
+		&& g_NowKey & PAD_INPUT_2) {
+		g_IronBall.HoldFlg = false;
+		g_IronBall.ThrowFlg = true;
+	}
+}
