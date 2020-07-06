@@ -6,7 +6,7 @@
 #define WIDTH 32//１画面の幅
 #define STAGE 10
 #define MAP_SIZE 32//32ビット
-#define CHA_SIZE 64//64ビット
+#define CHA_SIZE 64//48ビット
 #define GRAVITY 4//1,2,4,8,16,32のパターンあり
 
 /****************************************************

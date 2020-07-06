@@ -2,6 +2,7 @@
 
 #include "Player.h"
 #include "Map.h"
+#include "PlayerAndIronBall.h"
 
 
 //プレイヤーの位置
@@ -134,6 +135,8 @@ void PlayerMove() {
 		Map_PlayerX = Map_NewX;
 		Map_PlayerY = Map_NewY;
 	}
+	//プレイヤーが鉄球を投げるか持つか
+	IronHoldOrThrow();
 }
 
 void PlayerDisp() {

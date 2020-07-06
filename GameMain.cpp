@@ -5,6 +5,8 @@
 #include "Map.h"
 #include "Enemy.h"
 #include "Player.h"
+#include "accessory.h"
+#include "UI.h"
 
 
 
@@ -15,8 +17,13 @@ void DrawGameMain() {
 	PlayerMove();
 	PlayerDisp();
 
+	IronBallDisp();		//“S‹…‚Ì•`‰æˆ—
+	IronBallMove();		//	“S‹…‚Ì“®‚«‚Ìˆ—
+
 
 	enemyDisp();		//“G‚Ì•`‰æˆ—
 	enemyMove();		//“G‚Ìˆ—
+
+	HUDDisp();
 }
 
