@@ -11,6 +11,7 @@ struct enemyInfo
 {
 	int x, y;			//敵のX座標、Y座標
 	int w, h;			//敵の幅と高さ
+	int chipX,chipY;	//敵のマップチップの座標
 	int direct;			//敵の向き (右:1  左:-1)
 	int speed;			//敵のスピード
 

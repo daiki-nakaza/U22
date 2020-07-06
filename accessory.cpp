@@ -36,8 +36,10 @@ void partsInfo::Disp() {
 	if (DispFlg) {		//“S‹…•\¦
 		//DrawBox(x,y, x + w, y + h, 0x000000, true);
 		//DrawRotaGraphFast2(x, y, 0, 0, 1, 0, pic, true, picDir);
-		DrawCircle(x, y, r, 0x000000, true);
-		DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", (y + IRONBALL_R) / MAP_SIZE + MapY,(x / MAP_SIZE + MapX));
+		DrawCircle(x + MapDrawPointX + MapX, y - MapDrawPointY + MapY, r, 0x000000, true);
+		DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", y - MapDrawPointY + MapY, x + MapDrawPointX + MapX);
+		if (HoldFlg)DrawFormatString(100, 30, 0x000000, "HOLD");
+		if (ThrowFlg)DrawFormatString(100, 30, 0x000000, "THROW");
 	}
 	else {				//“S‹…”ñ•\¦
 
@@ -57,7 +59,7 @@ void partsInfo::Move() {
 }
 
 void partsInfo::Throw(){			//“S‹…‚ª”ò‚ñ‚Å‚¢‚­ˆ—
-	const int InitPow = -16;
+	const int InitPow = -24;
 	static int Pow = InitPow;
 	static int move = 1;
 
@@ -69,11 +71,11 @@ void partsInfo::Throw(){			//“S‹…‚ª”ò‚ñ‚Å‚¢‚­ˆ—
 
 	if (ThrowFlg) {			//“Š‚°‚ç‚ê‚Ä‚¢‚éˆ—
 		if (Pow++ < abs(InitPow)) {
-			x += 8;
+			x += 6;
 			y += Pow;
 			if (HitCheck()) {
 				ThrowFlg = false;
-				x -= 8;
+				x -= 6;
 				y -= Pow;
 			}
 		}
@@ -88,7 +90,12 @@ bool partsInfo::HitCheck() {		//’n–Ê‚Æ‚Ì“–‚½‚è”»’è@“–‚½‚Á‚Ä‚¢‚ê‚Îtrue “–‚½‚Á‚Ä‚
 	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][((x + IRONBALL_R) / MAP_SIZE + MapX)] != 1
 	//	
 	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] != 1) {
-	if(g_MapChip[(y + IRONBALL_R  ) / MAP_SIZE + MapY][(x / MAP_SIZE + MapX)] != 1){
+	if(g_MapChip[(y + IRONBALL_R  ) / MAP_SIZE + MapY][(x / MAP_SIZE + MapX)] != 1		//’†S‚Ì^‰º
+		|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + MapY][(x - IRONBALL_R / MAP_SIZE + MapX)] != 1	//¶ã
+		|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + MapY][(x + IRONBALL_R / MAP_SIZE + MapX)] != 1	//‰Eã
+		|| g_MapChip[(y + IRONBALL_R) / MAP_SIZE + MapY][(x - IRONBALL_R / MAP_SIZE + MapX)] != 1	//¶‰º
+		|| g_MapChip[(y + IRONBALL_R) / MAP_SIZE + MapY][(x + IRONBALL_R / MAP_SIZE + MapX)] != 1	//‰Eã
+		){	
 		return true;
 	}
 

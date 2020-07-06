@@ -4,6 +4,8 @@
 #include "Define.h"
 #include "Map.h"
 
+#include "PlayerAndIronBall.h"
+
 #define ENEMY_SIZE 48	//敵の大きさ
 
 /**************************************************
@@ -26,8 +28,11 @@ void enemyInfo::WalkInit() {                 // 敵の初期化
 
 	direct = -1;						//左向きから始める
 
-	speed = 2;						//敵のスピード
+	speed = 1;						//敵のスピード
 	picDir = true;
+
+	chipY = ((y + MapDrawPointY) / MAP_SIZE) + MapY;
+	chipX = ((x - MapDrawPointX) / MAP_SIZE) + MapX;
 
 	DispFlg = TRUE;					//敵を表示
 
@@ -37,12 +42,17 @@ void enemyInfo::WalkInit() {                 // 敵の初期化
 void enemyInfo::Disp() {
 
 	if (DispFlg) {		//敵表示
-		//DrawBox(x,y, x + w, y + h, 0x000000, true);
-		DrawRotaGraphFast2(x, y,0,0,1,0, pic[anm], true,picDir);
+		DrawBox(x,y, x + w, y + h, 0xff0000, true);
+		//DrawRotaGraphFast2(x, y,0,0,1,0, pic[anm], true,picDir);
 	}
 	else {				//敵非表示
 
 	}
+	/*for (int y = 0; y < HEIGHT; y++) {
+		for (int x = 0; x < WIDTH + 1; x++) {
+			DrawFormatString(x * MAP_SIZE + 16, y * MAP_SIZE + 16, 0xf0f0f0, "%d", g_MapChip[y + MapY + MapChipNumY][x + MapX + MapChipNumX]);
+		}
+	}*/
 }
 
 void enemyInfo::WalkMove(){
@@ -54,7 +64,7 @@ void enemyInfo::WalkMove(){
 
 
 	if (DispFlg) {
-		if (g_MapChip[(y / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] == 1) {			//１つ下のマスを見て空中だったら
+		if (g_MapChip[((y + h/2) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] == 1) {			//１つ下のマスを見て空中だったら
 			g_Enemy.y += GRAVITY;
 		}
 
@@ -62,15 +72,19 @@ void enemyInfo::WalkMove(){
 			direct *= -1;			//移動の向きを反転させる
 		}
 
-		if (direct < 0) picDir = false;
-		else picDir = true;
+		if (direct < 0) picDir = false;		//左向きなら
+		else picDir = true;					//右向きなら
 
-		x += direct * speed;				//移動のスピードを敵キャラに入れる
+		//x = (chipX * MAP_SIZE - MapDrawPointX) + direct * speed;				//移動のスピードを敵キャラに入れる
+		x += direct * speed;
 
 		if (++AnmCnt >= FrmMax) {
 			if (++anm > 3) anm = 0;
 			AnmCnt = 0;
 		}
+
+		chipY = ((y + MapDrawPointY) / MAP_SIZE) + MapY;
+		chipX = ((x - MapDrawPointX) / MAP_SIZE) + MapX;
 
 	}
 
@@ -97,18 +111,22 @@ void enemyMove() {
 }
 
 bool EnemyCheckHit(enemyInfo enemy) {
-	if (enemy.direct == 1)			//右向きの処理
+	if (enemy.picDir)			//右向きの処理
 	{
-		//次の移動の場所が敵キャラの右端に壁が重なったらスピードを反転する
+		//次の移動の場所が敵キャラの右端に壁が重なったらtrueを返す
 		if 
-			(g_MapChip[(enemy.y + MapDrawPointY) / MAP_SIZE + MapY]
+			(g_MapChip[(enemy.y + enemy.h + MapDrawPointY) / MAP_SIZE + MapY]
 			[(((enemy.x + enemy.w - MapDrawPointX)+(enemy.direct * enemy.speed)) / MAP_SIZE) + MapX] == 0) return true;
+
 	}
 	else {							//左向きの処理
 		//次の移動の場所が敵キャラの左端に壁が重なったらスピードを反転する
 		if
-			(g_MapChip[(enemy.y + MapDrawPointY) / MAP_SIZE + MapY]
+			(g_MapChip[(enemy.y + enemy.h + MapDrawPointY) / MAP_SIZE + MapY]
 			[((enemy.x - MapDrawPointX + (enemy.direct * enemy.speed)) / MAP_SIZE) + MapX] == 0) return true;
 	}
+
+	if (IronToEnemy()) return true;
+
 	return false;
 }
