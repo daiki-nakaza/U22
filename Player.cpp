@@ -2,6 +2,7 @@
 
 #include "Player.h"
 #include "Map.h"
+#include "PlayerAndIronBall.h"
 
 
 //プレイヤーの位置
@@ -83,22 +84,22 @@ void PlayerMove() {
 
 	MapChipNumX = 0;
 	MapChipNumY = 0;
-	for (int k = 1; MapX + (NewX / MAP_SIZE)  >= WIDTH * k; k++) {
+	for (int k = 1; MapX + ((NewX+ (Map_NewX % MAP_SIZE)) / MAP_SIZE)  >= WIDTH * k; k++) {
 		MapChipNumX += WIDTH;
 		MapChipNumY += HEIGHT;
 	}
 
 	//落下した場合
-	if (MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE) / MAP_SIZE) + MapChipNumY > HEIGHT) {
+	if (MapY + ((NewY + (Map_NewX % MAP_SIZE) + CHA_SIZE) / MAP_SIZE) + MapChipNumY >= HEIGHT) {
 	}
 
 	//プレイヤー位置がマップをまたいでいる
-	if (MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE) / MAP_SIZE) - MapChipNumX > WIDTH) {
+	if (MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE) / MAP_SIZE) - MapChipNumX >= WIDTH) {
 		i += WIDTH;
 		j += HEIGHT;
 	}
 	//真ん中の位置がマップをまたいでいる
-	if (MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX > WIDTH) {
+	if (MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX >= WIDTH) {
 		w += WIDTH;
 		z += HEIGHT;
 	}
@@ -134,6 +135,8 @@ void PlayerMove() {
 		Map_PlayerX = Map_NewX;
 		Map_PlayerY = Map_NewY;
 	}
+	//プレイヤーが鉄球を投げるか持つか
+	IronHoldOrThrow();
 }
 
 void PlayerDisp() {
@@ -177,22 +180,24 @@ void PlayerGravity() {
 
 	MapChipNumX = 0;
 	MapChipNumY = 0;
-	for (int k = 1; MapX + (PlayerX / MAP_SIZE) >= WIDTH * k; k++) {
+	for (int k = 1; MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) >= WIDTH * k; k++) {
 		MapChipNumX += WIDTH;
 		MapChipNumY += HEIGHT;
 	}
 
 
-	//プレイヤー位置がマップをまたいでいる
-	if (MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE) / MAP_SIZE) - MapChipNumX > WIDTH) {
+	//プレイヤー位置がマップをまたいでいる(右側だけ）
+	if (MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE) / MAP_SIZE) - MapChipNumX >= WIDTH) {
 		i += WIDTH;
 		j += HEIGHT;
 	}
 	//真ん中の位置がマップをまたいでいる
-	if (MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX > WIDTH) {
+	if (MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX  >= WIDTH) {
 		w += WIDTH;
 		z += HEIGHT;
 	}
+	//DrawFormatString(x * MAP_SIZE + MapDrawPointX, y * MAP_SIZE + MapDrawPointY, 0xffffff, "%d %d", y + MapY + MapChipNumY, x + MapX + MapChipNumX);
+
 
 
 
@@ -202,12 +207,12 @@ void PlayerGravity() {
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) - MapChipNumX - i] != 1
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) - MapChipNumX - i] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX - w] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX - w ] != 1
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX - w] != 1
 		)
 	{
 		if (Jump_Flg == -1) {
-			PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE - MAP_SIZE;
+			PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE % MAP_SIZE;
 			Jump_Flg = 0;
 			//(MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY) * 32;
 		}
