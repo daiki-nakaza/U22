@@ -23,8 +23,12 @@ struct enemyInfo
 
 
 	void WalkInit();			//’n–Ê‚Ì“G‚Ì‰Šú‰»ˆ—
-	void Disp();				//“G‚Ì•`‰æˆ—
 	void WalkMove();			//’n–Ê‚Ì“G‚Ìˆ—
+
+	void ShootInit();			//Œ‚‚Â“G‚Ì‰Šú‰»ˆ—
+	void ShootMove();			//Œ‚‚Â“G‚Ìˆ—
+
+	void Disp();				//“G‚Ì•`‰æˆ—
 };
 
 /**********************************************
