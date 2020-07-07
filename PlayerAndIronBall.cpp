@@ -16,9 +16,9 @@ void IronInit(int *ironX, int *ironY, int px,int py) {
 	*ironX = ( (px / MAP_SIZE) + 4 ) * MAP_SIZE ;
 }
 
-void IronHold(int* ironX, int* ironY, int px, int py) {
-	*ironX = px + (1 * MAP_SIZE);
-	*ironY = py + (1 * MAP_SIZE);
+void IronHold(int* ironX, int* ironY, int px, int py, int mpx,int mpy) {
+	*ironX = px + mpx;
+	*ironY = py + mpy;
 }
 
 void IronHoldOrThrow() {
@@ -32,6 +32,9 @@ void IronHoldOrThrow() {
 		&& g_NowKey & PAD_INPUT_2) {
 		g_IronBall.HoldFlg = false;
 		g_IronBall.ThrowFlg = true;
+	}
+	if (true) {
+
 	}
 }
 

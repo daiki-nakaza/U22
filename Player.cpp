@@ -135,8 +135,7 @@ void PlayerMove() {
 		Map_PlayerX = Map_NewX;
 		Map_PlayerY = Map_NewY;
 	}
-	//ƒvƒŒƒCƒ„[‚ª“S‹…‚ğ“Š‚°‚é‚©‚Â‚©
-	IronHoldOrThrow();
+	
 }
 
 void PlayerDisp() {

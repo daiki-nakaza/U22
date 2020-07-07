@@ -36,10 +36,10 @@ void partsInfo::Disp() {
 	if (DispFlg) {		//ìSãÖï\é¶
 		//DrawBox(x,y, x + w, y + h, 0x000000, true);
 		//DrawRotaGraphFast2(x, y, 0, 0, 1, 0, pic, true, picDir);
-		DrawCircle(x + MapDrawPointX + MapX, y - MapDrawPointY + MapY, r, 0x000000, true);
-		DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", y - MapDrawPointY + MapY, x + MapDrawPointX + MapX);
-		if (HoldFlg)DrawFormatString(100, 30, 0x000000, "HOLD");
-		if (ThrowFlg)DrawFormatString(100, 30, 0x000000, "THROW");
+		DrawCircle(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY*MAP_SIZE, r, 0x000000, true);
+		DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", x, x + MapDrawPointX - MapX * MAP_SIZE);
+		if (HoldFlg==false)DrawFormatString(100, 30, 0x000000, "HOLD");
+		if (ThrowFlg==false)DrawFormatString(100, 30, 0x000000, "THROW");
 	}
 	else {				//ìSãÖîÒï\é¶
 
@@ -53,6 +53,8 @@ void partsInfo::Move() {
 	if (HoldFlg) {
 		
 	}
+	//ÉvÉåÉCÉÑÅ[Ç™ìSãÖÇìäÇ∞ÇÈÇ©éùÇ¬Ç©
+	IronHoldOrThrow();
 	Throw();
 
 
@@ -90,11 +92,11 @@ bool partsInfo::HitCheck() {		//ínñ Ç∆ÇÃìñÇΩÇËîªíËÅ@ìñÇΩÇ¡ÇƒÇ¢ÇÍÇŒtrue ìñÇΩÇ¡ÇƒÇ
 	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][((x + IRONBALL_R) / MAP_SIZE + MapX)] != 1
 	//	
 	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] != 1) {
-	if(g_MapChip[(y + IRONBALL_R  ) / MAP_SIZE + MapY][(x / MAP_SIZE + MapX)] != 1		//íÜêSÇÃê^â∫
-		|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + MapY][(x - IRONBALL_R / MAP_SIZE + MapX)] != 1	//ç∂è„
-		|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + MapY][(x + IRONBALL_R / MAP_SIZE + MapX)] != 1	//âEè„
-		|| g_MapChip[(y + IRONBALL_R) / MAP_SIZE + MapY][(x - IRONBALL_R / MAP_SIZE + MapX)] != 1	//ç∂â∫
-		|| g_MapChip[(y + IRONBALL_R) / MAP_SIZE + MapY][(x + IRONBALL_R / MAP_SIZE + MapX)] != 1	//âEè„
+	if(g_MapChip[MapY + (y + IRONBALL_R  - MapDrawPointY) / MAP_SIZE ][MapX + (x - MapDrawPointX) / MAP_SIZE] != 1		//íÜêSÇÃê^â∫
+		|| g_MapChip[MapY + (y - IRONBALL_R - MapDrawPointY) / MAP_SIZE ][MapX + (x - IRONBALL_R - MapDrawPointX) / MAP_SIZE ] != 1	//ç∂è„
+		|| g_MapChip[MapY + (y - IRONBALL_R - MapDrawPointY) / MAP_SIZE ][(x + IRONBALL_R - MapDrawPointX) / MAP_SIZE + MapX] != 1	//âEè„
+		|| g_MapChip[MapY + (y + IRONBALL_R - MapDrawPointY) / MAP_SIZE ][(x - IRONBALL_R - MapDrawPointX) / MAP_SIZE + MapX] != 1	//ç∂â∫
+		|| g_MapChip[MapY + (y + IRONBALL_R - MapDrawPointY) / MAP_SIZE ][(x + IRONBALL_R - MapDrawPointX) / MAP_SIZE + MapX] != 1	//âEè„
 		){	
 		return true;
 	}

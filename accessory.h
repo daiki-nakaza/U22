@@ -30,7 +30,7 @@ struct partsInfo
 
 
 //“S‹…‚Ì\‘¢‘Ì‚ÌéŒ¾
-extern partsInfo g_IronBall;			//“G‚Ìî•ñ‚ğ‚Á‚½•Ï”
+extern partsInfo g_IronBall;			//“S‹…‚Ìî•ñ‚ğ‚Á‚½•Ï”
 
 
 /**********************************************
