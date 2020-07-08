@@ -5,34 +5,45 @@
 #include "Map.h"
 
 #include "PlayerAndIronBall.h"
+#include "IronToEnemy.h"
 
-#define ENEMY_SIZE 48	//敵の大きさ
+#define WALK_ENEMY_SIZE 48	//敵の大きさ
+#define SHOOT_ENEMY_SIZE 64
+#define ENEMY_MAX 10
+#define  Bullet_MAX 3
 
 /**************************************************
 *		変数の宣言
 ***************************************************/
-enemyInfo g_Enemy;			//敵の情報を持った変数
+enemyInfo g_Enemy[ENEMY_MAX];			//敵の情報を持った変数
+BulletInfo Bullet;			//弾丸をMAXの数ぶん配列を作る
+  
 
 
 /***************************************************
 *　　敵の構造体の関数の定義
 *****************************************************/
+
+//////////////////////////////////////////////
+/////////////歩く敵の処理////////////////////
+/////////////////////////////////////////////
+
 void enemyInfo::WalkInit() {                 // 敵の初期化
 	x = 24 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
 	y = 14 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
-	w = ENEMY_SIZE;						//敵の横幅
-	h = ENEMY_SIZE;						//敵の縦
+	w = WALK_ENEMY_SIZE;						//敵の横幅
+	h = WALK_ENEMY_SIZE;						//敵の縦
 
-	LoadDivGraph("images/MouseAll.png", 4, 4, 1, ENEMY_SIZE, ENEMY_SIZE, pic);
+	//LoadDivGraph("images/MouseAll.png", 4, 4, 1, WALK_ENEMY_SIZE, WALK_ENEMY_SIZE, pic);
 	anm = 0;
 
 	direct = -1;						//左向きから始める
-
-	speed = 2;						//敵のスピード
 	picDir = true;
 
-	chipY = ((y + MapDrawPointY) / MAP_SIZE) + MapY;
-	chipX = ((x - MapDrawPointX) / MAP_SIZE) + MapX;
+	speed = 2;						//敵のスピード
+
+	Life = 3;					//敵のHP　とりま３
+
 
 	DispFlg = TRUE;					//敵を表示
 
@@ -49,13 +60,11 @@ void enemyInfo::WalkMove(){
 
 
 	if (DispFlg) {//
-		if (g_MapChip[(y + h) / MAP_SIZE][x / MAP_SIZE] == 1) {			//１つ下のマスを見て空中だったら
-			g_Enemy.y += GRAVITY;
+		
+		if (g_MapChip[(y + h) / MAP_SIZE][x / MAP_SIZE] == 1) {			//自分の足元を見て空中だったら
+			y += GRAVITY;
 		}
 
-		if (EnemyCheckHit(g_Enemy)) {	//壁だったら
-			direct *= -1;			//移動の向きを反転させる
-		}
 
 		if (direct < 0) picDir = false;		//左向きなら
 		else picDir = true;					//右向きなら
@@ -68,29 +77,29 @@ void enemyInfo::WalkMove(){
 			AnmCnt = 0;
 		}
 
-		chipY = ((y + MapDrawPointY) / MAP_SIZE) + MapY;
-		chipX = ((x - MapDrawPointX) / MAP_SIZE) + MapX;
-
 	}
 
 }
 
+
+
+////////////////////////////////////////////
+//////////撃つ敵の処理//////////////////////
+/////////////////////////////////////////////
+
 void enemyInfo::ShootInit() {                 // 撃つ敵の初期化
 	x = 24 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
 	y = 15 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
-	w = ENEMY_SIZE;						//敵の横幅
-	h = ENEMY_SIZE;						//敵の縦
+	w = SHOOT_ENEMY_SIZE / 2;						//敵の横幅
+	h = SHOOT_ENEMY_SIZE;						//敵の縦
 
-	LoadDivGraph("images/MouseAll.png", 4, 4, 1, ENEMY_SIZE, ENEMY_SIZE, pic);
+	//LoadDivGraph("images/MouseAll.png", 4, 4, 1, SHOOT_ENEMY_SIZE, SHOOT_ENEMY_SIZE, pic);
 	anm = 0;
 
 	direct = -1;						//左向きから始める
 
 	speed = 0;						//敵のスピード
 	picDir = true;
-
-	chipY = ((y + MapDrawPointY) / MAP_SIZE) + MapY;
-	chipX = ((x - MapDrawPointX) / MAP_SIZE) + MapX;
 
 	DispFlg = TRUE;					//敵を表示
 
@@ -101,31 +110,25 @@ void enemyInfo::ShootInit() {                 // 撃つ敵の初期化
 void enemyInfo::ShootMove() {		//撃つ敵の処理
 
 	static int AnmCnt = 0;
-
 	const int FrmMax = 10;		//アニメーションフレームの間
 
 
 
-	if (DispFlg) {
-		//if (EnemyCheckHit) {			//１つ下のマスを見て空中だったら
-		//	g_Enemy.y += GRAVITY;
-		//}
-
-		if (EnemyCheckHit(g_Enemy)) {	//次のフレームの移動先を見て壁だったら
-			direct *= -1;			//移動の向きを反転させる
+	if (DispFlg) {//
+		if (g_MapChip[(y + h) / MAP_SIZE][x / MAP_SIZE] == 1) {			//自分の足元を見て空中だったら
+			y += GRAVITY;
 		}
 
 		if (direct < 0) picDir = false;		//左向きなら
 		else picDir = true;					//右向きなら
 
-		//x = (chipX * MAP_SIZE - MapDrawPointX) + direct * speed;				//移動のスピードを敵キャラに入れる
-		x += direct * speed;
+
+		//EnemyShoot();
 
 		if (++AnmCnt >= FrmMax) {
 			if (++anm > 3) anm = 0;
 			AnmCnt = 0;
 		}
-
 
 	}
 
@@ -141,30 +144,71 @@ void enemyInfo::Disp() {			//敵の表示処理
 	else {				//敵非表示
 
 	}
-	/*for (int y = 0; y < HEIGHT; y++) {
-		for (int x = 0; x < WIDTH + 1; x++) {
-			DrawFormatString(x * MAP_SIZE + 16, y * MAP_SIZE + 16, 0xf0f0f0, "%d", g_MapChip[y + MapY + MapChipNumY][x + MapX + MapChipNumX]);
-		}
-	}*/
 }
+
+//////////////////////////////////////////////
+////////////弾丸の関数の定義///////////////////
+//////////////////////////////////////////////
+void BulletInfo::Init() {			//弾丸の初期化処理
+	//x = g_Enemy.x;
+	//y = g_Enemy.y + (g_Enemy.h / 2);		//敵の真ん中ぐらいの高さから
+
+	Speed = 4;							//弾丸のスピード
+
+
+	DispFlg = true;			//表示フラグをオンにする
+}
+
+void BulletInfo::Move() {			//弾丸の処理
+	if (DispFlg) {
+		x += direct * Speed;
+
+		if (x < 0 || x > WIDTH) DispFlg = false;
+	}
+	else {
+
+	}
+}
+
+void BulletInfo::Disp() {			//弾丸の表示処理
+	if (DispFlg) {
+		DrawBox(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE,
+			x + w + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, 0xff0000, true);
+	}
+}
+
+
 /**************************************************
 *　敵の関数の定義
 ***************************************************/
 void enemyDisp() {
-	g_Enemy.Disp();
+	for (int i = 0; i < ENEMY_MAX; i++) {
+		g_Enemy[i].Disp();
+	}
+	
+	
+
+	//EnemyShoot();
 }
 
 void enemyMove() {
 	static int Initflg = true;
 
 	if (Initflg) {
-		g_Enemy.WalkInit();
+		//g_Enemy.ShootInit();
+		g_Enemy[0].WalkInit();
 
 		Initflg = false;
 	}
-	if (g_Enemy.DispFlg) {
-		g_Enemy.WalkMove();
+
+	for (int i = 0; i < ENEMY_MAX; i++) {
+		g_Enemy[i].WalkMove();
+
+		if (EnemyCheckHit(g_Enemy[i])) {	//壁だったら
+			g_Enemy[i].direct *= -1;			//移動の向きを反転させる
+		}
 	}
+		
 }
 
 bool EnemyCheckHit(enemyInfo enemy) {
@@ -199,7 +243,24 @@ bool EnemyCheckHit(enemyInfo enemy) {
 		{return true;}
 
 	}
-	//if (IronToEnemy()) return true;
+	if (IronToEnemy(enemy)) return true;
 
 	return false;
 }
+
+//敵が弾丸を飛ばす処理
+//void EnemyShoot() {
+//
+//	if (g_NowKey & PAD_INPUT_DOWN
+//		&& !Bullet->DispFlg) {
+//		Bullet->Init();
+//	}
+//
+//	if (Bullet->DispFlg) {
+//		Bullet->Move();
+//	}
+//	else {
+//
+//	}
+//
+//}
