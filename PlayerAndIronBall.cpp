@@ -25,7 +25,7 @@ void IronHoldOrThrow() {
 
 	//ƒvƒŒƒCƒ„[‚ª“S‹…‚ðŽ‚Â‚©“Š‚°‚éˆ—
 	if (!g_IronBall.HoldFlg && !g_IronBall.ThrowFlg		//“S‹…‚ðŽ‚Á‚Ä‚¢‚È‚¢‚©‚Â“S‹…‚ª“Š‚°‚ç‚ê‚Ä‚¢‚È‚¢
-		&& g_NowKey & PAD_INPUT_1) {
+		&& g_NowKey & PAD_INPUT_1 && Jump_Flg == 0) {
 		g_IronBall.HoldFlg = true;
 	}
 	else if (g_IronBall.HoldFlg && !g_IronBall.ThrowFlg	//“S‹…‚ðŽ‚Á‚Ä‚¢‚Ä‚©‚Â“S‹…‚ª“Š‚°‚ç‚ê‚Ä‚¢‚È‚¢
