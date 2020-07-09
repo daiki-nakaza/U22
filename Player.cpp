@@ -1,8 +1,10 @@
 #include "DxLib.h"
+#include "Math.h"
 
 #include "Player.h"
 #include "Map.h"
 #include "PlayerAndIronBall.h"
+#include "Enemy.h"
 
 
 //プレイヤーの位置
@@ -14,6 +16,15 @@ int Jump_Flg;
 int y_temp;
 int y_prev;
 
+int Bectl;
+int Attack;
+
+int Player_Pic[4];
+int Player_Pic_R[4];
+
+int Player_Pic_Attack[6];
+int Player_Pic_Attack_R[6];
+
 void PlayerInit() {
 
 	// プレイヤーの初期位置をセット
@@ -23,6 +34,20 @@ void PlayerInit() {
 	Map_PlayerY = 0;
 
 	Jump_Flg = false;
+
+	Bectl = 0;//０は右向き、１は左向き
+	Attack = 0;//０は攻撃可能
+	
+	/*if ((Player_Pic[0] = LoadGraph("images/shujin.png")) == -1) {
+		Bectl = 100;
+	}*/
+
+	LoadDivGraph("images/shujin.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic);
+	LoadDivGraph("images/shujin2.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_R);
+	LoadDivGraph("images/attack.png", 6, 6, 1, CHA_SIZE_X*2, CHA_SIZE_Y, Player_Pic_Attack);
+	LoadDivGraph("images/attack2.png", 6, 6, 1, CHA_SIZE_X*2, CHA_SIZE_Y, Player_Pic_Attack_R);
+
+
 
 }
 
@@ -42,9 +67,19 @@ void PlayerMove() {
 	
 
 	// キー入力に応じてプレイヤーの座標を移動
-	if (g_NowKey & PAD_INPUT_LEFT) NewX -= 2;
-	if (g_NowKey & PAD_INPUT_RIGHT) NewX += 2;
-	if (g_NowKey & PAD_INPUT_UP) {
+	if (g_NowKey & PAD_INPUT_LEFT) { 
+		NewX -= 2;
+		if (Attack < 10 && g_IronBall.ThrowFlg == false) {
+			Bectl = 1;
+		}
+	}
+	if (g_NowKey & PAD_INPUT_RIGHT) {
+		NewX += 2; 
+		if (Attack < 10 && g_IronBall.ThrowFlg == false) {
+			Bectl = 0;
+		}
+	}
+	if (g_NowKey & PAD_INPUT_UP && g_IronBall.HoldFlg == false) {
 		if (Jump_Flg == 0) {
 			y_prev = PlayerY;
 			NewY -= 16;
@@ -54,13 +89,16 @@ void PlayerMove() {
 			Jump_Flg = 1;
 		}
 	}
-	if (g_NowKey & PAD_INPUT_DOWN) NewY += 2;
+	if (g_NowKey & PAD_INPUT_DOWN) {
+		PlayerY += 16;
+		NewY += 16; 
+	}
 
 	
 	
 	
 
-	DrawFormatString(0, 0, 0xffffff,"%d", Jump_Flg);
+	DrawFormatString(0, 0, 0xffffff,"%d", g_Enemy[0].Life);
 		
 
 	if (NewX > 500) {
@@ -90,28 +128,36 @@ void PlayerMove() {
 	}
 
 	//落下した場合
-	if (MapY + ((NewY + (Map_NewX % MAP_SIZE) + CHA_SIZE) / MAP_SIZE) + MapChipNumY >= HEIGHT) {
+	if (MapY + ((NewY + (Map_NewX % MAP_SIZE) + CHA_SIZE_Y-1) / MAP_SIZE) + MapChipNumY >= HEIGHT) {
 	}
 
 	//プレイヤー位置がマップをまたいでいる
-	if (MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE) / MAP_SIZE) - MapChipNumX >= WIDTH) {
+	if (MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X-1) / MAP_SIZE) - MapChipNumX >= WIDTH) {
 		i += WIDTH;
 		j += HEIGHT;
 	}
 	//真ん中の位置がマップをまたいでいる
-	if (MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX >= WIDTH) {
+	if (MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX >= WIDTH) {
 		w += WIDTH;
 		z += HEIGHT;
 	}
 
 
-	// 進入不可能なマップだった場合は移動できない
-	if (g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE-1) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) ) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE-1) / MAP_SIZE) - MapChipNumX - i] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE-1) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE-1) / MAP_SIZE) - MapChipNumX - i] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) ) / MAP_SIZE) + MapChipNumY + z][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE/2) / MAP_SIZE) - MapChipNumX - w] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE-1) / MAP_SIZE) + MapChipNumY + z][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX - w] != 1
+	// 進入不可能なマップだった場合は移動できない//鉄球がある
+	if (g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1												//左上
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y-1) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1								//左下
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y / 2 - 1) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1						//左真ん中
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) ) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X-1) / MAP_SIZE) - MapChipNumX - i] != 1						//右上
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y-1) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X-1) / MAP_SIZE) - MapChipNumX - i] != 1			//右下
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y/2 - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1			//右真ん中
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) ) / MAP_SIZE) + MapChipNumY + z][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X/2) / MAP_SIZE) - MapChipNumX - w] != 1						//真ん中上
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y-1) / MAP_SIZE) + MapChipNumY + z][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w] != 1		//真ん中下
+		||		   (   g_IronBall.x - NewX - Map_NewX < CHA_SIZE_X + IRONBALL_R 
+					&& g_IronBall.y - NewY - Map_NewY < CHA_SIZE_Y - 1 + IRONBALL_R
+					&& g_IronBall.x - NewX - Map_NewX > 0 - IRONBALL_R
+					&& g_IronBall.y - NewY - Map_NewY > 0 - IRONBALL_R
+					&& g_IronBall.HoldFlg == false)
+		||		   (   pow((double)g_IronBall.x - (double)NewX - (double)Map_NewX - (double)CHA_SIZE_X/2.0, 2.0) + pow((double)g_IronBall.y - (double)NewY - (double)Map_NewY - (double)CHA_SIZE_Y/2.0, 2.0) > pow((double)MAP_SIZE * 9.0,2.0))
 		)
 	{
 		
@@ -135,15 +181,49 @@ void PlayerMove() {
 		Map_PlayerX = Map_NewX;
 		Map_PlayerY = Map_NewY;
 	}
-	//プレイヤーが鉄球を投げるか持つか
-	IronHoldOrThrow();
+	
+	
 }
 
 void PlayerDisp() {
-	// プレイヤーの描画
-	DrawBox((PlayerX), (PlayerY),
-		(PlayerX)+CHA_SIZE, (PlayerY)+CHA_SIZE,
-		GetColor(255, 255, 255), TRUE);//左下に当たり判定あり
+	static int i = 0;
+
+	//DrawBox((PlayerX), (PlayerY),
+	//	(PlayerX)+CHA_SIZE_X, (PlayerY)+CHA_SIZE_Y,
+	//	GetColor(255, 255, 255), TRUE);//左下に当たり判定あり
+	//DrawGraph(PlayerX, PlayerY, Player_Pic[0], false);
+	// プレイヤーの描画右
+	if (g_NowKey & PAD_INPUT_RIGHT && Bectl == 0 && Attack < 10 ) {
+		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic[i/10], true);
+		if (++i >= 40) {
+			i = 0;
+		}
+	}
+	else if(Bectl == 0 && Attack < 10){
+		i = 0;
+		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic[0], true);
+	}
+
+	// プレイヤーの描画左
+	if (g_NowKey & PAD_INPUT_LEFT && Bectl == 1 && Attack < 10) {
+		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_R[3 - i / 10], true);
+		if (++i >= 40) {
+			i = 0;
+		}
+	}
+	else if (Bectl == 1 && Attack < 10) {
+		i = 0;
+		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_R[3], true);
+	}
+
+	//攻撃用画像右
+	if (Attack >= 10 && Bectl == 0) {
+		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X*2, PlayerY + CHA_SIZE_Y, Player_Pic_Attack[5 - Attack/5], true);
+	}
+	//攻撃用画像左
+	if (Attack >= 10 && Bectl == 1) {
+		DrawExtendGraph(PlayerX - CHA_SIZE_X, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Attack_R[Attack / 5], true);
+	}
 }
 
 void PlayerGravity() {
@@ -187,12 +267,12 @@ void PlayerGravity() {
 
 
 	//プレイヤー位置がマップをまたいでいる(右側だけ）
-	if (MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE) / MAP_SIZE) - MapChipNumX >= WIDTH) {
+	if (MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X-1) / MAP_SIZE) - MapChipNumX >= WIDTH) {
 		i += WIDTH;
 		j += HEIGHT;
 	}
 	//真ん中の位置がマップをまたいでいる
-	if (MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX  >= WIDTH) {
+	if (MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX  >= WIDTH) {
 		w += WIDTH;
 		z += HEIGHT;
 	}
@@ -204,27 +284,81 @@ void PlayerGravity() {
 
 	// 進入不可能なマップだった場合は重力を消す
 	if (g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) - MapChipNumX - i] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) - MapChipNumX - i] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX - w ] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE / 2) / MAP_SIZE) - MapChipNumX - w] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y / 2 - 1) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1						//左真ん中
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w ] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w] != 1		
 		)
 	{
 		if (Jump_Flg == -1) {
-			PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE % MAP_SIZE;
+			PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE_Y % MAP_SIZE;
 			Jump_Flg = 0;
-			//(MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE - 1) / MAP_SIZE) + MapChipNumY) * 32;
 		}
 		else if(Jump_Flg != 0) 
 		{
 			Jump_Flg = -1;
 		}
+		else if (Jump_Flg == 0) {
+			PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE_Y % MAP_SIZE;
+		}
 		
 		
 	}
+	else if (g_IronBall.x - PlayerX - Map_PlayerX < CHA_SIZE_X + IRONBALL_R
+		  && g_IronBall.y - NewY - Map_PlayerY < CHA_SIZE_Y - 1 + IRONBALL_R
+		  && g_IronBall.x - PlayerX - Map_PlayerX > 0 - IRONBALL_R
+		  && g_IronBall.y - NewY - Map_PlayerY > 0 - IRONBALL_R
+		  && g_IronBall.HoldFlg == false) {
+		if (Jump_Flg == -1) {
+		//	PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE_Y % MAP_SIZE;
+			Jump_Flg = 0;
+		}
+		else if (Jump_Flg != 0)
+		{
+			Jump_Flg = -1;
+		}
+	}
 	else {
+		if (Jump_Flg == 0) {
+			Jump_Flg = -1;
+		}
 		PlayerY = NewY;
 		
+	}
+}
+
+
+//攻撃
+void PlayerAttack() {
+	if (g_NowKey & PAD_INPUT_3) {
+		if (Attack == 0) {
+			Attack = 30;
+		}
+	}
+
+	if(--Attack > 0){
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			if (g_Enemy[i].Life > 0) {					//敵のライフが０じゃないなら座標をみる
+				if (Bectl == 0 && g_Enemy[i].outtime == 0) {						//右向き
+					if (   g_Enemy[i].x - PlayerX - Map_PlayerX < CHA_SIZE_X * 2
+						&& g_Enemy[i].x - PlayerX - Map_PlayerX > 0) {
+						g_Enemy[i].Life--;
+						g_Enemy[i].outtime = 30;
+					}
+				}else if (Bectl == 1) {						//右向き
+					if (   g_Enemy[i].x - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X 
+						&& g_Enemy[i].x - PlayerX - Map_PlayerX < 0) {
+						g_Enemy[i].Life--;
+						g_Enemy[i].outtime = 30;
+					}
+				}
+				
+			}
+		}
+	}
+	else if (Attack < 0) {
+		Attack = 0;
 	}
 }
