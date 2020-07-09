@@ -2,12 +2,12 @@
 
 #include "DxLib.h"
 
-#define ENEMY_MAX 10
+#include "Bullet.h"
 
-/**************************************************************
-*		敵の情報を持った構造体の宣言
-***************************************************************/
-//#define 
+#define ENEMY_MAX 10
+#define  Bullet_MAX 3
+
+
 
 struct enemyInfo
 {
@@ -15,17 +15,22 @@ struct enemyInfo
 	int w, h;			//敵の幅と高さ
 	int direct;			//敵の向き (右:1  左:-1)
 	int speed;			//敵のスピード
+	int type;			//敵のタイプ
 
 	int pic[4];			//画像用変数
 	int anm;			//アニメーション用変数
 	bool picDir;			//画像の向き
 
-	bool DispFlg = FALSE;		//敵をの表示のフラグ
+	bool DispFlg = false;		//敵をの表示のフラグ
+	bool AttckFlg = false;		//敵の攻撃フラグ
 
 	int Life = 0;				//敵のライフ
 
-	void WalkInit();			//地面の敵の初期化処理
-	void WalkMove();			//地面の敵の処理
+
+	BulletInfo Bullet[Bullet_MAX];			//撃つ敵が使う弾丸大体３発ぐらいかなぁ？
+
+	void WalkInit();			//徘徊している敵の初期化処理
+	void WalkMove();			//徘徊している敵の処理
 
 	void ShootInit();			//撃つ敵の初期化処理
 	void ShootMove();			//撃つ敵の処理
@@ -34,22 +39,7 @@ struct enemyInfo
 };
 
 
-struct BulletInfo {
-	int x, y;			//弾丸の座標
-	int w, h;			//弾丸の幅と高さ
 
-	bool DispFlg = FALSE;		//表示フラグ
-
-	int direct;			//敵の向き (右:1  左:-1)
-	bool picDir;			//画像の向き
-	
-	int Speed;	//弾丸のスピード
-
-	void Init();			//弾丸の初期化処理
-	void Move();			//弾丸の処理
-	void Disp();			//弾丸の表示処理
-
-};
 
 /**********************************************
 *　　関数のプロトタイプ宣言

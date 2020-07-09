@@ -16,7 +16,6 @@
 *		変数の宣言
 ***************************************************/
 enemyInfo g_Enemy[ENEMY_MAX];			//敵の情報を持った変数
-BulletInfo Bullet;			//弾丸をMAXの数ぶん配列を作る
   
 
 
@@ -40,9 +39,13 @@ void enemyInfo::WalkInit() {                 // 敵の初期化
 	direct = -1;						//左向きから始める
 	picDir = true;
 
+	AttckFlg = false;
+
 	speed = 2;						//敵のスピード
 
 	Life = 3;					//敵のHP　とりま３
+
+	type = 0;					//敵のタイプ
 
 
 	DispFlg = TRUE;					//敵を表示
@@ -101,6 +104,12 @@ void enemyInfo::ShootInit() {                 // 撃つ敵の初期化
 	speed = 0;						//敵のスピード
 	picDir = true;
 
+	Life = 3;					//敵のHP　とりま３
+
+	type = 1;					//敵のタイプ
+
+	AttckFlg = false;			//攻撃用のフラグ
+
 	DispFlg = TRUE;					//敵を表示
 
 
@@ -112,24 +121,51 @@ void enemyInfo::ShootMove() {		//撃つ敵の処理
 	static int AnmCnt = 0;
 	const int FrmMax = 10;		//アニメーションフレームの間
 
-
+	const int Rate = 20;		//発射レート
+	static int Firecnt = 0;		 //
+	static int BulletCnt = 0;		//３発連続で弾を発射させる
 
 	if (DispFlg) {//
 		if (g_MapChip[(y + h) / MAP_SIZE][x / MAP_SIZE] == 1) {			//自分の足元を見て空中だったら
 			y += GRAVITY;
+		}
+		else {
+			AttckFlg = true;
 		}
 
 		if (direct < 0) picDir = false;		//左向きなら
 		else picDir = true;					//右向きなら
 
 
-		//EnemyShoot();
 
-		if (++AnmCnt >= FrmMax) {
+		if (++AnmCnt >= FrmMax) {				//アニメーションフレーム
 			if (++anm > 3) anm = 0;
 			AnmCnt = 0;
 		}
 
+	}
+
+
+
+	if (AttckFlg) {
+		if (Firecnt++ >= Rate
+			&& BulletCnt < Bullet_MAX) {
+			Bullet[BulletCnt].Init(x,y+h/2);			//弾を飛ばす間隔
+			BulletCnt++;
+			Firecnt = 0;
+		}
+		for (int i = 0; i < Bullet_MAX; i++) {
+			if (Bullet[i].DispFlg) {
+				Bullet[i].Disp();
+				Bullet[i].Move(direct);
+				if (IronToEnemy(Bullet[i])) {
+					Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+				}
+			}
+		}
+		if (!Bullet[0].DispFlg
+			&& !Bullet[1].DispFlg
+			&& !Bullet[2].DispFlg)	BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
 	}
 
 }
@@ -146,36 +182,6 @@ void enemyInfo::Disp() {			//敵の表示処理
 	}
 }
 
-//////////////////////////////////////////////
-////////////弾丸の関数の定義///////////////////
-//////////////////////////////////////////////
-void BulletInfo::Init() {			//弾丸の初期化処理
-	//x = g_Enemy.x;
-	//y = g_Enemy.y + (g_Enemy.h / 2);		//敵の真ん中ぐらいの高さから
-
-	Speed = 4;							//弾丸のスピード
-
-
-	DispFlg = true;			//表示フラグをオンにする
-}
-
-void BulletInfo::Move() {			//弾丸の処理
-	if (DispFlg) {
-		x += direct * Speed;
-
-		if (x < 0 || x > WIDTH) DispFlg = false;
-	}
-	else {
-
-	}
-}
-
-void BulletInfo::Disp() {			//弾丸の表示処理
-	if (DispFlg) {
-		DrawBox(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE,
-			x + w + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, 0xff0000, true);
-	}
-}
 
 
 /**************************************************
@@ -195,16 +201,27 @@ void enemyMove() {
 	static int Initflg = true;
 
 	if (Initflg) {
-		//g_Enemy.ShootInit();
-		g_Enemy[0].WalkInit();
+		g_Enemy[0].ShootInit();
+		//g_Enemy[0].WalkInit();
 
 		Initflg = false;
 	}
 
 	for (int i = 0; i < ENEMY_MAX; i++) {
-		g_Enemy[i].WalkMove();
+		switch (g_Enemy[i].type)
+		{
+		case 0:
+			g_Enemy[i].WalkMove();
+			break;
+		case 1:
+			g_Enemy[i].ShootMove();
+			break;
+		}
 
-		if (EnemyCheckHit(g_Enemy[i])) {	//壁だったら
+		if (g_Enemy[0].DispFlg)DrawFormatString(30, 60, 0x000000, "攻撃してます", true);
+
+		if (EnemyCheckHit(g_Enemy[i])
+			|| IronToEnemy(g_Enemy[i]) ) {	//壁だったら
 			g_Enemy[i].direct *= -1;			//移動の向きを反転させる
 		}
 	}
@@ -243,24 +260,7 @@ bool EnemyCheckHit(enemyInfo enemy) {
 		{return true;}
 
 	}
-	if (IronToEnemy(enemy)) return true;
 
 	return false;
 }
 
-//敵が弾丸を飛ばす処理
-//void EnemyShoot() {
-//
-//	if (g_NowKey & PAD_INPUT_DOWN
-//		&& !Bullet->DispFlg) {
-//		Bullet->Init();
-//	}
-//
-//	if (Bullet->DispFlg) {
-//		Bullet->Move();
-//	}
-//	else {
-//
-//	}
-//
-//}
