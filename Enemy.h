@@ -3,9 +3,7 @@
 #include "DxLib.h"
 
 #include "Bullet.h"
-
-#define ENEMY_MAX 10
-#define  Bullet_MAX 3
+#include "Define.h"
 
 
 
@@ -18,7 +16,7 @@ struct enemyInfo
 	int type;			//敵のタイプ
 	int outtime;		//一度攻撃をもらったらしばらく無敵
 
-	int pic[4];			//画像用変数
+	int pic;			//画像用変数
 	int anm;			//アニメーション用変数
 	bool picDir;			//画像の向き
 
