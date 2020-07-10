@@ -11,6 +11,13 @@
 #define GRAVITY 4//1,2,4,8,16,32‚Ìƒpƒ^[ƒ“‚ ‚è
 
 #define ENEMY_MAX 10
+#define WALK_ENEMY_SIZE 48	//“G‚Ì‘å‚«‚³
+#define SHOOT_ENEMY_SIZE 48
+#define  Bullet_MAX 3
+
+#define  Bullet_MAX 3
+#define BULLET_W 20
+#define BULLET_H 10
 
 /****************************************************
 *—ñ‹“‘Ì‚ÌéŒ¾
