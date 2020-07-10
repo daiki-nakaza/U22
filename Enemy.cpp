@@ -124,8 +124,13 @@ void enemyInfo::ShootMove() {		//撃つ敵の処理
 	const int FrmMax = 10;		//アニメーションフレームの間
 
 	const int Rate = 20;		//発射レート
-	static int Firecnt = 0;		 //
+	const int ReloadTime = 180;			//リロード時間　大体３秒
+
+
+	static int Firecnt = 0;		 //発射のカウント
 	static int BulletCnt = 0;		//３発連続で弾を発射させる
+	static int ReloadCnt = 0;		//リロードの時間カウント
+
 
 	if (DispFlg) {//
 		if (g_MapChip[(y + h) / MAP_SIZE][x / MAP_SIZE] == 1) {			//自分の足元を見て空中だったら
@@ -156,18 +161,24 @@ void enemyInfo::ShootMove() {		//撃つ敵の処理
 			BulletCnt++;
 			Firecnt = 0;
 		}
-		for (int i = 0; i < Bullet_MAX; i++) {
-			if (Bullet[i].DispFlg) {
-				Bullet[i].Disp();
-				Bullet[i].Move(direct);
-				if (IronToEnemy(Bullet[i])) {
-					Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
-				}
-			}
-		}
+		
 		if (!Bullet[0].DispFlg
 			&& !Bullet[1].DispFlg
-			&& !Bullet[2].DispFlg)	BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
+			&& !Bullet[2].DispFlg
+			&& ReloadCnt > ReloadTime) {
+			BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
+			ReloadCnt = 0;
+		}
+		if(ReloadCnt++ <= ReloadTime){}
+	}
+	for (int i = 0; i < Bullet_MAX; i++) {
+		if (Bullet[i].DispFlg) {
+			Bullet[i].Disp();
+			Bullet[i].Move(direct);
+			if (IronToEnemy(Bullet[i])) {
+				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+			}
+		}
 	}
 
 }
