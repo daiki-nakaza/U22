@@ -39,20 +39,20 @@ void IronHoldOrThrow() {
 }
 
 
-bool IronToEnemy() {
-
-	if (g_Enemy.picDir) {			//‰EŒü‚«‚Ìˆ—
-		//Ÿ‚ÌˆÚ“®‚ÌêŠ‚ª“S‹…‚Æ”í‚Á‚Ä‚¢‚½‚çtrue‚ğ•Ô‚·
-		if ((g_Enemy.y + g_Enemy.h + MapDrawPointY) / MAP_SIZE + MapY == g_IronBall.y / MAP_SIZE + MapY
-			&& (((g_Enemy.x + g_Enemy.w - MapDrawPointX) + (g_Enemy.direct * g_Enemy.speed)) / MAP_SIZE) + MapX == (g_IronBall.x - g_IronBall.r) / MAP_SIZE + MapX) return true;
-	}
-	else {							//¶Œü‚«‚Ìˆ—
-		//Ÿ‚ÌˆÚ“®‚ÌêŠ‚ª“S‹…‚Æ”í‚Á‚Ä‚¢‚½‚çtrue‚ğ•Ô‚·
-		if ((g_Enemy.y + g_Enemy.h + MapDrawPointY) / MAP_SIZE + MapY == g_IronBall.y / MAP_SIZE + MapY
-			&& (((g_Enemy.x - MapDrawPointX) + (g_Enemy.direct * g_Enemy.speed)) / MAP_SIZE) + MapX == (g_IronBall.x + g_IronBall.r) / MAP_SIZE + MapX) return true;
-	}
-	
-
-
-		return false;
-}
+//bool IronToEnemy() {
+//
+//	if (g_Enemy.picDir) {			//‰EŒü‚«‚Ìˆ—
+//		//Ÿ‚ÌˆÚ“®‚ÌêŠ‚ª“S‹…‚Æ”í‚Á‚Ä‚¢‚½‚çtrue‚ğ•Ô‚·
+//		if ((g_Enemy.y + g_Enemy.h + MapDrawPointY) / MAP_SIZE + MapY == g_IronBall.y / MAP_SIZE + MapY
+//			&& (((g_Enemy.x + g_Enemy.w - MapDrawPointX) + (g_Enemy.direct * g_Enemy.speed)) / MAP_SIZE) + MapX == (g_IronBall.x - g_IronBall.r) / MAP_SIZE + MapX) return true;
+//	}
+//	else {							//¶Œü‚«‚Ìˆ—
+//		//Ÿ‚ÌˆÚ“®‚ÌêŠ‚ª“S‹…‚Æ”í‚Á‚Ä‚¢‚½‚çtrue‚ğ•Ô‚·
+//		if ((g_Enemy.y + g_Enemy.h + MapDrawPointY) / MAP_SIZE + MapY == g_IronBall.y / MAP_SIZE + MapY
+//			&& (((g_Enemy.x - MapDrawPointX) + (g_Enemy.direct * g_Enemy.speed)) / MAP_SIZE) + MapX == (g_IronBall.x + g_IronBall.r) / MAP_SIZE + MapX) return true;
+//	}
+//	
+//
+//
+//		return false;
+//}

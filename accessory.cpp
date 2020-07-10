@@ -61,7 +61,7 @@ void partsInfo::Move() {
 }
 
 void partsInfo::Throw(){			//“S‹…‚ª”ò‚ñ‚Å‚¢‚­ˆ—
-	const int InitPow = -24;
+	const int InitPow = -20;
 	static int Pow = InitPow;
 	static int move = 1;
 
@@ -71,7 +71,7 @@ void partsInfo::Throw(){			//“S‹…‚ª”ò‚ñ‚Å‚¢‚­ˆ—
 		IronHold(&x,&y);
 	}
 
-	if (ThrowFlg) {			//“Š‚°‚ç‚ê‚Ä‚¢‚éˆ—
+	if (ThrowFlg && Bectl == 0) {			//“Š‚°‚ç‚ê‚Ä‚¢‚éˆ—‰E
 		Pow++;
 		x += 6;
 		y += Pow;
@@ -80,16 +80,15 @@ void partsInfo::Throw(){			//“S‹…‚ª”ò‚ñ‚Å‚¢‚­ˆ—
 			x -= 7;
 			y -= Pow;
 		}
-		/*if (Pow++ < abs(InitPow)) {
-			x += 6;
-			y += Pow;
-			if (HitCheck()) {
-				ThrowFlg = false;
-				x -= 6;
-				y -= Pow;
-			}
+	}else if(ThrowFlg && Bectl == 1){		//“Š‚°‚ç‚ê‚Ä‚¢‚éˆ—¶
+		Pow++;
+		x -= 6;
+		y += Pow;
+		if (HitCheck()) {
+			ThrowFlg = false;
+			x += 7;
+			y -= Pow;
 		}
-		else { ThrowFlg = false; }*/
 	}
 	else { Pow = InitPow; }
 }

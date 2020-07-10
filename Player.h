@@ -13,6 +13,9 @@ extern int MapX, MapY;                    //マップのｘ、ｙ
 extern int NewX, NewY;	// 移動する前のプレイヤーの位置を保存する変数
 extern int Map_NewX, Map_NewY;	// 移動する前のプレイヤーの位置を保存する変数
 
+extern int Bectl;		//プレイヤーの向き
+extern int Attack;		//プレイヤーの攻撃用
+
 extern int Jump_Flg;  //ジャンプ用変数 8ずつずれるのを５回繰り返す
 extern int y_temp;
 extern int y_prev;
@@ -27,6 +30,13 @@ extern int g_KeyFlg2;
 extern int g_MouseX;  //マウスｘ座標
 extern int g_MouseY;  //マウスｙ座標
 
+extern int Player_Pic[4];//プレイヤー移動の画像
+extern int Player_Pic_R[4];//逆プレイヤー移動の画像
+
+extern int Player_Pic_Attack[6];//プレイヤー移動の画像
+extern int Player_Pic_Attack_R[6];//逆プレイヤー移動の画像
+
+
 
 /***************************************************************************
 *          関数のプロトタイプ宣言  
@@ -36,3 +46,4 @@ void PlayerInit();
 void PlayerMove();
 void PlayerDisp();
 void PlayerGravity();
+void PlayerAttack();
