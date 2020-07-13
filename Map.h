@@ -21,4 +21,5 @@ extern int MapX, MapY;                    //マップのｘ、ｙ
 
 extern int g_MapChip[HEIGHT * 3][WIDTH];
 
+extern int MapTip;	//マップチップ画像変数
 extern int g_BackGroundImage;//背景画像
