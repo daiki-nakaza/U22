@@ -5,6 +5,9 @@
 int MapDrawPointX, MapDrawPointY;		// 
 int MapChipNumX, MapChipNumY;			//
 int MapX, MapY;                    //マップのｘ、ｙ
+int MapTip;		//マップチップ画像
+
+int g_BackGroundImage;//
 
 int g_MapChip[HEIGHT * 3][WIDTH] = {
 
@@ -87,6 +90,7 @@ int g_MapChip[HEIGHT * 3][WIDTH] = {
 };
 
 void MapDisp() {			// マップの描画
+	DrawGraph(0, 0, g_BackGroundImage, FALSE);
 	for (int y = 0; y < HEIGHT + 1; y++) {
 		for (int x = 0; x < WIDTH + 1; x++) {
 
@@ -104,11 +108,17 @@ void MapDisp() {			// マップの描画
 			switch (g_MapChip[y + MapY + MapChipNumY][x + MapX + MapChipNumX])
 			{
 			case 0:
+				/*DrawBox(x * MAP_SIZE + MapDrawPointX, y * MAP_SIZE + MapDrawPointY,
+					(x + 1) * MAP_SIZE + MapDrawPointX, (y + 1) * MAP_SIZE + MapDrawPointY,
+					GetColor(255, 255, 0), TRUE);*/
+				DrawGraph(x * MAP_SIZE + MapDrawPointX, y * MAP_SIZE + MapDrawPointY, MapTip, TRUE);
+				break;
+			case 3:
 				DrawBox(x * MAP_SIZE + MapDrawPointX, y * MAP_SIZE + MapDrawPointY,
 					(x + 1) * MAP_SIZE + MapDrawPointX, (y + 1) * MAP_SIZE + MapDrawPointY,
-					GetColor(255, 255, 0), TRUE);
+					GetColor(0, 255, 0), TRUE);
 				break;
-			case 1:
+			case 4:
 				DrawBox(x * MAP_SIZE + MapDrawPointX, y * MAP_SIZE + MapDrawPointY,
 					(x + 1) * MAP_SIZE + MapDrawPointX, (y + 1) * MAP_SIZE + MapDrawPointY,
 					GetColor(0, 255, 0), TRUE);

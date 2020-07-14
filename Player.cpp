@@ -54,6 +54,7 @@ void PlayerInit() {
 void PlayerMove() {
 
 	int i = 0, j = 0, w = 0, z = 0;//ローカルなので気にしないでください!あたり判定用の補正値
+	int flg = 0;//ローカル変数で、敵との当たり判定につかっています
 
 	//プレイヤー重力
 	PlayerGravity();
@@ -142,22 +143,35 @@ void PlayerMove() {
 		z += HEIGHT;
 	}
 
+	//敵キャラが移動する場所にいたら戻す
+	for (int a = 0; a < ENEMY_MAX; a++) {
+		if (g_Enemy[a].Life > 0) {
+			if (g_Enemy[a].x - NewX - Map_NewX < CHA_SIZE_X 
+				&& g_Enemy[a].y - NewY - Map_NewY < CHA_SIZE_Y - 1 
+				&& g_Enemy[a].x - NewX - Map_NewX > 0 - g_Enemy[a].w
+				&& g_Enemy[a].y - NewY - Map_NewY > 0 - g_Enemy[a].h) {
+				flg = 1;
+			}
+		}
+	}
+
 
 	// 進入不可能なマップだった場合は移動できない//鉄球がある
 	if (g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1												//左上
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y-1) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1								//左下
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1								//左下
 		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y / 2 - 1) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1						//左真ん中
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) ) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X-1) / MAP_SIZE) - MapChipNumX - i] != 1						//右上
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y-1) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X-1) / MAP_SIZE) - MapChipNumX - i] != 1			//右下
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y/2 - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1			//右真ん中
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) ) / MAP_SIZE) + MapChipNumY + z][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X/2) / MAP_SIZE) - MapChipNumX - w] != 1						//真ん中上
-		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y-1) / MAP_SIZE) + MapChipNumY + z][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w] != 1		//真ん中下
-		||		   (   g_IronBall.x - NewX - Map_NewX < CHA_SIZE_X + IRONBALL_R 
-					&& g_IronBall.y - NewY - Map_NewY < CHA_SIZE_Y - 1 + IRONBALL_R
-					&& g_IronBall.x - NewX - Map_NewX > 0 - IRONBALL_R
-					&& g_IronBall.y - NewY - Map_NewY > 0 - IRONBALL_R
-					&& g_IronBall.HoldFlg == false)
-		||		   (   pow((double)g_IronBall.x - (double)NewX - (double)Map_NewX - (double)CHA_SIZE_X/2.0, 2.0) + pow((double)g_IronBall.y - (double)NewY - (double)Map_NewY - (double)CHA_SIZE_Y/2.0, 2.0) > pow((double)MAP_SIZE * 9.0,2.0))
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1						//右上
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1			//右下
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y / 2 - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1			//右真ん中
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + z][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w] != 1						//真ん中上
+		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + z][MapX + ((NewX + (Map_NewX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w] != 1		//真ん中下
+		||		(g_IronBall.x - NewX - Map_NewX < CHA_SIZE_X + IRONBALL_R
+			  && g_IronBall.y - NewY - Map_NewY < CHA_SIZE_Y - 1 + IRONBALL_R
+			  && g_IronBall.x - NewX - Map_NewX > 0 - IRONBALL_R
+			  && g_IronBall.y - NewY - Map_NewY > 0 - IRONBALL_R
+			  && g_IronBall.HoldFlg == false)
+		|| (pow((double)g_IronBall.x - (double)NewX - (double)Map_NewX - (double)CHA_SIZE_X / 2.0, 2.0) + pow((double)g_IronBall.y - (double)NewY - (double)Map_NewY - (double)CHA_SIZE_Y / 2.0, 2.0) > pow((double)MAP_SIZE * 9.0, 2.0))
+		|| flg == 1
 		)
 	{
 		
@@ -176,6 +190,7 @@ void PlayerMove() {
 		
 	}
 	else {//移動できる
+		
 		PlayerX = NewX;
 		PlayerY = NewY;
 		Map_PlayerX = Map_NewX;
@@ -228,6 +243,7 @@ void PlayerDisp() {
 
 void PlayerGravity() {
 	int i = 0, j = 0, w = 0, z = 0;//ローカルなので気にしないでください!あたり判定用の補正値
+	int flg = 0;//ローカル変数です
 
 	//プレイヤー重力
 	NewY = PlayerY;
@@ -278,7 +294,17 @@ void PlayerGravity() {
 	}
 	//DrawFormatString(x * MAP_SIZE + MapDrawPointX, y * MAP_SIZE + MapDrawPointY, 0xffffff, "%d %d", y + MapY + MapChipNumY, x + MapX + MapChipNumX);
 
-
+	//敵キャラが移動する場所にいたら戻す
+	for (int a = 0; a < ENEMY_MAX; a++) {
+		if (g_Enemy[a].Life > 0) {
+			if (g_Enemy[a].x - PlayerX - Map_PlayerX < CHA_SIZE_X 
+				&& g_Enemy[a].y - NewY - Map_PlayerY < CHA_SIZE_Y - 1 
+				&& g_Enemy[a].x - PlayerX - Map_PlayerX > 0 - g_Enemy[a].w
+				&& g_Enemy[a].y - NewY - Map_PlayerY > 0 - g_Enemy[a].h) {
+				flg = 1;
+			}
+		}
+	}
 
 
 
@@ -289,7 +315,7 @@ void PlayerGravity() {
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w ] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w] != 1		
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w] != 1	
 		)
 	{
 		if (Jump_Flg == -1) {
@@ -305,12 +331,13 @@ void PlayerGravity() {
 		}
 		
 		
-	}
-	else if (g_IronBall.x - PlayerX - Map_PlayerX < CHA_SIZE_X + IRONBALL_R
+	}//鉄球がある場合と敵がいた場合
+	else if ((g_IronBall.x - PlayerX - Map_PlayerX < CHA_SIZE_X + IRONBALL_R
 		  && g_IronBall.y - NewY - Map_PlayerY < CHA_SIZE_Y - 1 + IRONBALL_R
 		  && g_IronBall.x - PlayerX - Map_PlayerX > 0 - IRONBALL_R
 		  && g_IronBall.y - NewY - Map_PlayerY > 0 - IRONBALL_R
-		  && g_IronBall.HoldFlg == false) {
+		  && g_IronBall.HoldFlg == false)
+		  || flg==1) {
 		if (Jump_Flg == -1) {
 		//	PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE_Y % MAP_SIZE;
 			Jump_Flg = 0;

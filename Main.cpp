@@ -141,6 +141,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 
 int LoadImages() {
+	//マップチップ
+	MapTip = LoadGraph("images/kenkyu7.png");
+	//背景
+	if ((g_BackGroundImage = LoadGraph("images/haikei.png")) == -1) return -1;
 	return 0;
 }
 int LoadSounds() {
