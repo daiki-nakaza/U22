@@ -7,10 +7,6 @@
 #include "PlayerAndIronBall.h"
 #include "IronToEnemy.h"
 
-#define WALK_ENEMY_SIZE 48	//敵の大きさ
-#define SHOOT_ENEMY_SIZE 64
-#define ENEMY_MAX 10
-#define  Bullet_MAX 3
 
 /**************************************************
 *		変数の宣言
@@ -46,6 +42,8 @@ void enemyInfo::WalkInit() {                 // 敵の初期化
 	Life = 3;					//敵のHP　とりま３
 
 	type = 0;					//敵のタイプ
+
+	outtime = 0;				//１度攻撃をもらったら無敵
 
 
 	DispFlg = TRUE;					//敵を表示
@@ -93,7 +91,7 @@ void enemyInfo::WalkMove(){
 void enemyInfo::ShootInit() {                 // 撃つ敵の初期化
 	x = 24 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
 	y = 15 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
-	w = SHOOT_ENEMY_SIZE / 2;						//敵の横幅
+	w = SHOOT_ENEMY_SIZE;						//敵の横幅
 	h = SHOOT_ENEMY_SIZE;						//敵の縦
 
 	//LoadDivGraph("images/MouseAll.png", 4, 4, 1, SHOOT_ENEMY_SIZE, SHOOT_ENEMY_SIZE, pic);
@@ -110,6 +108,8 @@ void enemyInfo::ShootInit() {                 // 撃つ敵の初期化
 
 	AttckFlg = false;			//攻撃用のフラグ
 
+	pic = LoadGraph("images/teki.png");
+
 	DispFlg = TRUE;					//敵を表示
 
 
@@ -122,8 +122,13 @@ void enemyInfo::ShootMove() {		//撃つ敵の処理
 	const int FrmMax = 10;		//アニメーションフレームの間
 
 	const int Rate = 20;		//発射レート
-	static int Firecnt = 0;		 //
+	const int ReloadTime = 180;			//リロード時間　大体３秒
+
+
+	static int Firecnt = 0;		 //発射のカウント
 	static int BulletCnt = 0;		//３発連続で弾を発射させる
+	static int ReloadCnt = 0;		//リロードの時間カウント
+
 
 	if (DispFlg) {//
 		if (g_MapChip[(y + h) / MAP_SIZE][x / MAP_SIZE] == 1) {			//自分の足元を見て空中だったら
@@ -132,6 +137,8 @@ void enemyInfo::ShootMove() {		//撃つ敵の処理
 		else {
 			AttckFlg = true;
 		}
+
+		//if(DirCheck)
 
 		if (direct < 0) picDir = false;		//左向きなら
 		else picDir = true;					//右向きなら
@@ -142,40 +149,56 @@ void enemyInfo::ShootMove() {		//撃つ敵の処理
 			if (++anm > 3) anm = 0;
 			AnmCnt = 0;
 		}
+		if (AttckFlg) {
+			if (Firecnt++ >= Rate
+				&& BulletCnt < Bullet_MAX) {
+				Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
+				BulletCnt++;
+				Firecnt = 0;
+			}
 
-	}
+			if (!Bullet[0].DispFlg
+				&& !Bullet[1].DispFlg
+				&& !Bullet[2].DispFlg
+				&& ReloadCnt > ReloadTime) {
+				BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
+				ReloadCnt = 0;
+			}
+			if (ReloadCnt++ <= ReloadTime) {}
 
-
-
-	if (AttckFlg) {
-		if (Firecnt++ >= Rate
-			&& BulletCnt < Bullet_MAX) {
-			Bullet[BulletCnt].Init(x,y+h/2);			//弾を飛ばす間隔
-			BulletCnt++;
-			Firecnt = 0;
-		}
-		for (int i = 0; i < Bullet_MAX; i++) {
-			if (Bullet[i].DispFlg) {
+			for (int i = 0; i < Bullet_MAX; i++) {
 				Bullet[i].Disp();
 				Bullet[i].Move(direct);
-				if (IronToEnemy(Bullet[i])) {
+				if (IronToBullet(Bullet[i])) {
+					Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+				}
+				if (PlayerToEnemy(Bullet[i])) {
 					Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
 				}
 			}
 		}
-		if (!Bullet[0].DispFlg
-			&& !Bullet[1].DispFlg
-			&& !Bullet[2].DispFlg)	BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
+		
+
 	}
+	else {
+		for (int i = 0; i < Bullet_MAX; i++) {
+			Bullet[i].DispFlg = false;
+		}
+	}
+
+
+
+	
 
 }
 
 void enemyInfo::Disp() {			//敵の表示処理
 
 	if (DispFlg) {		//敵表示
-		DrawBox(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE,	// + MapDrawPointX - MapX * MAP_SIZE
-			x + w + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, 0xff0000, true);
+		//DrawBox(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE,	// + MapDrawPointX - MapX * MAP_SIZE
+		//	x + w + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, 0xff0000, true);
 		//DrawRotaGraphFast2(x, y,0,0,1,0, pic[anm], true,picDir);
+		DrawGraph(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE, pic, true);
 	}
 	else {				//敵非表示
 
@@ -218,14 +241,22 @@ void enemyMove() {
 			break;
 		}
 
-		if (g_Enemy[0].DispFlg)DrawFormatString(30, 60, 0x000000, "攻撃してます", true);
 
 		if (EnemyCheckHit(g_Enemy[i])
 			|| IronToEnemy(g_Enemy[i]) ) {	//壁だったら
 			g_Enemy[i].direct *= -1;			//移動の向きを反転させる
 		}
-	}
-		
+
+		/******************************************************
+		*勝手に書きました
+		******************************************************/
+		if (--g_Enemy[i].outtime < 0) {
+			g_Enemy[i].outtime = 0;
+		}
+		if (g_Enemy[i].Life <= 0) {
+			g_Enemy[i].DispFlg = false;
+		}
+	}	
 }
 
 bool EnemyCheckHit(enemyInfo enemy) {

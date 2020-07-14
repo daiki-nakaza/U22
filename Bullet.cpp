@@ -6,21 +6,22 @@
 #include "Map.h"
 #include "IronToEnemy.h"
 
-#define BULLET_W 20
-#define BULLET_H 10
 
 //////////////////////////////////////////////
 ////////////弾丸の関数の定義///////////////////
 //////////////////////////////////////////////
 void BulletInfo::Init(const int Ex, const int Ey) {			//弾丸の初期化処理
+	const int valanceY = 10;		//弾丸の高さの補正値
 
 	Speed = 4;							//弾丸のスピード
 
 	x = Ex;		//敵キャラの座標にSet
-	y = Ey;
+	y = Ey - valanceY;
 
 	w = BULLET_W;
 	h = BULLET_H;
+
+	
 
 	DispFlg = true;			//表示フラグをオンにする
 }
@@ -35,6 +36,7 @@ void BulletInfo::Move(const int dir) {			//弾丸の処理
 		x += dir * Speed;
 
 		if (x < 0 || x > WIDTH * MAP_SIZE) DispFlg = false;		//画面外に出たら表示フラグをfalseにする
+		
 	}
 	else {
 
