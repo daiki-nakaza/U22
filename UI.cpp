@@ -2,15 +2,16 @@
 
 #include "UI.h"
 
-void HUDDisp() {
-	time_t now = time(NULL); 
-#pragma warning(suppress : 4996)
-	struct tm* pnow = localtime(&now);
-	char week[][3] = { "“ú","ŒŽ","‰Î","…","–Ø","‹à","“y" };
+const char data[] = __DATE__;
+const char time[] = __TIME__;
 
-	DrawFormatString(10,10,0x000000,"¡“ú‚Í%2d”N%2dŒŽ%2d“ú(%s)\n",
-		pnow->tm_year + 1900,
-		pnow->tm_mon + 1,
-		pnow->tm_mday,
-		week[pnow->tm_wday]);
+
+void HUDDisp() {
+
+	SetFontSize(30);
+	DrawFormatString(800, 10, 0x000000, "%c%c%c%c %c%c%c %c%c\n %s",
+		data[7], data[8], data[9], data[10],
+		data[0], data[1], data[2],
+		data[4], data[5] ,
+		time);
 }

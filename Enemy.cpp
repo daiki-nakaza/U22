@@ -165,14 +165,19 @@ void enemyInfo::ShootMove() {		//Œ‚‚Â“G‚Ìˆ—
 				ReloadCnt = 0;
 			}
 			if (ReloadCnt++ <= ReloadTime) {}
-		}
-		for (int i = 0; i < Bullet_MAX; i++) {
-			Bullet[i].Disp();
-			Bullet[i].Move(direct);
-			if (IronToEnemy(Bullet[i])) {
-				Bullet[i].DispFlg = false;		//“S‹…‚É“–‚½‚Á‚Ä‚¢‚½‚ç‚Æ‚è‚ÜÁ‚·
+
+			for (int i = 0; i < Bullet_MAX; i++) {
+				Bullet[i].Disp();
+				Bullet[i].Move(direct);
+				if (IronToBullet(Bullet[i])) {
+					Bullet[i].DispFlg = false;		//“S‹…‚É“–‚½‚Á‚Ä‚¢‚½‚ç‚Æ‚è‚ÜÁ‚·
+				}
+				if (PlayerToEnemy(Bullet[i])) {
+					Bullet[i].DispFlg = false;		//“S‹…‚É“–‚½‚Á‚Ä‚¢‚½‚ç‚Æ‚è‚ÜÁ‚·
+				}
 			}
 		}
+		
 
 	}
 	else {
@@ -236,7 +241,6 @@ void enemyMove() {
 			break;
 		}
 
-		if (g_Enemy[0].DispFlg)DrawFormatString(30, 60, 0x000000, "UŒ‚‚µ‚Ä‚Ü‚·", true);
 
 		if (EnemyCheckHit(g_Enemy[i])
 			|| IronToEnemy(g_Enemy[i]) ) {	//•Ç‚¾‚Á‚½‚ç

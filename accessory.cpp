@@ -36,6 +36,7 @@ void partsInfo::Disp() {
 	if (DispFlg) {		//ìSãÖï\é¶
 		//DrawBox(x,y, x + w, y + h, 0x000000, true);
 		//DrawRotaGraphFast2(x, y, 0, 0, 1, 0, pic, true, picDir);
+	//	DrawCircle(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE, MAP_SIZE * 9, 0xffffff, true);
 		DrawCircle(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY*MAP_SIZE, r, 0x000000, true);
 		DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", x, x + MapDrawPointX - MapX * MAP_SIZE);
 		if (HoldFlg==false)DrawFormatString(100, 30, 0x000000, "HOLD");
@@ -76,18 +77,24 @@ void partsInfo::Throw(){			//ìSãÖÇ™îÚÇÒÇ≈Ç¢Ç≠èàóù
 		x += 6;
 		y += Pow;
 		if (HitCheck()) {
-			ThrowFlg = false;
+		//	ThrowFlg = false;
 			x -= 7;
 			y -= Pow;
+			if (Pow < 0) {
+				Pow = 0;
+			}
 		}
 	}else if(ThrowFlg && Bectl == 1){		//ìäÇ∞ÇÁÇÍÇƒÇ¢ÇÈèàóùç∂
 		Pow++;
 		x -= 6;
 		y += Pow;
 		if (HitCheck()) {
-			ThrowFlg = false;
+		//	ThrowFlg = false;
 			x += 7;
 			y -= Pow;
+			if (Pow < 0) {
+				Pow = 0;
+			}
 		}
 	}
 	else { Pow = InitPow; }
@@ -111,6 +118,17 @@ bool partsInfo::HitCheck() {		//ínñ Ç∆ÇÃìñÇΩÇËîªíËÅ@ìñÇΩÇ¡ÇƒÇ¢ÇÍÇŒtrue ìñÇΩÇ¡ÇƒÇ
 		z += HEIGHT;
 	}
 	
+	//1Ç‹Ç∑â∫ÇÇ›Çƒínñ Ç©Ç«Ç§Ç©îªíf
+	if (g_MapChip[(y + IRONBALL_R) / MAP_SIZE + l + z+1][x / MAP_SIZE - k - w] != 1		//íÜêSÇÃê^â∫
+		|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l+1][(x - IRONBALL_R) / MAP_SIZE - k] != 1	//ç∂è„
+		|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l + j+1][(x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//âEè„
+		|| g_MapChip[(y + IRONBALL_R) / MAP_SIZE + l+1][(x - IRONBALL_R) / MAP_SIZE - k] != 1	//ç∂â∫
+		|| g_MapChip[(y + IRONBALL_R) / MAP_SIZE + l + j+1][(x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//âEè„
+		) {
+		ThrowFlg = false;
+	}
+
+
 	//if (g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] != 1		////ÇPÇ¬â∫ÇÃÉ}ÉXÇå©Çƒínñ ÇæÇ¡ÇΩÇÁ
 	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][((x - IRONBALL_R) / MAP_SIZE + MapX)] != 1
 	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][((x + IRONBALL_R) / MAP_SIZE + MapX)] != 1

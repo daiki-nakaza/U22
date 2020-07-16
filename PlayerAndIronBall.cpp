@@ -17,8 +17,8 @@ void IronInit(int *ironX, int *ironY, int px,int py) {
 }
 
 void IronHold(int* ironX, int* ironY, int px, int py, int mpx,int mpy) {
-	*ironX = px + mpx;
-	*ironY = py + mpy;
+	*ironX = px + mpx + g_IronBall.r/3*2-2;
+	*ironY = py + mpy - g_IronBall.r/3*2;
 }
 
 void IronHoldOrThrow() {
