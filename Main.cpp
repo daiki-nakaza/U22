@@ -8,6 +8,7 @@
 #include "GameHelp.h"
 #include "GameMenu.h"
 #include "Map.h"
+#include "Player.h"
 
 
 
@@ -81,6 +82,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	if (LoadSounds() == -1) {
 		return -1;
 	}
+	
 
 
 	//DrawInit();
@@ -140,7 +142,24 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 
 int LoadImages() {
+	//マップチップ
+	MapTip = LoadGraph("images/kenkyu7.png");
+	//背景
+	if ((g_BackGroundImage = LoadGraph("images/haikei.png")) == -1) return -1;
+
+	//プレイヤー画像
+	LoadDivGraph("images/shujin.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic);
+	LoadDivGraph("images/shujin2.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_R);
+	LoadDivGraph("images/attack.png", 6, 6, 1, CHA_SIZE_X * 2, CHA_SIZE_Y, Player_Pic_Attack);
+	LoadDivGraph("images/attack2.png", 6, 6, 1, CHA_SIZE_X * 2, CHA_SIZE_Y, Player_Pic_Attack_R);
+	Player_Pic_Down = LoadGraph("images/shagami.png", true);
+	Player_Pic_Down_R = LoadGraph("images/shagami2.png", true);
+	LoadDivGraph("images/motu.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_Hold);
+	LoadDivGraph("images/motu2.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_Hold_R);
+
+
 	return 0;
+
 }
 int LoadSounds() {
 	return 0;

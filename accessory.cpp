@@ -36,6 +36,7 @@ void partsInfo::Disp() {
 	if (DispFlg) {		//鉄球表示
 		//DrawBox(x,y, x + w, y + h, 0x000000, true);
 		//DrawRotaGraphFast2(x, y, 0, 0, 1, 0, pic, true, picDir);
+	//	DrawCircle(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE, MAP_SIZE * 9, 0xffffff, true);
 		DrawCircle(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY*MAP_SIZE, r, 0x000000, true);
 		DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", x, x + MapDrawPointX - MapX * MAP_SIZE);
 		if (HoldFlg==false)DrawFormatString(100, 30, 0x000000, "HOLD");
@@ -61,7 +62,7 @@ void partsInfo::Move() {
 }
 
 void partsInfo::Throw(){			//鉄球が飛んでいく処理
-	const int InitPow = -24;
+	const int InitPow = -20;
 	static int Pow = InitPow;
 	static int move = 1;
 
@@ -71,32 +72,73 @@ void partsInfo::Throw(){			//鉄球が飛んでいく処理
 		IronHold(&x,&y);
 	}
 
-	if (ThrowFlg) {			//投げられている処理
-		if (Pow++ < abs(InitPow)) {
-			x += 6;
-			y += Pow;
-			if (HitCheck()) {
-				ThrowFlg = false;
-				x -= 6;
-				y -= Pow;
+	if (ThrowFlg && Bectl == 0) {			//投げられている処理右
+		Pow++;
+		x += 6;
+		y += Pow;
+		if (HitCheck()) {
+		//	ThrowFlg = false;
+			x -= 7;
+			y -= Pow;
+			if (Pow < 0) {
+				Pow = 0;
 			}
 		}
-		else { ThrowFlg = false; }
+	}else if(ThrowFlg && Bectl == 1){		//投げられている処理左
+		Pow++;
+		x -= 6;
+		y += Pow;
+		if (HitCheck()) {
+		//	ThrowFlg = false;
+			x += 7;
+			y -= Pow;
+			if (Pow < 0) {
+				Pow = 0;
+			}
+		}
 	}
 	else { Pow = InitPow; }
 }
 
 bool partsInfo::HitCheck() {		//地面との当たり判定　当たっていればtrue 当たっていなければfalse
+	 int i=0, j=0, k=0, l=0, w=0, z=0;//ローカル変数
+	//鉄球の位置（左）がマップをまたいでいる
+	while ((x - IRONBALL_R)/MAP_SIZE - k >= WIDTH) {
+		k += WIDTH;
+		l += HEIGHT;
+	}
+	//鉄球の位置（右）がマップをまたいでいる
+	if ((x + IRONBALL_R)/MAP_SIZE - k>= WIDTH) {
+		i += WIDTH;
+		j += HEIGHT;
+	}
+	//真ん中の位置がマップをまたいでいる
+	if (x/MAP_SIZE - k >= WIDTH) {
+		w += WIDTH;
+		z += HEIGHT;
+	}
+	
+	//1ます下をみて地面かどうか判断
+	if (g_MapChip[(y + IRONBALL_R) / MAP_SIZE + l + z+1][x / MAP_SIZE - k - w] != 1		//中心の真下
+		|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l+1][(x - IRONBALL_R) / MAP_SIZE - k] != 1	//左上
+		|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l + j+1][(x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//右上
+		|| g_MapChip[(y + IRONBALL_R) / MAP_SIZE + l+1][(x - IRONBALL_R) / MAP_SIZE - k] != 1	//左下
+		|| g_MapChip[(y + IRONBALL_R) / MAP_SIZE + l + j+1][(x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//右上
+		) {
+		ThrowFlg = false;
+	}
+
+
 	//if (g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] != 1		////１つ下のマスを見て地面だったら
 	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][((x - IRONBALL_R) / MAP_SIZE + MapX)] != 1
 	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][((x + IRONBALL_R) / MAP_SIZE + MapX)] != 1
 	//	
 	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] != 1) {
-	if(g_MapChip[MapY + (y + IRONBALL_R  - MapDrawPointY) / MAP_SIZE ][MapX + (x - MapDrawPointX) / MAP_SIZE] != 1		//中心の真下
-		|| g_MapChip[MapY + (y - IRONBALL_R - MapDrawPointY) / MAP_SIZE ][MapX + (x - IRONBALL_R - MapDrawPointX) / MAP_SIZE ] != 1	//左上
-		|| g_MapChip[MapY + (y - IRONBALL_R - MapDrawPointY) / MAP_SIZE ][(x + IRONBALL_R - MapDrawPointX) / MAP_SIZE + MapX] != 1	//右上
-		|| g_MapChip[MapY + (y + IRONBALL_R - MapDrawPointY) / MAP_SIZE ][(x - IRONBALL_R - MapDrawPointX) / MAP_SIZE + MapX] != 1	//左下
-		|| g_MapChip[MapY + (y + IRONBALL_R - MapDrawPointY) / MAP_SIZE ][(x + IRONBALL_R - MapDrawPointX) / MAP_SIZE + MapX] != 1	//右上
+	if(g_MapChip[ (y + IRONBALL_R  ) / MAP_SIZE + l + z][x  / MAP_SIZE - k - w] != 1		//中心の真下
+		|| g_MapChip[ (y - IRONBALL_R ) / MAP_SIZE + l][(x - IRONBALL_R ) / MAP_SIZE - k] != 1	//左上
+		|| g_MapChip[ (y - IRONBALL_R ) / MAP_SIZE + l + j][(x + IRONBALL_R ) / MAP_SIZE - k - i] != 1	//右上
+		|| g_MapChip[ (y + IRONBALL_R ) / MAP_SIZE + l][(x - IRONBALL_R ) / MAP_SIZE - k] != 1	//左下
+		|| g_MapChip[ (y + IRONBALL_R ) / MAP_SIZE + l + j][(x + IRONBALL_R ) / MAP_SIZE - k - i] != 1	//右上
 		){	
 		return true;
 	}
