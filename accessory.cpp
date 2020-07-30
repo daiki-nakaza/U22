@@ -8,13 +8,19 @@
 /**************************************************
 *		•Ï”‚ÌéŒ¾
 ***************************************************/
-partsInfo g_IronBall;			//“G‚Ìî•ñ‚ğ‚Á‚½•Ï”
+partsInfo g_IronBall;			//“S‹…‚Ìî•ñ‚ğ‚Á‚½•Ï”
+Lock Locka;						//½‚Ìî•ñ‚ğ‚Á‚½•Ï”
 
 /*****************************************************
 *		ŠÖ”‚Ì’è‹`
 ********************************************************/
+
+//‰Šú‰»ˆ
 void partsInfo::Init() {                 // “S‹…‚Ì‰Šú‰»
 	IronInit(&x, &y);		//À•W‚ğƒvƒŒƒCƒ„[‚Ì—×‚É‘ã“ü
+	New_x = x;
+	New_y = y;
+
 	r = IRONBALL_R;
 
 	//LoadDivGraph("images/MouseAll.png", 4, 4, 1, ENEMY_SIZE, ENEMY_SIZE, pic);
@@ -30,24 +36,383 @@ void partsInfo::Init() {                 // “S‹…‚Ì‰Šú‰»
 
 }
 
+void Lock::Init() {
+	LockInit(&x[0], &y[0]);
+	for (int i = 0; i < LOCK_MAX; i++) {
+		New_x[i] = x[i];
+		New_y[i] = y[i];
+	}
+
+	ro = 4;
+
+	HenkaX = 0;		//l‚Ì•Ï‰»—Ê
+	HenkaY = 0;		//l‚Ì•Ï‰»—Ê
+
+	LenkaX = 0;		//“S‹…‚Ì•Ï‰»—Ê
+	LenkaY = 0;		//“S‹…‚Ì•Ï‰»—Ê
+}
+
+//•`‰æˆ—
 void partsInfo::Disp() {
 
 
 	if (DispFlg) {		//“S‹…•\¦
 		//DrawBox(x,y, x + w, y + h, 0x000000, true);
 		//DrawRotaGraphFast2(x, y, 0, 0, 1, 0, pic, true, picDir);
+	//	DrawCircle(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE, MAP_SIZE * 9, 0xffffff, true);
 		DrawCircle(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY*MAP_SIZE, r, 0x000000, true);
-		DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", x, x + MapDrawPointX - MapX * MAP_SIZE);
-		if (HoldFlg==false)DrawFormatString(100, 30, 0x000000, "HOLD");
-		if (ThrowFlg==false)DrawFormatString(100, 30, 0x000000, "THROW");
+		DrawFormatString(30, 90, 0x000000, "Y = %d\nX = %d\n", /*Locka.x[LOCK_MAX-1]*/0, 0);
+		if (HoldFlg)DrawFormatString(100, 30, 0x000000, "HOLD");
+		if (ThrowFlg)DrawFormatString(100, 30, 0x000000, "THROW");
 	}
 	else {				//“S‹…”ñ•\¦
 
 	}
 }
 
+void Lock::Disp() {
+	for (int i = 0; i < LOCK_MAX; i++) {
+		DrawCircle(x[i] + MapDrawPointX - MapX * MAP_SIZE, y[i] - MapDrawPointY - MapY * MAP_SIZE, ro, GetColor(252 - i*30,i*30,0), true);
+	}
+	DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", x[0] + MapDrawPointX - MapX * MAP_SIZE, PlayerX+16);
+
+}
+
+//ˆÚ“®‚Å‚«‚é‚©‚Ç‚¤‚©Šm‚©‚ß‚é
+void Lock::MoveCheck() {
+	int ox, oy;//ƒ[ƒJƒ‹•Ï”A½‚P‚Â‚¸‚Â‚Ì·‚ğ¦‚µ‚Ä‚¢‚é
+	//HenkaY = 0;
+	LenkaY = 0;
+	for (int i = 0; i < LOCK_MAX; i++) {
+		New_x[i] = x[i];
+		New_y[i] = y[i];
+	}
+
+	//ˆÚ“®—Ê‚È‚µ‚È‚çI‚í‚è
+	if (HenkaX == 0 && HenkaY == 0 && LenkaX == 0 && LenkaY == 0) {
+		return;
+	}
+
+	/*********************************
+	*“S‹…‚ªˆÚ“®‚µ‚½‚Æ‚«‚Ì•Ï‰»
+	*********************************/
+	//yÀ•W‚Ì•Ï‰»
+	//ƒ}ƒCƒiƒX‚È‚çBã‚É‚¢‚­Bƒvƒ‰ƒX‚à‚ ‚é
+	if (LenkaY < 0) {
+		for (int i = LOCK_MAX - 1; i > 0; i--) {
+			//•Ï‰»—Ê‚È‚µ‚È‚çƒuƒŒƒCƒN
+			if (LenkaY == 0) {
+				break;
+			}
+			//½‚Ì·‚ğ}‚é
+			oy = New_y[i-1] - New_y[i];
+			//À•WˆÚ“®
+			while (LenkaY != 0) {
+				New_y[i]--;
+				oy++;
+				LenkaY++;
+				if (HitCheck(i) == true) {//•Ç‚É“–‚½‚Á‚Ä‚¢‚é‚Ì‚Å¶‚©‰E‚ÉˆÚ“®‚³‚¹‚é
+					New_y[i]++;//‚±‚±‚©‚¦‚é
+					if (x[i] - x[i + 1] >= 0) {
+						New_x[i]++;
+						//HenkaX++;
+					}
+					else if (x[i] - x[i + 1] < 0) {
+						New_x[i]--;
+						//HenkaX--;
+					}
+
+				}
+			}
+
+			if (oy >= IRONBALL_R) {//ƒI[ƒo[‚µ‚½’·‚³•ª‚ğ•Ï‰»—Ê‚É–ß‚·
+				LenkaY -= oy - IRONBALL_R;
+			}
+
+		}
+	}
+	else if (LenkaY > 0) {
+		for (int i = LOCK_MAX - 1; i > 0; i--) {
+			//•Ï‰»—Ê‚È‚µ‚È‚çƒuƒŒƒCƒN
+			if (LenkaY == 0) {
+				break;
+			}
+			//½‚Ì·‚ğ}‚é
+			oy = New_y[i] - New_y[i - 1];
+			//À•WˆÚ“®
+			while (LenkaY != 0) {
+				New_y[i]++;
+				oy++;
+				LenkaY--;
+				if (HitCheck(i) == true) {//•Ç‚É“–‚½‚Á‚Ä‚¢‚é‚Ì‚Å¶‚©‰E‚ÉˆÚ“®‚³‚¹‚é
+					New_y[i]--;//‚±‚±‚©‚¦‚é
+					//if (x[i] - x[i + 1] >= 0) {
+					//	New_x[i]++;
+					//	//HenkaX++;
+					//}
+					//else if (x[i] - x[i + 1] < 0) {
+					//	New_x[i]--;
+					//	//HenkaX--;
+					//}
+
+				}
+			}
+
+			if (oy >= IRONBALL_R) {//ƒI[ƒo[‚µ‚½’·‚³•ª‚ğ•Ï‰»—Ê‚É–ß‚·
+				LenkaY += oy - IRONBALL_R;
+			}
+
+		}
+	}
+
+	//cˆÚ“®¬Œ÷
+	if (LenkaY == 0) {
+
+	}
+	//ˆÚ“®¸”s
+	else {
+		NewY += LenkaY;
+		//HenkaY += LenkaY;
+	}
+
+	LenkaY = 0;
+
+	//‚˜À•W‚Ì•Ï‰»
+	//ƒvƒ‰ƒX‚È‚Ì‚Å‰E‚ÉˆÚ“®‚µ‚Ä‚¢‚éB
+	if (LenkaX > 0) {
+		for (int i = LOCK_MAX - 1; i > 0; i--) {
+			//•Ï‰»—Ê‚È‚µ‚È‚çƒuƒŒƒCƒN
+			if (LenkaX == 0) {
+				break;
+			}
+
+			ox = New_x[i] - New_x[i - 1];							//½‚Ì·‚ğ}‚é
+
+			//À•WˆÚ“®
+			New_x[i] += LenkaX;
+			ox += LenkaX;
+			LenkaX = 0;
+			if (ox > IRONBALL_R) {
+				LenkaX += ox - IRONBALL_R;
+			}
+		}
+	}
+	//ƒ}ƒCƒiƒX‚È‚Ì‚Å¶‚ÉˆÚ“®‚µ‚Ä‚¢‚éB
+	else if (LenkaX < 0) {
+		for (int i = LOCK_MAX - 1; i > 0; i--) {
+			//•Ï‰»—Ê‚È‚µ‚È‚çƒuƒŒƒCƒN
+			if (LenkaX == 0) {
+				break;
+			}
+
+			ox = New_x[i - 1] - New_x[i];							//½‚Ì·‚ğ}‚é
+
+			//À•WˆÚ“®
+			New_x[i] -= (-LenkaX);
+			ox += (-LenkaX);
+			LenkaX = 0;
+			if (ox > IRONBALL_R) {
+				LenkaX -= ox - IRONBALL_R;
+			}
+		}
+	}
+
+	//ˆÚ“®¬Œ÷B‚ ‚Æ“–‚½‚èƒ`ƒFƒbƒN‚à‚·‚é
+	if (LenkaX == 0) {
+
+	}//ˆÚ“®¸”sBl‚Ì‚Ù‚¤‚ğ“®‚©‚·BƒGƒ‰[‚·‚é‚©‚à
+	else {
+		NewX += LenkaX;
+		HenkaX += LenkaX;
+	}
+	LenkaX = 0;
+
+	/*********************************
+	*l‚ªˆÚ“®‚µ‚½‚Æ‚«‚Ì•Ï‰»
+	*********************************/
+	//yÀ•W‚Ì•Ï‰»
+	//ƒ}ƒCƒiƒX‚µ‚©‚È‚¢Bã‚É‚¢‚­
+	if (HenkaY < 0) {
+		for (int i = 0; i < LOCK_MAX - 1; i++) {
+			//•Ï‰»—Ê‚È‚µ‚È‚çƒuƒŒƒCƒN
+			if (HenkaY == 0) {
+				break;
+			}
+			//½‚Ì·‚ğ}‚é
+			oy = /*abs(x[i] - x[i + 1])*/  New_y[i + 1] - New_y[i];
+			//À•WˆÚ“®
+			while (HenkaY != 0) {
+				New_y[i]--;
+				oy++;
+				HenkaY++;
+				if (HitCheck(i) == true) {//•Ç‚É“–‚½‚Á‚Ä‚¢‚é‚Ì‚Å¶‚©‰E‚ÉˆÚ“®‚³‚¹‚éB‚±‚±l‚¦‚é‚×‚«
+					New_y[i]++;//‚±‚±‚©‚¦‚é
+					if (x[i] - x[i + 1] >= 0) {
+						New_x[i]++;
+						//HenkaX++;
+					}
+					else if (x[i] - x[i + 1] < 0) {
+						New_x[i]--;
+						//HenkaX--;
+					}
+					
+				}
+			}
+
+			if (oy >= IRONBALL_R) {//ƒI[ƒo[‚µ‚½’·‚³•ª‚ğ•Ï‰»—Ê‚É–ß‚·
+				HenkaY -= oy - IRONBALL_R;
+			}
+
+		}
+	}
+	else if (HenkaY > 0) {//‚Ğ‚Æ‚ª—‚¿‚Ä‚¢‚­ê‡
+
+		static int zo[LOCK_MAX];//d—Í‚Æ—‚½‚æ‚¤‚Èˆ—‚ğ‚·‚é‚½‚ß
+
+		//ÅŒã‚Ì•û‚Ì½
+		New_y[LOCK_MAX - 1] += HenkaY;
+		if (HitCheck(0) == false && (y[LOCK_MAX - 1] - g_IronBall.y) < 0) {
+		}
+		else {
+			New_y[LOCK_MAX - 1] -= HenkaY;
+		}
+		
+
+		//‚·‚×‚Ä‚Éd—Í‚ğ‰Á‚¦‚Ä‚»‚ÌŒãAˆø‚¢‚Ä‚¢‚­
+		for (int i = 0; i < LOCK_MAX - 1; i++) {
+			New_y[i] += HenkaY;
+			zo[i] = 4;
+		}
+
+		//4FŠ®àø‚É—‚¿‚½B2F•Ç‚Éˆø‚Á‚©‚©‚Á‚Ä‚¢‚é‚ª‚Ü‚ ‘åä•vB0F½‚Ì’·‚³‚Åˆø‚Á‚©‚©‚Á‚Ä‚¢‚é‚Ì‚Å•s‰Â
+		for (int i = LOCK_MAX - 2; i >= 0; i--) {
+			if (New_y[i] - New_y[i + 1] >= IRONBALL_R) {
+				if (zo[i] == 4 ) {
+					New_y[i] -= HenkaY;
+					zo[i] = 0;
+				}
+				else if (zo[i] == 2) {
+					zo[i] = 0;
+				}
+			}
+			else if (HitCheck(i) == true) {
+				if (zo[i] == 4) {
+					New_y[i] -= HenkaY;
+					zo[i] = 2;
+				}
+			}
+		}
+
+		for (int i = 1; i < LOCK_MAX-1; i++) {
+			if (New_y[i] - New_y[i-1] >= IRONBALL_R) {
+				if (zo[i] == 4) {
+					New_y[i] -= HenkaY;
+					zo[i] = 0;
+				}
+				else if (zo[i] == 2) {
+					zo[i] = 0;
+				}
+			}
+			else if (HitCheck(i) == true) {
+				if (zo[i] == 4) {
+					New_y[i] -= HenkaY;
+					zo[i] = 2;
+				}
+			}
+		}
+		//ƒ`ƒFƒbƒN
+		for (int i = 0; i < LOCK_MAX - 1; i++) {
+			if (zo[i] == 4 || zo[i] == 2) {
+				HenkaY = 0;
+				break;
+			}
+		}
+	}
+	
+	//HenkaY = 0;
+
+
+	//‚˜À•W‚Ì•Ï‰»
+	//ƒvƒ‰ƒX‚È‚Ì‚Å‰E‚ÉˆÚ“®‚µ‚Ä‚¢‚éB
+	if (HenkaX > 0) {
+		for (int i = 0; i < LOCK_MAX - 1; i++) {
+			//•Ï‰»—Ê‚È‚µ‚È‚çƒuƒŒƒCƒN
+			if (HenkaX == 0) {
+				break;
+			}
+
+			ox = (New_x[i] - New_x[i + 1]); //+ //abs(New_y[i] - New_y[i + 1]);							//½‚Ì·‚ğ}‚é
+
+			//À•WˆÚ“®
+			while (HenkaX != 0) {
+				New_x[i]++;
+				ox ++;
+				HenkaX--;
+				if (HitCheck(i) == true) {//•Ç‚É“–‚½‚Á‚Ä‚¢‚é‚Ì‚Åã‚Éã¸‚³‚¹‚é
+					New_y[i]--;//‚±‚±‚©‚¦‚é
+					New_x[i]--;
+				}
+			}
+
+			if (ox >= IRONBALL_R) {//ƒI[ƒo[‚µ‚½’·‚³•ª‚ğ•Ï‰»—Ê‚É–ß‚·
+				HenkaX += ox - IRONBALL_R;
+			}
+		}
+	}
+	//ƒ}ƒCƒiƒX‚È‚Ì‚Å¶‚ÉˆÚ“®‚µ‚Ä‚¢‚éB
+	else if (HenkaX < 0) {
+		for (int i = 0; i < LOCK_MAX - 1; i++) {
+			//•Ï‰»—Ê‚È‚µ‚È‚çƒuƒŒƒCƒN
+			if (HenkaX == 0) {
+				break;
+			}
+
+			ox = New_x[i + 1] - New_x[i];// + abs(New_y[i] - New_y[i + 1]);							//½‚Ì·‚ğ}‚é
+
+			//À•WˆÚ“®
+			while (HenkaX != 0) {
+				New_x[i]--;
+				ox++;
+				HenkaX++;
+				if (HitCheck(i) == true) {//•Ç‚É“–‚½‚Á‚Ä‚¢‚é‚Ì‚Åã‚Éã¸‚³‚¹‚é
+					New_y[i]--;//‚±‚±‚©‚¦‚é
+					New_x[i]++;
+				}
+			}
+			
+			if (ox >= IRONBALL_R) {
+				HenkaX -= ox - IRONBALL_R;
+			}
+		}
+	}
+
+	//ˆÚ“®¬Œ÷B‚ ‚Æ“–‚½‚èƒ`ƒFƒbƒN‚à‚·‚é
+	if (HenkaX == 0) {
+		
+	}//ˆÚ“®¸”sB
+	else {
+		for (int i = 0; i < LOCK_MAX - 1; i++) {
+			New_x[i] += (-HenkaX);
+		}
+	}
+}
+
+//ˆÚ“®ˆ—
 void partsInfo::Move() {
-	if (!HitCheck() && !ThrowFlg) y += 4;
+	
+
+	//if (!ThrowFlg)y += 4;
+	New_x = x;
+	New_y = y;
+	if (!HitCheck() && !ThrowFlg ) y += 4;
+	
+
+	if (!HoldFlg && !ThrowFlg) {
+		HitBectl();
+		DrawFormatString(100, 100, 0x000000, "true");
+	}
+	
+	
 	
 	//x = ((PlayerX / MAP_SIZE) + 4) * MAP_SIZE;
 	if (HoldFlg) {
@@ -56,10 +421,71 @@ void partsInfo::Move() {
 	//ƒvƒŒƒCƒ„[‚ª“S‹…‚ğ“Š‚°‚é‚©‚Â‚©
 	IronHoldOrThrow();
 	Throw();
-
+	
+	
 
 }
 
+
+void Lock::Move() {
+	 static int zo[LOCK_MAX];
+
+
+	for (int i = 0; i < LOCK_MAX; i++) {
+		x[i] = New_x[i];
+		y[i] = New_y[i];
+	}
+
+	if (!g_IronBall.ThrowFlg && Jump_Flg == 0/*&& !g_IronBall.HoldFlg*/) {//“S‹…‚ğ“Š‚°‚Ä‚È‚¢‚Æ‚«A‚Á‚Ä‚¢‚È‚¢‚Æ‚«d—Í‚ğ½‚É‰Á‚¦‚é.
+													//‚»‚ê‚Æ½‚Ì’·‚³‚Ì§–ñ‚à‰Á‚¦‚é‚×‚«
+		New_y[0] += 4;
+		if (HitCheck(0) == false && (y[0] - PlayerY) < (CHA_SIZE_Y -4)) {
+			y[0] += 4;
+		}
+		New_y[0] = y[0];
+
+		//ÅŒã‚Ì•û‚Ì½
+		New_y[LOCK_MAX - 1] += 4;
+		if (HitCheck(0) == false && (y[LOCK_MAX - 1] - g_IronBall.y) < 0) {
+			y[LOCK_MAX - 1] += 4;
+		}
+		New_y[LOCK_MAX - 1] = y[LOCK_MAX - 1];
+
+		//‚·‚×‚Ä‚Éd—Í‚ğ‰Á‚¦‚Ä‚»‚ÌŒãAˆø‚¢‚Ä‚¢‚­
+		for (int i = 1; i < LOCK_MAX - 1; i++) {
+			New_y[i] += 4;
+			zo[i] = 4;
+		}
+
+		for (int i = LOCK_MAX - 2; i >= 1; i--) {
+			if (HitCheck(i) == true || New_y[i] - New_y[i + 1] >= IRONBALL_R) {
+				if (zo[i] == 4) {
+					New_y[i] -= 4;
+					zo[i] = 0;
+				}
+			}
+		}
+
+		for (int i = 1; i < LOCK_MAX-1; i++) {
+			if (HitCheck(i) == true ||  New_y[i] - New_y[i-1] >= IRONBALL_R) {
+				if (zo[i] == 4) {
+					New_y[i] -= 4;
+					zo[i] = 0;
+				}
+			}
+		}
+		
+	}
+
+
+	for (int i = 0; i < LOCK_MAX; i++) {
+		x[i] = New_x[i];
+		y[i] = New_y[i];
+	}
+}
+
+
+//“Š‚°‚éˆ—
 void partsInfo::Throw(){			//“S‹…‚ª”ò‚ñ‚Å‚¢‚­ˆ—
 	const int InitPow = -20;
 	static int Pow = InitPow;
@@ -72,55 +498,115 @@ void partsInfo::Throw(){			//“S‹…‚ª”ò‚ñ‚Å‚¢‚­ˆ—
 	}
 
 	if (ThrowFlg && Bectl == 0) {			//“Š‚°‚ç‚ê‚Ä‚¢‚éˆ—‰E
+		New_x = x;
+		New_y = y;
 		Pow++;
-		x += 6;
-		y += Pow;
+		New_x += 6;
+		New_y += Pow;
 		if (HitCheck()) {
-			ThrowFlg = false;
-			x -= 7;
-			y -= Pow;
+		//	ThrowFlg = false;
+			
+			if (Pow < 0) {
+				Pow = 0;
+			}
+			else {
+				//‰º~‚¾‚¯‚³‚¹‚Ä‚à‘åä•v‚È‚ç‚·‚é
+				New_x = x;
+				if (!HitCheck()) {
+					//x = New_x;
+					y = New_y;
+				}
+			}
+			
+		}
+		else {
+			x = New_x;
+			y = New_y;
+			Locka.LenkaX += 6;
+			Locka.LenkaY += Pow;
 		}
 	}else if(ThrowFlg && Bectl == 1){		//“Š‚°‚ç‚ê‚Ä‚¢‚éˆ—¶
+		New_x = x;
+		New_y = y;
 		Pow++;
-		x -= 6;
-		y += Pow;
+		New_x -= 6;
+		New_y += Pow;
 		if (HitCheck()) {
-			ThrowFlg = false;
-			x += 7;
-			y -= Pow;
+			//	ThrowFlg = false;
+
+			if (Pow < 0) {
+				Pow = 0;
+			}
+			else {
+				//‰º~‚¾‚¯‚³‚¹‚Ä‚à‘åä•v‚È‚ç‚·‚é
+				New_x = x;
+				if (!HitCheck()) {
+					x = New_x;
+					y = New_y;
+				}
+			}
+			
+			
+		}
+		else {
+			x = New_x;
+			y = New_y;
+			Locka.LenkaX -= 6;
+			Locka.LenkaY += Pow;
 		}
 	}
 	else { Pow = InitPow; }
+
+	New_x = x;
+	New_y = y;//ÅI“I‚ÈƒŠƒZƒbƒg
 }
 
-bool partsInfo::HitCheck() {		//’n–Ê‚Æ‚Ì“–‚½‚è”»’è@“–‚½‚Á‚Ä‚¢‚ê‚Îtrue “–‚½‚Á‚Ä‚¢‚È‚¯‚ê‚Îfalse
+
+void Lock::Throw() {
+
+}
+
+
+
+//“–‚½‚è”»’è
+bool partsInfo::HitCheck() {		//’n–Ê‚Æ‚Ì“–‚½‚è”»’è@“–‚½‚Á‚Ä‚¢‚ê‚Îtrue “–‚½‚Á‚Ä‚¢‚È‚¯‚ê‚ÎfalseB“®‚¢‚½Œã‚ÌÀ•W‚ğ‚İ‚é‚Æ‚±‚ë
 	 int i=0, j=0, k=0, l=0, w=0, z=0;//ƒ[ƒJƒ‹•Ï”
 	//“S‹…‚ÌˆÊ’ui¶j‚ªƒ}ƒbƒv‚ğ‚Ü‚½‚¢‚Å‚¢‚é
-	while ((x - IRONBALL_R)/MAP_SIZE - k >= WIDTH) {
+	while ((New_x - IRONBALL_R)/MAP_SIZE - k >= WIDTH) {
 		k += WIDTH;
 		l += HEIGHT;
 	}
 	//“S‹…‚ÌˆÊ’ui‰Ej‚ªƒ}ƒbƒv‚ğ‚Ü‚½‚¢‚Å‚¢‚é
-	if ((x + IRONBALL_R)/MAP_SIZE - k>= WIDTH) {
+	if ((New_x + IRONBALL_R)/MAP_SIZE - k>= WIDTH) {
 		i += WIDTH;
 		j += HEIGHT;
 	}
 	//^‚ñ’†‚ÌˆÊ’u‚ªƒ}ƒbƒv‚ğ‚Ü‚½‚¢‚Å‚¢‚é
-	if (x/MAP_SIZE - k >= WIDTH) {
+	if (New_x/MAP_SIZE - k >= WIDTH) {
 		w += WIDTH;
 		z += HEIGHT;
 	}
 	
-	//if (g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] != 1		////‚P‚Â‰º‚Ìƒ}ƒX‚ğŒ©‚Ä’n–Ê‚¾‚Á‚½‚ç
-	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][((x - IRONBALL_R) / MAP_SIZE + MapX)] != 1
-	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][((x + IRONBALL_R) / MAP_SIZE + MapX)] != 1
-	//	
-	//	&& g_MapChip[((y + (MAP_SIZE - IRONBALL_R)) / MAP_SIZE + MapY) + 1][(x / MAP_SIZE + MapX)] != 1) {
-	if(g_MapChip[ (y + IRONBALL_R  ) / MAP_SIZE + l + z][x  / MAP_SIZE - k - w] != 1		//’†S‚Ì^‰º
-		|| g_MapChip[ (y - IRONBALL_R ) / MAP_SIZE + l][(x - IRONBALL_R ) / MAP_SIZE - k] != 1	//¶ã
-		|| g_MapChip[ (y - IRONBALL_R ) / MAP_SIZE + l + j][(x + IRONBALL_R ) / MAP_SIZE - k - i] != 1	//‰Eã
-		|| g_MapChip[ (y + IRONBALL_R ) / MAP_SIZE + l][(x - IRONBALL_R ) / MAP_SIZE - k] != 1	//¶‰º
-		|| g_MapChip[ (y + IRONBALL_R ) / MAP_SIZE + l + j][(x + IRONBALL_R ) / MAP_SIZE - k - i] != 1	//‰Eã
+	//“Š‚°‚Ä‚¢‚é‚Æ‚«‚É•Ç‚É‚ ‚½‚Á‚½‚ç“Š‚°‚é‚Ì‚ğ‚â‚ß‚éBThrowFlg‚ğ•Ï‚¦‚é‚Æ‚±‚ë
+	if (g_MapChip[(New_y + IRONBALL_R) / MAP_SIZE + l + z][New_x / MAP_SIZE - k - w] != 1		//’†S‚Ì^‰º
+		//|| g_MapChip[(New_y - IRONBALL_R + 10) / MAP_SIZE + l][(New_x - IRONBALL_R) / MAP_SIZE - k] != 1	//¶ã + 10
+		//|| g_MapChip[(New_y - IRONBALL_R + 10) / MAP_SIZE + l + j][(New_x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//‰Eã + 10
+		|| g_MapChip[(New_y ) / MAP_SIZE + l][(New_x - IRONBALL_R) / MAP_SIZE - k] != 1	//¶^‚ñ’†
+		|| g_MapChip[(New_y ) / MAP_SIZE + l + j][(New_x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//‰E^‚ñ’†
+		|| g_MapChip[(New_y + IRONBALL_R) / MAP_SIZE + l][(New_x - IRONBALL_R) / MAP_SIZE - k] != 1	//¶‰º
+		|| g_MapChip[(New_y + IRONBALL_R) / MAP_SIZE + l + j][(New_x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//‰E‰º
+		) {
+		
+		ThrowFlg = false;
+	}
+
+
+	if(g_MapChip[ (New_y - IRONBALL_R  ) / MAP_SIZE + l + z][New_x  / MAP_SIZE - k - w] != 1		//’†S‚Ì^ã
+		||g_MapChip[(New_y + IRONBALL_R) / MAP_SIZE + l + z][New_x / MAP_SIZE - k - w] != 1		//’†S‚Ì^‰º
+		|| g_MapChip[ (New_y - IRONBALL_R ) / MAP_SIZE + l][(New_x - IRONBALL_R ) / MAP_SIZE - k] != 1	//¶ã
+		|| g_MapChip[ (New_y - IRONBALL_R ) / MAP_SIZE + l + j][(New_x + IRONBALL_R ) / MAP_SIZE - k - i] != 1	//‰Eã
+		|| g_MapChip[ (New_y + IRONBALL_R ) / MAP_SIZE + l][(New_x - IRONBALL_R ) / MAP_SIZE - k] != 1	//¶‰º
+		|| g_MapChip[ (New_y + IRONBALL_R ) / MAP_SIZE + l + j][(New_x + IRONBALL_R ) / MAP_SIZE - k - i] != 1	//‰E‰º
 		){	
 		return true;
 	}
@@ -129,11 +615,112 @@ bool partsInfo::HitCheck() {		//’n–Ê‚Æ‚Ì“–‚½‚è”»’è@“–‚½‚Á‚Ä‚¢‚ê‚Îtrue “–‚½‚Á‚Ä‚
 }
 
 
+//‰E¶‚Ç‚¿‚ç‚É‚ ‚½‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©BŒ»İ‚ÌÀ•W‚ğ‚İ‚é‚Æ‚±‚ë
+void  partsInfo::HitBectl() {
+	int i = 0, j = 0, k = 0, l = 0, w = 0, z = 0;//ƒ[ƒJƒ‹•Ï”
+	//“S‹…‚ÌˆÊ’ui¶j‚ªƒ}ƒbƒv‚ğ‚Ü‚½‚¢‚Å‚¢‚é
+	while ((x - IRONBALL_R) / MAP_SIZE - k >= WIDTH) {
+		k += WIDTH;
+		l += HEIGHT;
+	}
+	//“S‹…‚ÌˆÊ’ui‰Ej‚ªƒ}ƒbƒv‚ğ‚Ü‚½‚¢‚Å‚¢‚é
+	if ((x + IRONBALL_R) / MAP_SIZE - k >= WIDTH) {
+		i += WIDTH;
+		j += HEIGHT;
+	}
+	//^‚ñ’†‚ÌˆÊ’u‚ªƒ}ƒbƒv‚ğ‚Ü‚½‚¢‚Å‚¢‚é
+	if (x / MAP_SIZE - k >= WIDTH) {
+		w += WIDTH;
+		z += HEIGHT;
+	}
+
+
+	//Œ»İ‚ÌãÀ•W‚ğ‚İ‚é
+	if (g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l][(x - IRONBALL_R) / MAP_SIZE - k] != 1	//¶ã
+		|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l + j][(x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//‰Eã
+		|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l + z][x / MAP_SIZE - k - w] != 1)		//’†S‚Ì^ã
+	{
+		//‚™‚È‚Ì‚Åƒ}ƒbƒv‚ÅˆêŒÂ‰º‚ğ‚İ‚Ä‚à‘åä•v‚È‚Í‚¸B‚»‚±‚ª•Ç‚¶‚á‚È‚¯‚ê‚Î‚™À•W‚ğ‚»‚±‚ÉˆÚ‚·
+		if (g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l + 1][(x - IRONBALL_R) / MAP_SIZE - k] != 1	//¶ã
+			|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l + j + 1][(x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//‰Eã
+			|| g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l + z + 1][x / MAP_SIZE - k - w] != 1)
+		{
+		}
+		else {
+			y = ((y - IRONBALL_R) / MAP_SIZE + 1) * MAP_SIZE + IRONBALL_R + 1;
+		}
+	}
+
+
+
+
+	//Œ»İ‚Ì¶À•W‚ª•Ç‚É–„‚à‚ê‚Ä‚¢‚é‚È‚ç‚ÎÀ•W‚ğˆêŒÂ‰E‚É‚·‚é
+	if (g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l][(x - IRONBALL_R) / MAP_SIZE - k] != 1	//¶ã
+		|| g_MapChip[(y + IRONBALL_R - 4) / MAP_SIZE + l ][(x - IRONBALL_R) / MAP_SIZE - k] != 1	//¶‰º-4
+		) {
+		Locka.LenkaX +=  (((x - IRONBALL_R) / MAP_SIZE + 1) * MAP_SIZE + IRONBALL_R) - x;
+		x = ((x - IRONBALL_R) / MAP_SIZE + 1) * MAP_SIZE + IRONBALL_R;
+		Locka.MoveCheck();
+		//return;
+	}
+	//Œ»İ‚Ì‰EÀ•W‚ª•Ç‚É–„‚à‚ê‚Ä‚¢‚é‚È‚ç‚ÎÀ•W‚ğˆêŒÂ¶‚É‚·‚é
+	if (g_MapChip[(y - IRONBALL_R) / MAP_SIZE + l + j][(x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//‰Eã
+		|| g_MapChip[(y + IRONBALL_R - 4) / MAP_SIZE + l + j][(x + IRONBALL_R) / MAP_SIZE - k - i] != 1	//‰E‰º-4
+		) {
+		Locka.LenkaX +=  (((x + IRONBALL_R) / MAP_SIZE) * MAP_SIZE - IRONBALL_R - 1) - x;
+		x = ((x + IRONBALL_R) / MAP_SIZE) * MAP_SIZE - IRONBALL_R - 1;
+		Locka.MoveCheck();
+		//return;
+	}
+
+	//New_x = x;
+	//New_y = y;//ÅI“I‚ÈƒŠƒZƒbƒg‚±‚ê‚Ånew_X‚ªG‚ê‚é
+	return ;
+}
+
+
+int Lock::HitCheck(int num) {
+	int i = 0, j = 0, k = 0, l = 0, w = 0, z = 0;//ƒ[ƒJƒ‹•Ï”
+
+	//½‚ÌˆÊ’ui¶j‚ªƒ}ƒbƒv‚ğ‚Ü‚½‚¢‚Å‚¢‚é
+	while ((New_x[num] - ro) / MAP_SIZE - k >= WIDTH) {
+		k += WIDTH;
+		l += HEIGHT;
+	}
+	//“S‹…‚ÌˆÊ’ui‰Ej‚ªƒ}ƒbƒv‚ğ‚Ü‚½‚¢‚Å‚¢‚é
+	if ((New_x[num] + ro) / MAP_SIZE - k >= WIDTH) {
+		i += WIDTH;
+		j += HEIGHT;
+	}
+	//^‚ñ’†‚ÌˆÊ’u‚ªƒ}ƒbƒv‚ğ‚Ü‚½‚¢‚Å‚¢‚é
+	if (New_x[num] / MAP_SIZE - k >= WIDTH) {
+		w += WIDTH;
+		z += HEIGHT;
+	}
+
+
+	if (g_MapChip[(New_y[num] - ro) / MAP_SIZE + l + z][New_x[num] / MAP_SIZE - k - w] != 1		//’†S‚Ì^ã
+		|| g_MapChip[(New_y[num] + ro) / MAP_SIZE + l + z][New_x[num] / MAP_SIZE - k - w] != 1		//’†S‚Ì^‰º
+		|| g_MapChip[(New_y[num] - ro) / MAP_SIZE + l][(New_x[num] - ro) / MAP_SIZE - k] != 1	//¶ã
+		|| g_MapChip[(New_y[num] - ro) / MAP_SIZE + l + j][(New_x[num] + ro) / MAP_SIZE - k - i] != 1	//‰Eã
+		|| g_MapChip[(New_y[num] + ro) / MAP_SIZE + l][(New_x[num] - ro) / MAP_SIZE - k] != 1	//¶‰º
+		|| g_MapChip[(New_y[num] + ro) / MAP_SIZE + l + j][(New_x[num] + ro) / MAP_SIZE - k - i] != 1	//‰E‰º
+		) {
+		return true;
+	}
+
+	return false;
+
+	//return 0;
+}
+
+
 /***********************************************
 *		“S‹…‚ÌŠÖ”‚Ì’è‹`
 ************************************************/
 void IronBallDisp() {
 	g_IronBall.Disp();
+	Locka.Disp();
 }
 
 
@@ -143,8 +730,10 @@ void IronBallMove() {
 
 	if (initflg) {
 		g_IronBall.Init();
+		Locka.Init();
 		initflg = false;
 	}
 
 	g_IronBall.Move();
+	Locka.Move();
 }

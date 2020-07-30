@@ -20,6 +20,8 @@ extern int Jump_Flg;  //ジャンプ用変数 8ずつずれるのを５回繰り返す
 extern int y_temp;
 extern int y_prev;
 
+extern int y_prev;//しゃがみのフラグ
+
 
 extern int g_OldKey;
 extern int g_NowKey;
@@ -35,6 +37,12 @@ extern int Player_Pic_R[4];//逆プレイヤー移動の画像
 
 extern int Player_Pic_Attack[6];//プレイヤー移動の画像
 extern int Player_Pic_Attack_R[6];//逆プレイヤー移動の画像
+
+extern int Player_Pic_Down;//プレイヤーしゃがみの画像
+extern int Player_Pic_Down_R;//逆プレイヤーしゃがみの画像
+
+extern int Player_Pic_Hold[4];//プレイヤーが鉄球をもって移動する画像
+extern int Player_Pic_Hold_R[4];//逆プレイヤーが鉄球をもって移動する画像
 
 
 
