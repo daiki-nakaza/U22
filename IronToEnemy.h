@@ -7,7 +7,9 @@
 #include "Player.h"
 
 
-bool IronToEnemy(enemyInfo enemy);			//“S‹…‚Æ“G‚Ì“–‚½‚è”»’è
+bool IronToEnemy(WalkEnemy enemy);			//“S‹…‚Æ“G‚Ì“–‚½‚è”»’è
+bool IronToEnemy(ShootEnemy enemy);			//“S‹…‚Æ“G‚Ì“–‚½‚è”»’è
+
 //bool IronToEnemy(BulletInfo Bullet);			//“S‹…‚Æ“G‚Ì’eŠÛ‚Ì“–‚½‚è”»’è
 
 bool PlayerToEnemy(BulletInfo Bullet);			//ƒvƒŒƒCƒ„[‚Æ’eŠÛ‚Ì“–‚½‚è”»’è
