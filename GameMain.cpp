@@ -14,6 +14,7 @@ void DrawGameMain() {
 	static int i = 0;
 	if (i++ == 0) {
 		PlayerInit();
+		MapChipInit();
 	}
 	MapDisp();			//マップの描画
 	MapMove();			//スクリーンの処理

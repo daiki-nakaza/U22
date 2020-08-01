@@ -35,8 +35,8 @@ int Player_Pic_Hold_R[4];//逆プレイヤーが鉄球をもって移動する画像
 void PlayerInit() {
 
 	// プレイヤーの初期位置をセット
-	PlayerX = 200;
-	PlayerY = 200;
+	PlayerX = 200;//200
+	PlayerY = 54;//544
 	Map_PlayerX = 0;
 	Map_PlayerY = 0;
 
@@ -67,52 +67,71 @@ void PlayerMove() {
 	Down_flg = 0;
 	
 
-	// キー入力に応じてプレイヤーの座標を移動
-	if (g_NowKey & PAD_INPUT_LEFT) { 
-		NewX -= 2;
-		if (Attack < 10 && g_IronBall.ThrowFlg == false) {
-			Bectl = 1;
-		}
-	}
-	if (g_NowKey & PAD_INPUT_RIGHT) {
-		NewX += 2; 
-		if (Attack < 10 && g_IronBall.ThrowFlg == false) {
-			Bectl = 0;
-		}
-	}
-	if (g_NowKey & PAD_INPUT_UP && g_IronBall.HoldFlg == false) {
+
+	//キー入力に応じてプレイヤーの座標を移動 上
+	if (g_NowKey & PAD_INPUT_UP && g_IronBall.HoldFlg == false && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1)) {
 		if (Jump_Flg == 0) {
 			y_prev = PlayerY;
 			NewY -= 16;
+			Locka.HenkaY -= 16;
 			Jump_Flg = 1;
 		}
 		else if (Jump_Flg == 3) {
 			Jump_Flg = 1;
 		}
 	}
-	if (g_NowKey & PAD_INPUT_DOWN && Jump_Flg == 0 && g_IronBall.HoldFlg == false) {
+	//  左
+	if (g_NowKey & PAD_INPUT_LEFT && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1) && Jump_Flg != -2) {
+		NewX -= 2;
+		Locka.HenkaX -= 2;
+		if (g_IronBall.HoldFlg == true) {//鉄球を持っている場合
+			Locka.LenkaX -= 2;
+		}
+
+		if (Attack < 10 && g_IronBall.ThrowFlg == false) {
+			Bectl = 1;
+		}
+	}
+	//右
+	if (g_NowKey & PAD_INPUT_RIGHT && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1) && Jump_Flg != -2) {
+		NewX += 2; 
+		Locka.HenkaX += 2;
+		if (g_IronBall.HoldFlg == true) {//鉄球を持っている場合
+			Locka.LenkaX += 2;
+		}
+
+		//攻撃しておらず、鉄球を投げていないときだけ向いている方向をかえることができる。
+		if (Attack < 10 && g_IronBall.ThrowFlg == false) {
+			Bectl = 0;
+		}
+	}
+	
+	//しゃがみ用、自由落下中はJump_Flgが-1なので、地面についているときだけ作用する
+	if (g_NowKey & PAD_INPUT_DOWN && Jump_Flg == 0 && g_IronBall.HoldFlg == false && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1)) {
 		PlayerY += 16;
 		NewY += 16; 
 		Down_flg = 1;
 	}
 
-	
+	//鎖の移動できるか処理
+	//Locka.HenkaY = 0;
+	Locka.MoveCheck();
 	
 	
 
-	DrawFormatString(0, 0, 0xffffff,"%d", g_Enemy[0].Life);
+	DrawFormatString(0, 0, 0xffffff,"%d", Jump_Flg);
 		
 
 	if (NewX > 500) {
+		Map_NewX += NewX - 500;
 		NewX = 500;
-		Map_NewX += 2;
 	}
 	if (NewX < 64) {
-		NewX = 64;
 		if (Map_NewX > 0) {
-			Map_NewX -= 2;
+			Map_NewX -= 64 - NewX;
+			NewX = 64;
 		}
-
+		
 	}
 
 	// スライド用の０から３１までの値
@@ -156,8 +175,11 @@ void PlayerMove() {
 		}
 	}
 
+	//鉄球の中に入った場合。//あとで書く
 
-	// 進入不可能なマップだった場合は移動できない//鉄球がある
+	
+
+	// 進入不可能なマップだった場合は移動できない//鉄球がある//鎖の長さが大丈夫かどうか
 	if (g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1												//左上
 		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1								//左下
 		|| g_MapChip[MapY + ((NewY + (Map_NewY % MAP_SIZE) + CHA_SIZE_Y / 2 - 1) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_NewX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1						//左真ん中
@@ -171,11 +193,27 @@ void PlayerMove() {
 			  && g_IronBall.x - NewX - Map_NewX > 0 - IRONBALL_R
 			  && g_IronBall.y - NewY - Map_NewY > 0 - IRONBALL_R
 			  && g_IronBall.HoldFlg == false)
-		|| (pow((double)g_IronBall.x - (double)NewX - (double)Map_NewX - (double)CHA_SIZE_X / 2.0, 2.0) + pow((double)g_IronBall.y - (double)NewY - (double)Map_NewY - (double)CHA_SIZE_Y / 2.0, 2.0) > pow((double)MAP_SIZE * 9.0, 2.0))
+		//|| (pow((double)g_IronBall.x - (double)NewX - (double)Map_NewX - (double)CHA_SIZE_X / 2.0, 2.0) + pow((double)g_IronBall.y - (double)NewY - (double)Map_NewY - (double)CHA_SIZE_Y / 2.0, 2.0) > pow((double)MAP_SIZE * 9.0, 2.0))
 		|| flg == 1
+		|| (Locka.HenkaX != 0 || Locka.HenkaY != 0)
 		)
 	{
-		
+		//壁にあたって、ここにはいったなら移動した鎖を元に戻す
+		//if (Locka.HenkaX == 0 && Locka.HenkaY == 0) {
+			for (int i = 0; i < LOCK_MAX; i++) {
+				Locka.New_x[i] = Locka.x[i];
+				Locka.New_y[i] = Locka.y[i];
+			}
+		//}
+		Locka.HenkaX = 0;
+		Locka.HenkaY = 0;
+
+		if (Locka.LenkaX != 0 || Locka.LenkaY != 0) {
+			g_IronBall.x -= Locka.LenkaX;
+			Locka.LenkaX = 0;
+			Locka.LenkaY = 0;
+		}
+
 		MapDrawPointX = -(Map_PlayerX % MAP_SIZE);
 		MapDrawPointY = -(Map_PlayerY % MAP_SIZE);
 
@@ -190,20 +228,23 @@ void PlayerMove() {
 		}
 		
 	}
-	else {//移動できる
-		
-		PlayerX = NewX;
-		PlayerY = NewY;
-		Map_PlayerX = Map_NewX;
-		Map_PlayerY = Map_NewY;
+	else {	
+			PlayerX = NewX;
+			PlayerY = NewY;
+			Map_PlayerX = Map_NewX;
+			Map_PlayerY = Map_NewY;
+
+			Locka.LenkaX = 0;//移動成功なら、鉄球に引っ張られていても、成功ということで０にする
+			Locka.LenkaY = 0;//移動成功なら、鉄球に引っ張られていても、成功ということで０にする
+
 	}
-	
+	Locka.Move();
 	
 }
 
 void PlayerDisp() {
 	static int i = 0;
-
+	//return;
 	//DrawBox((PlayerX), (PlayerY),
 	//	(PlayerX)+CHA_SIZE_X, (PlayerY)+CHA_SIZE_Y,
 	//	GetColor(255, 255, 255), TRUE);//左下に当たり判定あり
@@ -276,23 +317,29 @@ void PlayerDisp() {
 
 void PlayerGravity() {
 	int i = 0, j = 0, w = 0, z = 0;//ローカルなので気にしないでください!あたり判定用の補正値
-	int flg = 0;//ローカル変数です
+	int flg = 0;//ローカル変数です。敵キャラが移動する場所にいるかどうかのフラグ
 
 	//プレイヤー重力
 	NewY = PlayerY;
 
-	if (Jump_Flg == 0 || Jump_Flg == -1) {
+	if (Jump_Flg == 0 || Jump_Flg == -1 || Jump_Flg == -2) {
 		NewY += GRAVITY;
+		if (Jump_Flg == -1 || Jump_Flg == -2) {
+			Locka.HenkaY += GRAVITY;
+		}
+		
 	}
 	//ジャンプ処理
 	else if (Jump_Flg == 4 || Jump_Flg == 6) {
 		y_temp = NewY;
+		Locka.HenkaY += (NewY - y_prev) + 2;
 		NewY += (NewY - y_prev) + 2;
 		y_prev = y_temp;
 		Jump_Flg = 5;
 	}
 	else if (Jump_Flg == 2) {
 		y_temp = NewY;
+		Locka.HenkaY += (NewY - y_prev) + 1;
 		NewY += (NewY - y_prev) + 1;
 		y_prev = y_temp;
 		//NewY -= 12;
@@ -339,9 +386,10 @@ void PlayerGravity() {
 		}
 	}
 
+	//鎖の移動処理
+	Locka.MoveCheck();
 
-
-	// 進入不可能なマップだった場合は重力を消す
+	// 進入不可能なマップだった場合は重力を消す//鎖の長さが大丈夫かどうか
 	if (g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y / 2 - 1) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1						//左真ん中
@@ -349,9 +397,19 @@ void PlayerGravity() {
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w ] != 1
 		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w] != 1	
+		|| (Locka.HenkaX != 0 || Locka.HenkaY != 0)
 		)
 	{
-		if (Jump_Flg == -1) {
+		if (Locka.HenkaX != 0 || Locka.HenkaY != 0) {
+			for (int i = 0; i < LOCK_MAX; i++) {
+				Locka.New_x[i] = Locka.x[i];
+				Locka.New_y[i] = Locka.y[i];
+				Jump_Flg = -2;//ここばぐるｘが原因
+			}
+			Locka.HenkaX = 0;
+			Locka.HenkaY = 0;
+		}
+		else if (Jump_Flg == -1) {
 			PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE_Y % MAP_SIZE;
 			Jump_Flg = 0;
 		}
@@ -379,6 +437,11 @@ void PlayerGravity() {
 		{
 			Jump_Flg = -1;
 		}
+		for (int i = 0; i < LOCK_MAX; i++) {
+			Locka.New_x[i] = Locka.x[i];
+			Locka.New_y[i] = Locka.y[i];
+		//	Jump_Flg = -2;//ここばぐるｘが原因
+		}
 	}
 	else {
 		if (Jump_Flg == 0) {
@@ -387,6 +450,9 @@ void PlayerGravity() {
 		PlayerY = NewY;
 		
 	}
+	Locka.HenkaY = 0;
+	Locka.HenkaX = 0;
+	Locka.Move();
 }
 
 
