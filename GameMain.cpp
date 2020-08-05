@@ -11,6 +11,13 @@
 
 
 void DrawGameMain() {
+
+	static int i = 0;
+	if (i++ == 0) {
+		PlayerInit();
+		MapChipInit();
+	}
+
 	MapDisp();			//マップの描画
 	MapMove();			//スクリーンの処理
 
@@ -23,6 +30,8 @@ void DrawGameMain() {
 
 	enemyDisp();		//敵の描画処理
 	enemyMove();		//敵の処理
+
+	PlayerAttack();		//プレイヤー攻撃
 
 	HUDDisp();
 }

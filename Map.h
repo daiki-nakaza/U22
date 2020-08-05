@@ -10,6 +10,7 @@
 
 void MapDisp();
 void MapMove();
+void MapChipInit();
 
 
 /*@•Ï”‚ÌéŒ¾@*/

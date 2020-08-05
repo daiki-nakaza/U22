@@ -145,7 +145,7 @@ int LoadImages() {
 	//マップチップ
 	MapTip = LoadGraph("images/kenkyu7.png");
 	//背景
-	if ((g_BackGroundImage = LoadGraph("images/haikei.png")) == -1) return -1;
+	if ((g_BackGroundImage = LoadGraph("images/haikei2.png")) == -1) return -1;
 
 	//プレイヤー画像
 	LoadDivGraph("images/shujin.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic);
