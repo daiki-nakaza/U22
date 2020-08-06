@@ -49,26 +49,72 @@ void IronHoldOrThrow() {
 		}
 
 		else if ((PlayerX + CHA_SIZE_X / 2 + Map_PlayerX) - g_IronBall.x > 0) {//鉄球：プレイヤーの順にいる
-			g_IronBall.New_x += 2;
-			g_IronBall.New_y -= 4;//重力のせいで鉄球が下にめり込んでいるのでなくす
-			if (!g_IronBall.HitCheck()) {//正常にひけた
-				g_IronBall.x += 2;
-				Locka.LenkaX += 2;
-			}
-			else if (true) {//鉄球が横には引けない人が上なら鉄球を上に引ける。
+			if (Jump_Flg == -2) {//ぶら下がっているとき鉄球をうごかすパターン
+				g_IronBall.New_x += 2;
+				g_IronBall.New_y -= 4;//重力のせいで鉄球が下にめり込んでいるのでなくす
+				if (!g_IronBall.HitCheck()) {//正常にひけた
+					g_IronBall.x += 2;
+					Locka.LenkaX += 2;
+				}
+				else if (true) {//鉄球が横には引けない人が上なら鉄球を上に引ける。
 
+				}
+			}
+			else if (Jump_Flg == 0) {//ぶら下がっていない。鎖から引く
+				g_IronBall.New_x += 2;
+				g_IronBall.New_y -= 4;//重力のせいで鉄球が下にめり込んでいるのでなくす
+				if (!g_IronBall.HitCheck()) {//正常にひけた
+					//g_IronBall.x += 2;
+					Locka.HenkaX += 2;
+					Locka.HI = 2;
+				}
+				else if (true) {//鉄球が横には引けない人が上なら鉄球を上に引ける。
+
+				}
+				/*
+				g_IronBall.New_x += 2;
+				g_IronBall.New_y -= 4;//重力のせいで鉄球が下にめり込んでいるのでなくす
+				if (!g_IronBall.HitCheck()) {//正常にひけた
+					g_IronBall.x += 2;
+					Locka.LenkaX += 2;
+				}
+				else if (true) {//鉄球が横には引けない人が上なら鉄球を上に引ける。
+
+				}
+				*/
 			}
 		}
 		else if ((PlayerX + CHA_SIZE_X / 2 + Map_PlayerX) - g_IronBall.x < 0) {//プレイヤー：鉄球の順にいる
+			if (Jump_Flg == -2) {
+				g_IronBall.New_x -= 2;
+				g_IronBall.New_y -= 4;//重力のせいで鉄球が下にめり込んでいるのでなくす
+				if (!g_IronBall.HitCheck()) {
+					g_IronBall.x -= 2;
+					Locka.LenkaX -= 2;
+				}
+				else if (true) {//鉄球が横には引けない人が上なら鉄球を上に引ける。
 
-			g_IronBall.New_x -= 2;
-			g_IronBall.New_y -= 4;//重力のせいで鉄球が下にめり込んでいるのでなくす
-			if (!g_IronBall.HitCheck()) {
-				g_IronBall.x -= 2;
-				Locka.LenkaX -= 2;
+				}
 			}
-			else if (true) {//鉄球が横には引けない人が上なら鉄球を上に引ける。
+			else if (Jump_Flg == 0) {
+				g_IronBall.New_x -= 2;
+				g_IronBall.New_y -= 4;//重力のせいで鉄球が下にめり込んでいるのでなくす
+				if (!g_IronBall.HitCheck()) {
+					Locka.HenkaX -= 2;
+					Locka.HI = -2;
+				}
+				else if (true) {//鉄球が横には引けない人が上なら鉄球を上に引ける。
 
+				}
+				/*g_IronBall.New_x -= 2;
+				g_IronBall.New_y -= 4;//重力のせいで鉄球が下にめり込んでいるのでなくす
+				if (!g_IronBall.HitCheck()) {
+					g_IronBall.x -= 2;
+					Locka.LenkaX -= 2;
+				}
+				else if (true) {//鉄球が横には引けない人が上なら鉄球を上に引ける。
+
+				}*/
 			}
 		}
 
@@ -84,8 +130,15 @@ void IronHoldOrThrow() {
 
 	}
 	Locka.MoveCheck();
+		///*
+		if (Locka.HenkaX != 0 && Locka.HI != 0) {
+			g_IronBall.x += Locka.HI;
+			Locka.New_x[LOCK_MAX - 1] += Locka.HI;
+		}
+		//*/
 	Locka.HenkaY = 0;
 	Locka.HenkaX = 0;
+	Locka.HI = 0;
 	Locka.Move();
 }
 

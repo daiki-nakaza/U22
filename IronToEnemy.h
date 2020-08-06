@@ -14,3 +14,8 @@ bool PlayerToEnemy(BulletInfo Bullet);			//プレイヤーと弾丸の当たり判定
 
 bool IronToBullet(BulletInfo Bullet);			//プレイヤーと弾丸の当たり判定
 
+//敵キャラが移動する場所にいたら戻す
+int PlayerMoveCheck(enemyInfo enemy);
+
+void PlayerAttackCheck(enemyInfo enemy);			//プレイヤーの攻撃判定
+

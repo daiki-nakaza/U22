@@ -76,3 +76,37 @@ bool EnemyCheckDir(enemyInfo enemy) {
 
 	return true;
 }
+
+
+//敵キャラが移動する場所にいたら戻す
+int PlayerMoveCheck(enemyInfo enemy) {
+	if (enemy.Life > 0) {
+		if (enemy.x - NewX - Map_NewX < CHA_SIZE_X
+			&& enemy.y - NewY - Map_NewY < CHA_SIZE_Y - 1
+			&& enemy.x - NewX - Map_NewX > 0 - enemy.w
+			&& enemy.y - NewY - Map_NewY > 0 - enemy.h) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void PlayerAttackCheck(enemyInfo enemy) {
+	if (enemy.Life > 0) {					//敵のライフが０じゃないなら座標をみる
+		if (Bectl == 0 && enemy.outtime == 0) {						//右向き
+			if (enemy.x - PlayerX - Map_PlayerX < CHA_SIZE_X * 2
+				&& enemy.x - PlayerX - Map_PlayerX > 0) {
+				enemy.Life--;
+				enemy.outtime = 30;
+			}
+		}
+		else if (Bectl == 1) {						//右向き
+			if (enemy.x - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X
+				&& enemy.x - PlayerX - Map_PlayerX < 0) {
+				enemy.Life--;
+				enemy.outtime = 30;
+			}
+		}
+
+	}
+}

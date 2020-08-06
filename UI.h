@@ -1,6 +1,6 @@
 #pragma once
 
 #include "DxLib.h"
-#include <time.h>
+//#include <time.h>
 
 void HUDDisp();

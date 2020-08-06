@@ -40,6 +40,8 @@ struct Lock
 	int ro;                         //半径
 	int HenkaX, HenkaY;				//キャラが動いたときの鎖の変化量。プラスなら右と下にマイナスなら左と上。これが０にならないとキャラが移動できない
 	int LenkaX, LenkaY;				//鉄球が動いたときの鎖の変化量。
+	int HI;							//引っ張られているフラグ。ー１、０、－１
+	int Wall[LOCK_MAX];				//鎖が壁にあたっているので、直線距離じゃなくする
 
 	int HitCheck(int num);          //鎖の当たり判定
 
@@ -48,6 +50,7 @@ struct Lock
 	void MoveCheck();		 //鎖が移動できるかどうか確かめる
 	void Move();             //鎖の移動処理
 	void Throw();            //鎖が飛んでいく処理
+	void Gravity();			 //鎖の重力処理
 };
 
 
