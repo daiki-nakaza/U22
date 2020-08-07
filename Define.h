@@ -15,6 +15,9 @@
 #define ENEMY_MAX 10
 #define WALK_ENEMY_SIZE 48	//敵の大きさ
 #define SHOOT_ENEMY_SIZE 48
+#define TANK_ENEMY_SIZE 64
+#define RAZER_ENEMY_SIZE 64
+
 #define  Bullet_MAX 3
 
 #define  Bullet_MAX 3
@@ -37,4 +40,10 @@ typedef enum MENU_MODE {
 
 
 	END = 99
+};
+
+//ステージ１の敵の座標
+const int Stage1_WalkEnemy[2][9] = {
+	{63,76,122,132,211,233,244,278,302},
+	{18,18,18,18,9,18,18,18,16}
 };
