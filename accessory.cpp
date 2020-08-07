@@ -1,4 +1,5 @@
 #include "DxLib.h"
+#include "Math.h"
 
 #include "accessory.h"
 
@@ -41,6 +42,7 @@ void Lock::Init() {
 	for (int i = 0; i < LOCK_MAX; i++) {
 		New_x[i] = x[i];
 		New_y[i] = y[i];
+		Wall[i] = 0;
 	}
 
 	ro = 4;
@@ -83,6 +85,8 @@ void Lock::Disp() {
 //移動できるかどうか確かめる
 void Lock::MoveCheck() {
 	int ox, oy;//ローカル変数、鎖１つずつの差を示している
+	bool Gr = true;//ローカル変数、HenkaYのところで使用。すべての鎖が地面についているならHenkaYをなくす。
+	int EL = 0;//ローカル変数、HenkaXのところで使用
 	//HenkaY = 0;
 	//LenkaY = 0;
 	for (int i = 0; i < LOCK_MAX; i++) {
@@ -102,10 +106,12 @@ void Lock::MoveCheck() {
 	//マイナスなら。上にいく。プラスもある
 	if (LenkaY < 0) {
 		for (int i = LOCK_MAX - 1; i > 0; i--) {
+
 			//変化量なしならブレイク
 			if (LenkaY == 0) {
 				break;
 			}
+
 			//鎖の差を図る
 			oy = New_y[i-1] - New_y[i];
 			//座標移動
@@ -261,15 +267,30 @@ void Lock::MoveCheck() {
 				}
 			}
 
-			if (oy >= IRONBALL_R) {//オーバーした長さ分を変化量に戻す
+			if (oy >= IRONBALL_R) {//オーバーした長さ分を変化量に戻す//直線距離にする
 				HenkaY -= oy - IRONBALL_R;
 			}
 
 		}
+		//if(i==LOCK_MAX - 2){
+		//HenkaY = 0;
+
 	}
 	else if (HenkaY > 0) {//ひとが落ちていく場合
 
 		static int zo[LOCK_MAX];//重力と似たような処理をするため
+
+		New_y[0] += HenkaY;
+		zo[0] = 4;
+		if (HitCheck(0) == false && (y[0] - (NewY + Map_PlayerY)) < (CHA_SIZE_Y - 8)) {
+		}
+		else {
+			New_y[0] -= HenkaY;
+			zo[0] = 2;
+		}
+		
+
+
 
 		//最後の方の鎖
 		New_y[LOCK_MAX - 1] += HenkaY;
@@ -281,7 +302,7 @@ void Lock::MoveCheck() {
 		
 
 		//すべてに重力を加えてその後、引いていく
-		for (int i = 0; i < LOCK_MAX - 1; i++) {
+		for (int i = 1; i < LOCK_MAX - 1; i++) {
 			New_y[i] += HenkaY;
 			zo[i] = 4;
 		}
@@ -324,9 +345,26 @@ void Lock::MoveCheck() {
 		}
 		//チェック
 		for (int i = 0; i < LOCK_MAX - 1; i++) {
-			if (zo[i] == 4 || zo[i] == 2) {
+			if (zo[i] == 4 ) {
 				HenkaY = 0;
 				break;
+			}
+			if (zo[i] == 2 ) {
+				continue;
+			}
+			Gr = false;
+		}
+		//もしすべての鎖が地面についていたらHenkaYを０にする。いらんかも
+		if (Gr == true) {
+			HenkaY = 0;
+		}
+
+		if (HenkaY != 0 && Jump_Flg == -2) {
+			if (PlayerX - New_x[1] > 0) {
+				HenkaX += HenkaY;
+			}
+			else if (PlayerX - New_x[1] < 0) {
+				HenkaX -= HenkaY;
 			}
 		}
 	}
@@ -346,28 +384,37 @@ void Lock::MoveCheck() {
 				continue;
 			}
 
-			ox = (New_x[i] - New_x[i + 1]); //+ //abs(New_y[i] - New_y[i + 1]);							//鎖の差を図る
+		//	ox = (New_x[i] - New_x[i + 1]); //+ //abs(New_y[i] - New_y[i + 1]);							//鎖の差を図る
 
 			//座標移動
 			while (HenkaX != 0) {
 				New_x[i]++;
-				ox ++;
+			//	ox ++;
 				HenkaX--;
 				if (HitCheck(i) == true) {//壁に当たっているので上に上昇させる
 					New_y[i]--;//ここかえる
 					New_x[i]--;
+				//	EL++;
 				}
 			}
 
-			if (ox >= IRONBALL_R) {//オーバーした長さ分を変化量に戻す
-				//if (HI == 0) {//引っ張られているフラグ.いない
-					HenkaX += ox - IRONBALL_R;
-				//}
-				//else {//
-				//	if (abs((PlayerX+16) - New_x[i]) < 2) {
-				//		HenkaX += 2;
-				//	}
-				//}
+			//HenkaX += EL;			//
+			//EL = 0;
+
+			//if (ox >= IRONBALL_R) {//オーバーした長さ分を変化量に戻す
+
+			//		HenkaX += ox - IRONBALL_R;
+			//	
+			//}
+			//(New_x[i] - New_x[i + 1])
+			if (New_x[i] - New_x[i + 1] >= 0
+				&& pow((double)New_x[i] - (double)New_x[i + 1], 2.0) + pow((double)New_y[i] - (double)New_y[i + 1], 2.0) >= pow(IRONBALL_R, 2.0)
+				) {
+				ox = (int)(pow((double)New_x[i] - (double)New_x[i + 1], 2.0) + pow((double)New_y[i] - (double)New_y[i + 1], 2.0));
+				if (ox >= pow(IRONBALL_R, 2.0)) {
+					HenkaX += (int)sqrt(ox) - IRONBALL_R;
+				}
+
 			}
 		}
 	}
@@ -382,29 +429,31 @@ void Lock::MoveCheck() {
 				continue;
 			}
 
-			ox = New_x[i + 1] - New_x[i];// + abs(New_y[i] - New_y[i + 1]);							//鎖の差を図る
+		//	ox = New_x[i + 1] - New_x[i];// + abs(New_y[i] - New_y[i + 1]);							//鎖の差を図る
 
 			//座標移動
 			while (HenkaX != 0) {
 				New_x[i]--;
-				ox++;
+			//	ox++;
 				HenkaX++;
 				if (HitCheck(i) == true) {//壁に当たっているので上に上昇させる
 					New_y[i]--;//ここかえる
 					New_x[i]++;
+					//EL++;
 				}
 			}
-			
-			if (ox >= IRONBALL_R) {
+
+			//HenkaX += EL;
+			//EL = 0;
+
+			if ( New_x[i + 1] - New_x[i] >= 0
+				&& pow((double)New_x[i + 1] - (double)New_x[i], 2.0) + pow((double)New_y[i + 1] - (double)New_y[i], 2.0) >= pow(IRONBALL_R, 2.0)
+				) {
+				ox = (int)(pow((double)New_x[i + 1] - (double)New_x[i], 2.0) + pow((double)New_y[i + 1] - (double)New_y[i], 2.0));
+				if (ox >= pow(IRONBALL_R, 2.0)) {
+					HenkaX -= (int)sqrt(ox) - IRONBALL_R;
+				}
 				
-				//if (HI == 0) {//引っ張られているフラグ.いない
-					HenkaX -= ox - IRONBALL_R;
-				/*}*/
-				//else {//
-				//	if (abs((PlayerX+16) - New_x[i]) < 6) {
-				//		HenkaX -= 2;
-				//	}
-				//}
 			}
 		}
 	}
@@ -702,7 +751,7 @@ void Lock::Gravity() {
 	if (!g_IronBall.ThrowFlg && Jump_Flg == 0/*&& !g_IronBall.HoldFlg*/) {//鉄球を投げてないとき、持っていないとき重力を鎖に加える.
 													//それと鎖の長さの制約も加えるべき
 		New_y[0] += 4;
-		if (HitCheck(0) == false && (y[0] - (PlayerY + Map_PlayerY)) < (CHA_SIZE_Y - 4)) {
+		if (HitCheck(0) == false && (y[0] - (PlayerY + Map_PlayerY)) < (CHA_SIZE_Y - 8)) {
 			y[0] += 4;
 		}
 		New_y[0] = y[0];
@@ -718,38 +767,65 @@ void Lock::Gravity() {
 		for (int i = 1; i < LOCK_MAX - 1; i++) {
 			New_y[i] += 4;
 			zo[i] = 4;
+			Wall[i] = 0;
 		}
 
-		//もし１個左右が壁なら重力なしにしてみる？
+		//もし１個左右が壁なら//直線距離じゃなくする
 		for (int i = 1; i < LOCK_MAX - 1; i++) {
-			New_x[i] += 1;
+			New_x[i] += 2;
 			if (zo[i] == 4 && HitCheck(i) == true ) {
-				New_y[i] -= 4;
-				zo[i] = 0;
+				/*New_y[i] -= 4;
+				zo[i] = 0;*/
+				Wall[i] = 1;
 			}
-			New_x[i] -= 2;
+			New_x[i] -= 4;
 			if (zo[i] == 4 && HitCheck(i) == true) {
-				New_y[i] -= 4;
-				zo[i] = 0;
+				/*New_y[i] -= 4;
+				zo[i] = 0;*/
+				Wall[i] = 1;
 			}
-			New_x[i] += 1;
+			New_x[i] += 2;
 		}
 
 
 		for (int i = LOCK_MAX - 2; i >= 1; i--) {
-			if (HitCheck(i) == true || New_y[i] - New_y[i + 1] >= IRONBALL_R) {
-				if (zo[i] == 4) {
-					New_y[i] -= 4;
-					zo[i] = 0;
+			if (Wall[i] == 0) {//壁に当たっていないので一応ななめの直線距離を調べる。//２乗の中身が＋であるここでは高さｙが重要
+				if (HitCheck(i) == true 
+					|| (New_y[i] - New_y[i + 1] > 0  &&  pow((double)New_y[i] - (double)New_y[i + 1] , 2.0) + pow((double)New_x[i] - (double)New_x[i + 1], 2.0) >= pow((double)IRONBALL_R, 2.0))
+					) {
+					if (zo[i] == 4) {
+						New_y[i] -= 4;
+						zo[i] = 0;
+					}
+				}
+			}
+			else if (Wall[i] == 1) {//鎖が壁に当たっているので縦＋横
+				if (HitCheck(i) == true || (New_y[i] - New_y[i + 1]) + abs(New_x[i] - New_x[i + 1])  >= IRONBALL_R) {
+					if (zo[i] == 4) {
+						New_y[i] -= 4;
+						zo[i] = 0;
+					}
 				}
 			}
 		}
 
 		for (int i = 1; i < LOCK_MAX - 1; i++) {
-			if (HitCheck(i) == true || New_y[i] - New_y[i - 1] >= IRONBALL_R) {
-				if (zo[i] == 4) {
-					New_y[i] -= 4;
-					zo[i] = 0;
+			if (Wall[i] == 0) {
+				if (HitCheck(i) == true 
+					|| (New_y[i] - New_y[i - 1] > 0 && pow((double)New_y[i] - (double)New_y[i - 1], 2.0) + pow((double)New_x[i] - (double)New_x[i - 1], 2.0) >= pow((double)IRONBALL_R , 2.0)))
+				{
+					if (zo[i] == 4) {
+						New_y[i] -= 4;
+						zo[i] = 0;
+					}
+				}
+			}
+			else if (Wall[i] == 1) {
+				if (HitCheck(i) == true || New_y[i] - New_y[i - 1] + abs(New_y[i] - New_y[i - 1]) >= IRONBALL_R) {
+					if (zo[i] == 4) {
+						New_y[i] -= 4;
+						zo[i] = 0;
+					}
 				}
 			}
 		}
