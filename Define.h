@@ -5,9 +5,26 @@
 #define HEIGHT 22 //１画面の高さ
 #define WIDTH 32//１画面の幅
 #define STAGE 10
-#define MAP_SIZE 32//32ビット
-#define CHA_SIZE 64//48ビット
+#define MAP_SIZE 32//32ドット
+#define CHA_SIZE_X 32//32ドット
+#define CHA_SIZE_Y 64//64ドット
 #define GRAVITY 4//1,2,4,8,16,32のパターンあり
+
+#define LOCK_MAX 12
+
+#define ENEMY_MAX 10
+#define WALK_ENEMY_SIZE 64	//敵の大きさ
+#define SHOOT_ENEMY_SIZE 48
+#define TANK_ENEMY_SIZE 64
+#define RAZER_ENEMY_SIZE 64
+
+#define  Bullet_MAX 3
+
+#define  Bullet_MAX 3
+#define BULLET_W 20
+#define BULLET_H 10
+
+#define MAP_LONG 10
 
 /****************************************************
 *列挙体の宣言
@@ -23,4 +40,10 @@ typedef enum MENU_MODE {
 
 
 	END = 99
+};
+
+//ステージ１の敵の座標
+const int Stage1_WalkEnemy[2][9] = {
+	{63,76,122,132,211,233,244,278,302},
+	{18,18,18,18,9,18,18,18,16}
 };

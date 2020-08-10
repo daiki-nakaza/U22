@@ -34,7 +34,7 @@ struct enemyInfo
 //•à‚­“G‚Ì\‘¢‘Ì
 struct WalkEnemy : public enemyInfo
 {
-	void Init();			//œpœj‚µ‚Ä‚¢‚é“G‚Ì‰Šú‰»ˆ—
+	void Init(int Ec);			//œpœj‚µ‚Ä‚¢‚é“G‚Ì‰Šú‰»ˆ—
 	void WalkMove();			//œpœj‚µ‚Ä‚¢‚é“G‚Ìˆ—
 };
 
@@ -89,7 +89,8 @@ void enemyDisp();			//“G‚Ì•`‰æˆ—
 void enemyMove();			//“G‚Ì“®‚«
 void enemyInit();			//“G‚Ì‰Šú‰»ˆ—
 
-bool EnemyCheckHit(WalkEnemy enemy);		//“G‘¤‚Ì“–‚½‚è”»’èƒ`ƒFƒbƒN
+bool EnemyCheckHit(int x,int y,int direct);		//“G‘¤‚Ì“–‚½‚è”»’èƒ`ƒFƒbƒN
+bool CheckWindow(int x);							//ƒEƒBƒ“ƒhƒE‚Ì’†‚É‚¢‚é‚©‚Ç‚¤‚© “ü‚Á‚Ä‚¢‚½‚çtrue
 
 //void EnemyShoot();
 

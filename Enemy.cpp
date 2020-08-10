@@ -62,9 +62,10 @@ void enemyInfo::Disp() {			//敵の表示処理
 /////////////歩く敵の処理////////////////////
 /////////////////////////////////////////////
 
-void WalkEnemy::Init() {                 // 敵の初期化
-	x = 24 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
-	y = 14 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+void WalkEnemy::Init(int Ec) {                 // 敵の初期化
+	x = Stage1_WalkEnemy[0][Ec] * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
+	y = Stage1_WalkEnemy[1][Ec] * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+
 	w = WALK_ENEMY_SIZE;						//敵の横幅
 	h = WALK_ENEMY_SIZE;						//敵の縦
 
@@ -107,8 +108,13 @@ void WalkEnemy::WalkMove(){
 		if (direct < 0) picDir = false;		//左向きなら
 		else picDir = true;					//右向きなら
 
+		if (CheckWindow(x)) {
+			x += direct * speed;
+		}
 		//x = (chipX * MAP_SIZE - MapDrawPointX) + direct * speed;				//移動のスピードを敵キャラに入れる
-		x += direct * speed;
+		
+
+		if (EnemyCheckHit(x,y,direct))direct *= -1;
 
 		if (++AnmCnt >= FrmMax) {
 			if (++anm > 3) anm = 0;
@@ -312,8 +318,9 @@ void LockShootEnemy::LockShootMove() {			//撃つ敵の処理
 
 //戦車の敵(上に向かって弾を飛ばす奴)
 void TankEnemy::Init() {
-	x = 15 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
-	y = 8 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+
+	x = Stage1_WalkEnemy[0][0];							 // 敵のX座標の初期位置(マップチップの場所)
+	y = Stage1_WalkEnemy[1][0];								    // 敵のY座標の初期位置(マップチップの場所)
 	w = TANK_ENEMY_SIZE;						//敵の横幅
 	h = TANK_ENEMY_SIZE;						//敵の縦幅
 
@@ -488,7 +495,9 @@ void enemyMove() {
 	static bool Initflg = true;
 
 	if (Initflg) {
-		g_RazerEnemy[0].Init();
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			g_WalkEnemy[i].Init(i);
+		}
 		Initflg = false;
 	}
 
@@ -505,39 +514,49 @@ void enemyMove() {
 	}	
 }
 
-bool EnemyCheckHit(WalkEnemy enemy) {
+bool EnemyCheckHit(int x, int y, int direct) {
 	int i = 0, j = 0, k = 0, l = 0, w = 0, z = 0;		//補正値用変数
 	//的の位置（左）がマップをまたいでいる
-	while (enemy.x / MAP_SIZE - k >= WIDTH) {
+	while (x / MAP_SIZE - k >= WIDTH) {
 		k += WIDTH;
 		l += HEIGHT;
 	}
 
 	//敵の位置(右)がマップをまたいでいる
-	if ((enemy.x + enemy.h) / MAP_SIZE - k >= WIDTH) {
+	if ((x + WALK_ENEMY_SIZE) / MAP_SIZE - k >= WIDTH) {
 		i += WIDTH;
 		j += HEIGHT;
 	}
 	//真ん中の位置がマップをまたいでいる
-	if ((enemy.x + enemy.h / 2) / MAP_SIZE - k >= WIDTH) {
+	if ((x + WALK_ENEMY_SIZE / 2) / MAP_SIZE - k >= WIDTH) {
 		w += WIDTH;
 		z += HEIGHT;
 	}
 
 
-	if (enemy.picDir)			//右向きの処理
+	if (direct == 1)			//右向きの処理
 	{
-		if (g_MapChip[(enemy.y) / MAP_SIZE + l + j][(enemy.x + enemy.w) / MAP_SIZE - k - w] != 1	//右上
-			|| g_MapChip[(enemy.y +( enemy.h /2) ) / MAP_SIZE + l + j][(enemy.x + enemy.w) / MAP_SIZE - k - w] != 1)	//右下
-			 {return true;}
+		if (g_MapChip[(y) / MAP_SIZE + l + j][(x + WALK_ENEMY_SIZE) / MAP_SIZE - k - w] != 1	//右上
+			&& g_MapChip[(y +(WALK_ENEMY_SIZE /2) ) / MAP_SIZE + l + j][(x + WALK_ENEMY_SIZE) / MAP_SIZE - k - w] != 1){	//右下
+			return true;
+		}
 	}
 	else {
-		if (g_MapChip[(enemy.y) / MAP_SIZE + l][(enemy.x) / MAP_SIZE - k] != 1				//左上
-			|| g_MapChip[(enemy.y +( enemy.h / 2) ) / MAP_SIZE + l][(enemy.x) / MAP_SIZE - k] != 1)	//左下
-		{return true;}
+		if (g_MapChip[(y) / MAP_SIZE + l][(x) / MAP_SIZE - k] != 1				//左上
+			&& g_MapChip[(y +(WALK_ENEMY_SIZE / 2) ) / MAP_SIZE + l][(x) / MAP_SIZE - k] != 1){	//左下
+ 		return true;
+		}
 
 	}
 
 	return false;
 }
 
+bool CheckWindow(int x) {
+
+	int Cx = GetPlayerX();
+
+	if (Cx + WIDTH * MAP_SIZE > x) return true;
+
+	return false;
+}

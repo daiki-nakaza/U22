@@ -20,7 +20,5 @@ void HUDDisp() {
 		data[4], data[5] ,
 		time);
 
-	DrawFormatString(150, 150, 0x000000, "x = %d  y = %d", PlayerX + Map_NewX , PlayerY);
-	DrawFormatString(150, 180, 0x000000, "x = %d  y = %d", g_LockShootEnemy[0].x, g_LockShootEnemy[0].y);
-	DrawFormatString(150, 210, 0x000000, "x = %d  y = %d", g_MouseX, g_MouseY);
+	//DrawFormatString(150, 210, 0x000000, "x = %d", g_ShootEnemy[0].Life);
 }
