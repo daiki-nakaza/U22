@@ -1,6 +1,8 @@
 se説明
 iron_damage(鉄球で敵にダメージを与えた時のse)
 
+iron_slide(鉄球を引っ張る時のse)
+
 iron_swing(鉄球を投げる時のse)
 
 landing(プレイヤーが着地した時のbgm)
