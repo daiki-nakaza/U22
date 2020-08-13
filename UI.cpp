@@ -2,6 +2,11 @@
 
 #include "UI.h"
 
+#include "Define.h"
+#include "Player.h"
+#include "Enemy.h"
+#include "Map.h"
+
 const char data[] = __DATE__;
 const char time[] = __TIME__;
 
@@ -14,4 +19,6 @@ void HUDDisp() {
 		data[0], data[1], data[2],
 		data[4], data[5] ,
 		time);
+
+	//DrawFormatString(150, 210, 0x000000, "x = %d", g_ShootEnemy[0].Life);
 }

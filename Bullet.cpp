@@ -132,8 +132,8 @@ void ChargeBullet::Move(const int dir) {			//’eŠÛ‚Ìˆ—
 			y -= Speed;
 
 			if (y + h < -50) {		//ã‚És‚Á‚½‚ç‰E‚©¶‚ÉSet
-				LockX = GetPlayerX();
-				y = 0;
+				LockX = GetPlayerX() + CHA_SIZE_X/2;
+				y = 0 + CHA_SIZE_Y / 2;
 
 				Replace = w;
 				w = h;

@@ -18,6 +18,10 @@ Lock Locka;						//鎖の情報を持った変数
 
 //初期化処
 void partsInfo::Init() {                 // 鉄球の初期化
+	x = 0;
+	y = 0;
+	New_x = 0;
+	New_y = 0;
 	IronInit(&x, &y);		//座標をプレイヤーの隣に代入
 	New_x = x;
 	New_y = y;
@@ -54,6 +58,9 @@ void Lock::Init() {
 	LenkaY = 0;		//鉄球の変化量
 
 	HI = 0;//引っ張られているフラグ
+	WI = 0;//ぶら下がっているフラグ
+	RD = 0;//縦に上がるフラグ
+
 }
 
 //描画処理
@@ -64,10 +71,12 @@ void partsInfo::Disp() {
 		//DrawBox(x,y, x + w, y + h, 0x000000, true);
 		//DrawRotaGraphFast2(x, y, 0, 0, 1, 0, pic, true, picDir);
 	//	DrawCircle(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE, MAP_SIZE * 9, 0xffffff, true);
-		DrawCircle(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY*MAP_SIZE, r, 0x000000, true);
-		DrawFormatString(30, 90, 0x000000, "Y = %d\nX = %d\n", /*Locka.x[LOCK_MAX-1]*/0, 0);
-		if (HoldFlg)DrawFormatString(100, 30, 0x000000, "HOLD");
-		if (ThrowFlg)DrawFormatString(100, 30, 0x000000, "THROW");
+		DrawCircle(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE, r, 0x000000, true);
+		if (DebugMode) {
+			DrawFormatString(30, 90, 0x000000, "Y = %d\nX = %d\n", /*Locka.x[LOCK_MAX-1]*/0, 0);
+			if (HoldFlg)DrawFormatString(100, 30, 0x000000, "HOLD");
+			if (ThrowFlg)DrawFormatString(100, 30, 0x000000, "THROW");
+		}
 	}
 	else {				//鉄球非表示
 
@@ -78,8 +87,9 @@ void Lock::Disp() {
 	for (int i = 0; i < LOCK_MAX; i++) {
 		DrawCircle(x[i] + MapDrawPointX - MapX * MAP_SIZE, y[i] - MapDrawPointY - MapY * MAP_SIZE, ro, GetColor(252 - i*30,i*30,0), true);
 	}
-	DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", x[0] + MapDrawPointX - MapX * MAP_SIZE, PlayerX+16);
-
+	if (DebugMode) {
+		DrawFormatString(30, 30, 0x000000, "Y = %d\nX = %d\n", x[0] + MapDrawPointX - MapX * MAP_SIZE, PlayerX + 16);
+	}
 }
 
 //移動できるかどうか確かめる
@@ -309,7 +319,7 @@ void Lock::MoveCheck() {
 
 		//4：完璧に落ちた。2：壁に引っかかっているがまあ大丈夫。0：鎖の長さで引っかかっているので不可
 		for (int i = LOCK_MAX - 2; i >= 0; i--) {
-			if (New_y[i] - New_y[i + 1] >= IRONBALL_R) {
+			if (New_y[i] - New_y[i + 1] > 0 && sqrt(((double)New_y[i] - New_y[i + 1])* ((double)New_y[i] - New_y[i + 1]) + ((double)New_x[i] - New_x[i + 1] )* ((double)New_x[i] - New_x[i + 1])) >= IRONBALL_R) {
 				if (zo[i] == 4 ) {
 					New_y[i] -= HenkaY;
 					zo[i] = 0;
@@ -327,7 +337,7 @@ void Lock::MoveCheck() {
 		}
 
 		for (int i = 1; i < LOCK_MAX-1; i++) {
-			if (New_y[i] - New_y[i-1] >= IRONBALL_R) {
+			if (New_y[i] - New_y[i - 1] > 0 && sqrt(((double)New_y[i] - New_y[i-1])* ((double)New_y[i] - New_y[i - 1]) + ((double)New_x[i] - New_x[i - 1]) * ((double)New_x[i] - New_x[i - 1])) >= IRONBALL_R) {
 				if (zo[i] == 4) {
 					New_y[i] -= HenkaY;
 					zo[i] = 0;
@@ -360,16 +370,27 @@ void Lock::MoveCheck() {
 		}
 
 		if (HenkaY != 0 && Jump_Flg == -2) {
-			if (PlayerX - New_x[1] > 0) {
-				HenkaX += HenkaY;
-			}
-			else if (PlayerX - New_x[1] < 0) {
-				HenkaX -= HenkaY;
+		//	for(int i=LOCK_MAX)
+			for (int i = 1; i < LOCK_MAX - 1; i++) {
+				if (PlayerX - New_x[i] > 0) {
+					HenkaX += HenkaY;
+				//	HenkaY = 0;
+					break;
+				}
+				else if (PlayerX - New_x[i] < 0) {
+					HenkaX -= HenkaY;
+					//HenkaY = 0;
+					break;
+				}
 			}
 		}
 	}
 	
 	//HenkaY = 0;
+
+
+	double radian = atan2((double)NewY + (double)CHA_SIZE_Y - g_IronBall.New_y + 4.0, (double)NewX + (double)CHA_SIZE_X/2 - g_IronBall.New_x);
+	int nn = 0;
 
 
 	//ｘ座標の変化
@@ -389,14 +410,30 @@ void Lock::MoveCheck() {
 			//座標移動
 			while (HenkaX != 0) {
 				New_x[i]++;
+				nn = 1;
 			//	ox ++;
 				HenkaX--;
-				if (HitCheck(i) == true) {//壁に当たっているので上に上昇させる
-					New_y[i]--;//ここかえる
+				if (HitCheck(i) == true ) {//壁に当たっているので上に上昇させる
+					if (WI == 0) {
+						New_y[i]--;//ここかえる
+					}
+					nn = 0;
 					New_x[i]--;
 				//	EL++;
 				}
+				if (RD > 0 && i != 0) {
+					
+					if (fabs((double)sin(radian) * (double)IRONBALL_R) > (double)New_y[i - 1] - (double)New_y[i]) {
+						New_y[i]--;
+						if (nn == 1) {
+							New_x[i]--;
+						}
+						
+					}
+					
+				}
 			}
+			
 
 			//HenkaX += EL;			//
 			//EL = 0;
@@ -408,7 +445,7 @@ void Lock::MoveCheck() {
 			//}
 			//(New_x[i] - New_x[i + 1])
 			if (New_x[i] - New_x[i + 1] >= 0
-				&& pow((double)New_x[i] - (double)New_x[i + 1], 2.0) + pow((double)New_y[i] - (double)New_y[i + 1], 2.0) >= pow(IRONBALL_R, 2.0)
+					&& pow((double)New_x[i] - (double)New_x[i + 1], 2.0) + pow((double)New_y[i] - (double)New_y[i + 1], 2.0) >= pow(IRONBALL_R, 2.0)
 				) {
 				ox = (int)(pow((double)New_x[i] - (double)New_x[i + 1], 2.0) + pow((double)New_y[i] - (double)New_y[i + 1], 2.0));
 				if (ox >= pow(IRONBALL_R, 2.0)) {
@@ -416,7 +453,20 @@ void Lock::MoveCheck() {
 				}
 
 			}
+			if (WI > 0 && i < LOCK_MAX - 2) {
+				
+				if (New_y[i+1] - New_y[i + 2] > 5) {
+					HenkaX += 2;
+				}
+				else {
+					WI = 0;
+				}
+			}
+			
 		}
+		/*if (RD > 0) {
+			RD = 0;
+		}*/
 	}
 	//マイナスなので左に移動している。
 	else if (HenkaX < 0) {
@@ -434,19 +484,35 @@ void Lock::MoveCheck() {
 			//座標移動
 			while (HenkaX != 0) {
 				New_x[i]--;
+				nn = 1;
 			//	ox++;
 				HenkaX++;
-				if (HitCheck(i) == true) {//壁に当たっているので上に上昇させる
-					New_y[i]--;//ここかえる
+				if (HitCheck(i) == true ) {//壁に当たっているので上に上昇させる
+					if (WI == 0) {
+						New_y[i]--;//ここかえる
+					}
 					New_x[i]++;
+					nn = 0;
 					//EL++;
 				}
+				 if (RD < 0 && i != 0) {
+					
+					if (fabs((double)sin(radian) * (double)IRONBALL_R) > (double)New_y[i - 1] - (double)New_y[i]) {
+						New_y[i]--;
+						if (nn == 1) {
+							New_x[i]++;
+						}
+					}
+					
+				}
 			}
+
+			
 
 			//HenkaX += EL;
 			//EL = 0;
 
-			if ( New_x[i + 1] - New_x[i] >= 0
+			if (New_x[i + 1] - New_x[i] >= 0
 				&& pow((double)New_x[i + 1] - (double)New_x[i], 2.0) + pow((double)New_y[i + 1] - (double)New_y[i], 2.0) >= pow(IRONBALL_R, 2.0)
 				) {
 				ox = (int)(pow((double)New_x[i + 1] - (double)New_x[i], 2.0) + pow((double)New_y[i + 1] - (double)New_y[i], 2.0));
@@ -455,7 +521,20 @@ void Lock::MoveCheck() {
 				}
 				
 			}
+
+			if (WI < 0 && i < LOCK_MAX - 2) {
+				//HenkaX = 0;
+				if (New_y[i+1] - New_y[i + 2] > 5) {
+					HenkaX -= 2;
+				}
+				else {
+					WI = 0;
+				}
+				
+				
+			}
 		}
+		
 	}
 
 	//移動成功。あと当たりチェックもする
@@ -481,7 +560,9 @@ void partsInfo::Move() {
 
 	if (!HoldFlg && !ThrowFlg) {
 		HitBectl();
-		DrawFormatString(100, 100, 0x000000, "true");
+		if (DebugMode) {
+			DrawFormatString(100, 100, 0x000000, "true");
+		}
 	}
 	
 	
@@ -686,6 +767,7 @@ void  partsInfo::HitBectl() {
 		Locka.LenkaX +=  (((x - IRONBALL_R) / MAP_SIZE + 1) * MAP_SIZE + IRONBALL_R) - x;
 		x = ((x - IRONBALL_R) / MAP_SIZE + 1) * MAP_SIZE + IRONBALL_R;
 		Locka.MoveCheck();
+		Locka.Move();
 		//return;
 	}
 	//現在の右座標が壁に埋もれているならば座標を一個左にする
@@ -695,6 +777,7 @@ void  partsInfo::HitBectl() {
 		Locka.LenkaX +=  (((x + IRONBALL_R) / MAP_SIZE) * MAP_SIZE - IRONBALL_R - 1) - x;
 		x = ((x + IRONBALL_R) / MAP_SIZE) * MAP_SIZE - IRONBALL_R - 1;
 		Locka.MoveCheck();
+		Locka.Move();
 		//return;
 	}
 
@@ -748,7 +831,7 @@ void Lock::Gravity() {
 		y[i] = New_y[i];
 	}
 
-	if (!g_IronBall.ThrowFlg && Jump_Flg == 0/*&& !g_IronBall.HoldFlg*/) {//鉄球を投げてないとき、持っていないとき重力を鎖に加える.
+	if (!g_IronBall.ThrowFlg && Jump_Flg == 0 && RD == 0/*&& !g_IronBall.HoldFlg*/) {//鉄球を投げてないとき、持っていないとき重力を鎖に加える.
 													//それと鎖の長さの制約も加えるべき
 		New_y[0] += 4;
 		if (HitCheck(0) == false && (y[0] - (PlayerY + Map_PlayerY)) < (CHA_SIZE_Y - 8)) {
@@ -767,31 +850,37 @@ void Lock::Gravity() {
 		for (int i = 1; i < LOCK_MAX - 1; i++) {
 			New_y[i] += 4;
 			zo[i] = 4;
-			Wall[i] = 0;
+			if(Wall[i] >= 1){
+				Wall[i]--;
+			}
 		}
 
 		//もし１個左右が壁なら//直線距離じゃなくする
 		for (int i = 1; i < LOCK_MAX - 1; i++) {
+			New_y[i] += 2;
+
 			New_x[i] += 2;
 			if (zo[i] == 4 && HitCheck(i) == true ) {
 				/*New_y[i] -= 4;
 				zo[i] = 0;*/
-				Wall[i] = 1;
+				Wall[i] = 3;
 			}
 			New_x[i] -= 4;
 			if (zo[i] == 4 && HitCheck(i) == true) {
 				/*New_y[i] -= 4;
 				zo[i] = 0;*/
-				Wall[i] = 1;
+				Wall[i] = 3;
 			}
 			New_x[i] += 2;
+
+			New_y[i] -= 2;
 		}
 
 
 		for (int i = LOCK_MAX - 2; i >= 1; i--) {
 			if (Wall[i] == 0) {//壁に当たっていないので一応ななめの直線距離を調べる。//２乗の中身が＋であるここでは高さｙが重要
 				if (HitCheck(i) == true 
-					|| (New_y[i] - New_y[i + 1] > 0  &&  pow((double)New_y[i] - (double)New_y[i + 1] , 2.0) + pow((double)New_x[i] - (double)New_x[i + 1], 2.0) >= pow((double)IRONBALL_R, 2.0))
+					|| (New_y[i] - New_y[i + 1] > 16  &&  pow((double)New_y[i] - (double)New_y[i + 1] , 2.0) + pow((double)New_x[i] - (double)New_x[i + 1], 2.0) >= pow((double)IRONBALL_R, 2.0))
 					) {
 					if (zo[i] == 4) {
 						New_y[i] -= 4;
@@ -799,7 +888,7 @@ void Lock::Gravity() {
 					}
 				}
 			}
-			else if (Wall[i] == 1) {//鎖が壁に当たっているので縦＋横
+			else if (Wall[i] >= 1) {//鎖が壁に当たっているので縦＋横
 				if (HitCheck(i) == true || (New_y[i] - New_y[i + 1]) + abs(New_x[i] - New_x[i + 1])  >= IRONBALL_R) {
 					if (zo[i] == 4) {
 						New_y[i] -= 4;
@@ -812,7 +901,7 @@ void Lock::Gravity() {
 		for (int i = 1; i < LOCK_MAX - 1; i++) {
 			if (Wall[i] == 0) {
 				if (HitCheck(i) == true 
-					|| (New_y[i] - New_y[i - 1] > 0 && pow((double)New_y[i] - (double)New_y[i - 1], 2.0) + pow((double)New_x[i] - (double)New_x[i - 1], 2.0) >= pow((double)IRONBALL_R , 2.0)))
+					|| (New_y[i] - New_y[i - 1] > 16 && pow((double)New_y[i] - (double)New_y[i - 1], 2.0) + pow((double)New_x[i] - (double)New_x[i - 1], 2.0) >= pow((double)IRONBALL_R , 2.0)))
 				{
 					if (zo[i] == 4) {
 						New_y[i] -= 4;
@@ -820,7 +909,7 @@ void Lock::Gravity() {
 					}
 				}
 			}
-			else if (Wall[i] == 1) {
+			else if (Wall[i] >= 1) {
 				if (HitCheck(i) == true || New_y[i] - New_y[i - 1] + abs(New_y[i] - New_y[i - 1]) >= IRONBALL_R) {
 					if (zo[i] == 4) {
 						New_y[i] -= 4;

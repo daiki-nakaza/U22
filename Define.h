@@ -15,6 +15,9 @@
 #define ENEMY_MAX 10
 #define WALK_ENEMY_SIZE 48	//ìGÇÃëÂÇ´Ç≥
 #define SHOOT_ENEMY_SIZE 48
+#define TANK_ENEMY_SIZE 64
+#define RAZER_ENEMY_SIZE 64
+
 #define  Bullet_MAX 3
 
 #define  Bullet_MAX 3
@@ -29,12 +32,21 @@
 typedef enum MENU_MODE {
 	GAME_TITLE,//ÇO
 	GAME_MAIN,//ÇP
-	GAME_END,//ÇQ
-	GAME_MENU,//3
-	GAME_INIT,//4
-	GAME_CLEAR,//5
-	GAME_HELP,//6
+	GAME_HELP,//2
+	GAME_END,//3
+	GAME_MENU,//4
+	GAME_INIT,//5
+	GAME_CLEAR,//6
+	GAME_OVER,//7
+
+	
 
 
 	END = 99
+};
+
+//ÉXÉeÅ[ÉWÇPÇÃìGÇÃç¿ïW
+const int Stage1_WalkEnemy[2][9] = {
+	{63,76,122,132,211,233,244,278,302},
+	{18,18,18,18,9,18,18,18,16}
 };

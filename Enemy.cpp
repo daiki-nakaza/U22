@@ -11,7 +11,15 @@
 /**************************************************
 *		変数の宣言
 ***************************************************/
-enemyInfo g_Enemy[ENEMY_MAX];			//敵の情報を持った変数
+//エラー防止用（後で消します）
+enemyInfo g_Enemy[ENEMY_MAX];
+
+WalkEnemy g_WalkEnemy[ENEMY_MAX];					//歩く敵
+ShootEnemy g_ShootEnemy[ENEMY_MAX];					//真っすぐ撃つ敵
+LockShootEnemy g_LockShootEnemy[ENEMY_MAX];			//狙い撃つ敵
+TankEnemy g_TankEnemy[ENEMY_MAX];					//戦車の敵
+RazerEnemy g_RazerEnemy[ENEMY_MAX];					//波動砲の敵
+
   
 
 
@@ -19,17 +27,53 @@ enemyInfo g_Enemy[ENEMY_MAX];			//敵の情報を持った変数
 *　　敵の構造体の関数の定義
 *****************************************************/
 
+void enemyInfo::Move() {
+	/******************************************************
+		*勝手に書きました
+		******************************************************/
+	if (outtime < 0) {
+		outtime = 0;
+	}
+	if (Life <= 0) {
+		DispFlg = false;
+	}
+	if (y < 1000) {
+		if (g_MapChip[(y + h) / MAP_SIZE][x / MAP_SIZE] == 1) {			//自分の足元を見て空中だったら
+			y += GRAVITY;
+		}
+	}
+}
+
+void enemyInfo::Disp() {			//敵の表示処理
+
+	if (DispFlg) {		//敵表示
+		//DrawBox(x + MapDrawPointX - MapX * MAP_SIZE,
+		//	y - MapDrawPointY - MapY * MAP_SIZE,
+		//	(x + MapDrawPointX - MapX * MAP_SIZE) + w,
+		//	(y - MapDrawPointY - MapY * MAP_SIZE) + h, 0x000000, true);
+		DrawGraph(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE, pic, true);
+	}
+	else {				//敵非表示
+
+	}
+}
+
+
+
 //////////////////////////////////////////////
 /////////////歩く敵の処理////////////////////
 /////////////////////////////////////////////
 
-void enemyInfo::WalkInit() {                 // 敵の初期化
-	x = 24 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
-	y = 14 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+void WalkEnemy::Init(int Ec) {                 // 敵の初期化
+	x = Stage1_WalkEnemy[0][Ec] * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
+	y = Stage1_WalkEnemy[1][Ec] * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+
 	w = WALK_ENEMY_SIZE;						//敵の横幅
 	h = WALK_ENEMY_SIZE;						//敵の縦
 
 	//LoadDivGraph("images/MouseAll.png", 4, 4, 1, WALK_ENEMY_SIZE, WALK_ENEMY_SIZE, pic);
+	pic = LoadGraph("images/Zako.png");
+
 	anm = 0;
 
 	direct = -1;						//左向きから始める
@@ -52,7 +96,7 @@ void enemyInfo::WalkInit() {                 // 敵の初期化
 }
 
 
-void enemyInfo::WalkMove(){
+void WalkEnemy::WalkMove(){
 
 	static int AnmCnt = 0;
 
@@ -62,10 +106,6 @@ void enemyInfo::WalkMove(){
 
 	if (DispFlg) {//
 		
-		if (g_MapChip[(y + h) / MAP_SIZE][x / MAP_SIZE] == 1) {			//自分の足元を見て空中だったら
-			y += GRAVITY;
-		}
-
 
 		if (direct < 0) picDir = false;		//左向きなら
 		else picDir = true;					//右向きなら
@@ -77,6 +117,7 @@ void enemyInfo::WalkMove(){
 			if (++anm > 3) anm = 0;
 			AnmCnt = 0;
 		}
+		Move();			//敵共通の関数
 
 	}
 
@@ -88,7 +129,7 @@ void enemyInfo::WalkMove(){
 //////////撃つ敵の処理//////////////////////
 /////////////////////////////////////////////
 
-void enemyInfo::ShootInit() {                 // 撃つ敵の初期化
+void ShootEnemy::Init() {                 // 撃つ敵の初期化
 	x = 24 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
 	y = 15 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
 	w = SHOOT_ENEMY_SIZE;						//敵の横幅
@@ -116,7 +157,7 @@ void enemyInfo::ShootInit() {                 // 撃つ敵の初期化
 }
 
 
-void enemyInfo::ShootMove() {		//撃つ敵の処理
+void ShootEnemy::ShootMove() {		//撃つ敵の処理
 
 	static int AnmCnt = 0;
 	const int FrmMax = 10;		//アニメーションフレームの間
@@ -131,12 +172,6 @@ void enemyInfo::ShootMove() {		//撃つ敵の処理
 
 
 	if (DispFlg) {//
-		if (g_MapChip[(y + h) / MAP_SIZE][x / MAP_SIZE] == 1) {			//自分の足元を見て空中だったら
-			y += GRAVITY;
-		}
-		else {
-			AttckFlg = true;
-		}
 
 		//if(DirCheck)
 
@@ -149,117 +184,334 @@ void enemyInfo::ShootMove() {		//撃つ敵の処理
 			if (++anm > 3) anm = 0;
 			AnmCnt = 0;
 		}
-		if (AttckFlg) {
-			if (Firecnt++ >= Rate
-				&& BulletCnt < Bullet_MAX) {
-				Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
-				BulletCnt++;
-				Firecnt = 0;
-			}
-
-			if (!Bullet[0].DispFlg
-				&& !Bullet[1].DispFlg
-				&& !Bullet[2].DispFlg
-				&& ReloadCnt > ReloadTime) {
-				BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
-				ReloadCnt = 0;
-			}
-			if (ReloadCnt++ <= ReloadTime) {}
-
-			for (int i = 0; i < Bullet_MAX; i++) {
-				Bullet[i].Disp();
-				Bullet[i].Move(direct);
-				if (IronToBullet(Bullet[i])) {
-					Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
-				}
-				if (PlayerToEnemy(Bullet[i])) {
-					Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
-				}
-			}
+		if (Firecnt++ >= Rate
+			&& BulletCnt < Bullet_MAX) {
+			Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
+			BulletCnt++;
+			Firecnt = 0;
 		}
-		
 
-	}
-	else {
+		if (!Bullet[0].DispFlg
+			&& !Bullet[1].DispFlg
+			&& !Bullet[2].DispFlg
+			&& ReloadCnt > ReloadTime) {
+			BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
+			ReloadCnt = 0;
+		}
+		if (ReloadCnt++ <= ReloadTime) {}
+
 		for (int i = 0; i < Bullet_MAX; i++) {
-			Bullet[i].DispFlg = false;
+			Bullet[i].Disp();
+			Bullet[i].Move(direct);			//弾丸の処理
+			if (IronToBullet(Bullet[i])) {
+				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+			}
+			if (PlayerToEnemy(Bullet[i])) {
+				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+			}
 		}
+
+		Move();			//敵共通の関数
+
 	}
 
-
-
-	
 
 }
 
-void enemyInfo::Disp() {			//敵の表示処理
+
+////////////////////////////////////////////
+//////////狙い撃つ敵の処理//////////////////////
+/////////////////////////////////////////////
+
+//狙い撃つ敵の初期化
+void LockShootEnemy::Init() {
+	x = 15 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
+	y = 8 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+	w = SHOOT_ENEMY_SIZE;						//敵の横幅
+	h = SHOOT_ENEMY_SIZE;						//敵の縦
+
+	anm = 0;
+
+	direct = -1;						//左向きから始める
+
+	speed = 0;						//敵のスピード
+	picDir = true;
+
+	Life = 3;					//敵のHP　とりま３
+
+	type = 1;					//敵のタイプ
+
+	AttckFlg = false;			//攻撃用のフラグ
+
+	pic = LoadGraph("images/teki.png");
+
+	DispFlg = TRUE;					//敵を表示
+
+
+
+}
+
+
+void LockShootEnemy::LockShootMove() {			//撃つ敵の処理
+
+
+	static int AnmCnt = 0;
+	const int FrmMax = 10;		//アニメーションフレームの間
+
+	const int Rate = 20;		//発射レート
+	const int ReloadTime = 180;			//リロード時間　大体３秒
+
+
+	static int Firecnt = 0;		 //発射のカウント
+	static int BulletCnt = 0;		//３発連続で弾を発射させる
+	static int ReloadCnt = 0;		//リロードの時間カウント
+
+
+	if (DispFlg) {//
+
+		//if(DirCheck)
+
+		if (direct < 0) picDir = false;		//左向きなら
+		else picDir = true;					//右向きなら
+
+
+
+		if (++AnmCnt >= FrmMax) {				//アニメーションフレーム
+			if (++anm > 3) anm = 0;
+			AnmCnt = 0;
+		}
+		if (Firecnt++ >= Rate
+			&& BulletCnt < Bullet_MAX) {
+			Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
+			BulletCnt++;
+			Firecnt = 0;
+		}
+
+		if (!Bullet[0].DispFlg
+			&& !Bullet[1].DispFlg
+			&& !Bullet[2].DispFlg
+			&& ReloadCnt > ReloadTime) {
+			BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
+			ReloadCnt = 0;
+		}
+		if (ReloadCnt++ <= ReloadTime) {}
+
+		for (int i = 0; i < Bullet_MAX; i++) {
+			Bullet[i].Disp();
+			Bullet[i].Move(direct);			//弾丸の処理
+			if (IronToBullet(Bullet[i])) {
+				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+			}
+			if (PlayerToEnemy(Bullet[i])) {
+				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+			}
+		}
+
+		Move();			//敵共通の関数
+
+	}
+
+}
+
+//戦車の敵(上に向かって弾を飛ばす奴)
+void TankEnemy::Init() {
+
+	x = Stage1_WalkEnemy[0][0];							 // 敵のX座標の初期位置(マップチップの場所)
+	y = Stage1_WalkEnemy[1][0];								    // 敵のY座標の初期位置(マップチップの場所)
+	w = TANK_ENEMY_SIZE;						//敵の横幅
+	h = TANK_ENEMY_SIZE;						//敵の縦幅
+
+	anm = 0;
+
+	direct = -1;						//左向きから始める
+
+	speed = 0;						//敵のスピード
+	picDir = true;
+
+	Life = 3;					//敵のHP　とりま３
+
+	type = 1;					//敵のタイプ
+
+	AttckFlg = false;			//攻撃用のフラグ
+
+	pic = LoadGraph("images/Enemy.Tank.png");
+
+	DispFlg = TRUE;					//敵を表示
+
+
+}
+
+void TankEnemy::TankMove() {
+
+
+	static int AnmCnt = 0;
+	const int FrmMax = 10;		//アニメーションフレームの間
+
+	const int Rate = 40;		//発射レート
+	const int ReloadTime = 240;			//リロード時間　
+
+
+	static int Firecnt = 0;		 //発射のカウント
+	static int BulletCnt = 0;		//３発連続で弾を発射させる
+	static int ReloadCnt = 0;		//リロードの時間カウント
+
+
+	if (DispFlg) {//
+
+		//if(DirCheck)
+
+		if (direct < 0) picDir = false;		//左向きなら
+		else picDir = true;					//右向きなら
+
+
+
+		if (++AnmCnt >= FrmMax) {				//アニメーションフレーム
+			if (++anm > 3) anm = 0;
+			AnmCnt = 0;
+		}
+		if (Firecnt++ >= Rate
+			&& BulletCnt < Bullet_MAX) {
+			Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
+			BulletCnt++;
+			Firecnt = 0;
+		}
+
+		if (!Bullet[0].DispFlg
+			&& !Bullet[1].DispFlg
+			&& !Bullet[2].DispFlg
+			&& ReloadCnt > ReloadTime) {
+			BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
+			ReloadCnt = 0;
+		}
+		if (ReloadCnt++ <= ReloadTime) {}
+
+		for (int i = 0; i < Bullet_MAX; i++) {
+			Bullet[i].Disp();
+			Bullet[i].Move(direct);			//弾丸の処理
+			if (IronToBullet(Bullet[i])) {
+				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+			}
+			if (PlayerToEnemy(Bullet[i])) {
+				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+			}
+		}
+
+		Move();			//敵共通の関数
+
+	}
+}
+
+//波動砲を撃つ敵の関数定義
+void RazerEnemy::Init(){
+	x = 15 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
+	y = 8 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+	w = TANK_ENEMY_SIZE;						//敵の横幅
+	h = TANK_ENEMY_SIZE;						//敵の縦幅
+
+	anm = 0;
+
+	direct = -1;						//左向きから始める
+
+	speed = 0;						//敵のスピード
+	picDir = true;
+
+	Life = 3;					//敵のHP　とりま３
+
+	type = 1;					//敵のタイプ
+
+	AttckFlg = false;			//攻撃用のフラグ
+
+	LoadDivGraph("images/HadouhouAll.png",3,3,1, TANK_ENEMY_SIZE, TANK_ENEMY_SIZE,pic);
+
+	//pic[2] = LoadGraph("images/Hadouhou2.png");
+
+	DispFlg = TRUE;					//敵を表示
+
+}
+
+void RazerEnemy::ShotMove() {
+
+	static int AnmCnt = 0;
+
+	const int FrmMax = 10;		//アニメーションフレームの間
+
+
+
+	if (DispFlg) {//
+
+
+		if (++AnmCnt >= FrmMax) {
+			if (++anm > 3) anm = 0;
+			AnmCnt = 0;
+		}
+		Move();			//敵共通の関数
+
+	}
+}
+
+void RazerEnemy::Disp() {
 
 	if (DispFlg) {		//敵表示
-		//DrawBox(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE,	// + MapDrawPointX - MapX * MAP_SIZE
-		//	x + w + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, 0xff0000, true);
-		//DrawRotaGraphFast2(x, y,0,0,1,0, pic[anm], true,picDir);
-		DrawGraph(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE, pic, true);
+		//DrawBox(x + MapDrawPointX - MapX * MAP_SIZE,
+		//	y - MapDrawPointY - MapY * MAP_SIZE,
+		//	(x + MapDrawPointX - MapX * MAP_SIZE) + w,
+		//	(y - MapDrawPointY - MapY * MAP_SIZE) + h, 0x000000, true);
+		DrawGraph(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE, pic[2], true);
 	}
 	else {				//敵非表示
 
 	}
 }
-
-
-
 /**************************************************
 *　敵の関数の定義
 ***************************************************/
+
+void enemyInit() {			//敵の初期化処理
+
+		//g_LockShootEnemy[0].Init();
+
+}
+
 void enemyDisp() {
+
 	for (int i = 0; i < ENEMY_MAX; i++) {
-		g_Enemy[i].Disp();
+		g_WalkEnemy[i].Disp();
+		g_ShootEnemy[i].Disp();
+		g_LockShootEnemy[i].Disp();
+		g_TankEnemy[i].Disp();
+		g_RazerEnemy[i].Disp();
 	}
 	
-	
-
 	//EnemyShoot();
 }
 
+
+
+
 void enemyMove() {
-	static int Initflg = true;
+	static bool Initflg = true;
 
 	if (Initflg) {
-		g_Enemy[0].ShootInit();
-		//g_Enemy[0].WalkInit();
-
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			g_WalkEnemy[i].Init(i);
+		}
 		Initflg = false;
 	}
 
+
 	for (int i = 0; i < ENEMY_MAX; i++) {
-		switch (g_Enemy[i].type)
-		{
-		case 0:
-			g_Enemy[i].WalkMove();
-			break;
-		case 1:
-			g_Enemy[i].ShootMove();
-			break;
-		}
 
+		g_WalkEnemy[i].WalkMove();
+		g_ShootEnemy[i].ShootMove();
+		g_LockShootEnemy[i].LockShootMove();
+		g_TankEnemy[i].TankMove();
+		g_RazerEnemy[i].ShotMove();
 
-		if (EnemyCheckHit(g_Enemy[i])
-			|| IronToEnemy(g_Enemy[i]) ) {	//壁だったら
-			g_Enemy[i].direct *= -1;			//移動の向きを反転させる
-		}
-
-		/******************************************************
-		*勝手に書きました
-		******************************************************/
-		if (--g_Enemy[i].outtime < 0) {
-			g_Enemy[i].outtime = 0;
-		}
-		if (g_Enemy[i].Life <= 0) {
-			g_Enemy[i].DispFlg = false;
-		}
+		
 	}	
 }
 
-bool EnemyCheckHit(enemyInfo enemy) {
+bool EnemyCheckHit(WalkEnemy enemy) {
 	int i = 0, j = 0, k = 0, l = 0, w = 0, z = 0;		//補正値用変数
 	//的の位置（左）がマップをまたいでいる
 	while (enemy.x / MAP_SIZE - k >= WIDTH) {
