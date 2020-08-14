@@ -34,8 +34,9 @@ struct enemyInfo
 //•à‚­“G‚Ì\‘¢‘Ì
 struct WalkEnemy : public enemyInfo
 {
-	void Init(int Ec);			//œpœj‚µ‚Ä‚¢‚é“G‚Ì‰Šú‰»ˆ—
+	void Init(int Tempx,int Tempy);			//œpœj‚µ‚Ä‚¢‚é“G‚Ì‰Šú‰»ˆ—
 	void WalkMove();			//œpœj‚µ‚Ä‚¢‚é“G‚Ìˆ—
+	void Disp();
 };
 
 
@@ -44,7 +45,7 @@ struct ShootEnemy : public enemyInfo
 {
 	NormalBullet Bullet[Bullet_MAX];			//^‚Á‚·‚®Œ‚‚Â“G‚ªg‚¤’eŠÛ‚R”­
 
-	void Init();			//Œ‚‚Â“G‚Ì‰Šú‰»ˆ—
+	void Init(int Tempx, int Tempy);			//Œ‚‚Â“G‚Ì‰Šú‰»ˆ—
 	void ShootMove();			//Œ‚‚Â“G‚Ìˆ—
 
 };
@@ -56,7 +57,7 @@ struct LockShootEnemy : public enemyInfo
 
 	LockBullet Bullet[Bullet_MAX];			//’eŠÛ3”­
 
-	void Init();			//‘_‚¢Œ‚‚Â“G‚Ì‰Šú‰»ˆ—
+	void Init(int Tempx, int Tempy);			//‘_‚¢Œ‚‚Â“G‚Ì‰Šú‰»ˆ—
 	void LockShootMove();			//Œ‚‚Â“G‚Ìˆ—
 
 };
@@ -66,7 +67,7 @@ struct TankEnemy : public enemyInfo
 {
 	ChargeBullet Bullet[Bullet_MAX];		//’eŠÛ3”­
 
-	void Init();			//íÔ‚Ì‰Šú‰»ˆ—
+	void Init(int Tempx, int Tempy);			//íÔ‚Ì‰Šú‰»ˆ—
 	void TankMove();		//íÔ‚Ìˆ—
 };
 
@@ -76,7 +77,7 @@ struct RazerEnemy : public enemyInfo
 
 	int pic[3];
 
-	void Init();
+	void Init(int Tempx, int Tempy);
 	void ShotMove();
 	void Disp();
 };

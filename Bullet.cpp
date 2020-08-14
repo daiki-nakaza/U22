@@ -17,6 +17,7 @@ void NormalBullet::Init(const int Ex, const int Ey) {			//弾丸の初期化処理
 	const int valanceY = 10;		//弾丸の高さの補正値
 
 	Speed = 4;							//横の弾丸のスピード
+	MoveSum = 0;
 
 	x = Ex;		//敵キャラの座標にSet
 	y = Ey - valanceY;
@@ -38,9 +39,14 @@ void NormalBullet::Move(const int dir) {			//弾丸の処理
 		else picDir = true;					//右向きなら
 
 		x += dir * Speed;
+		MoveSum += Speed;
 
-		if (x < 0 || x > WIDTH * MAP_SIZE) DispFlg = false;		//画面外に出たら表示フラグをfalseにする
-		
+		if (CheckHit()) {
+			DispFlg = false;
+		}
+		if (abs(MoveSum) > WIDTH * MAP_SIZE) {
+			DispFlg = false;
+		}
 	}
 	else {
 
@@ -84,6 +90,7 @@ void LockBullet::Move(const int dir) {			//弾丸の処理
 
 		if (x < 0 || x > WIDTH * MAP_SIZE) DispFlg = false;		//画面外に出たら表示フラグをfalseにする
 
+		if (CheckHit()) DispFlg = false;
 	}
 	else {
 
@@ -125,6 +132,8 @@ void ChargeBullet::Move(const int dir) {			//弾丸の処理
 		direct = dir; 
 		//if (x < 0 || x > WIDTH * MAP_SIZE) DispFlg = false;		//画面外に出たら表示フラグをfalseにする
 		if (y > HEIGHT * MAP_SIZE) DispFlg = false;
+
+		if (CheckHit()) DispFlg = false;
 
 		switch (sequence)
 		{
@@ -205,3 +214,25 @@ void ChargeBullet::Disp() {			//上にむっかていく弾丸の表示処理
 }
 
 
+
+//当たり判定
+bool BulletInfo::CheckHit() {
+
+	if (y - MapDrawPointY - MapY * MAP_SIZE < PlayerY + CHA_SIZE_Y 
+		&& y + h - MapDrawPointY - MapY * MAP_SIZE > PlayerY) {
+		if (x + MapDrawPointX - MapX * MAP_SIZE < (PlayerX + CHA_SIZE_X)
+			&& x + w + MapDrawPointX - MapX * MAP_SIZE > (PlayerX) ) {
+			return true;
+		}
+	}
+
+	if (y - MapDrawPointY - MapY * MAP_SIZE < (g_IronBall.y + MapDrawPointY - MapY * MAP_SIZE) + g_IronBall.r
+		&& y + h - MapDrawPointY - MapY * MAP_SIZE > (g_IronBall.y + MapDrawPointY - MapY * MAP_SIZE) - g_IronBall.r) {
+		if ( (x + MapDrawPointX - MapX * MAP_SIZE) < ( (g_IronBall.x + MapDrawPointX - MapX * MAP_SIZE) + g_IronBall.r)
+			&& (x + w + MapDrawPointX - MapX * MAP_SIZE) > ( (g_IronBall.x + MapDrawPointX - MapX * MAP_SIZE) - g_IronBall.r) ) {
+			return true;
+		}
+	}
+
+	return false;
+}

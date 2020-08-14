@@ -20,8 +20,6 @@ LockShootEnemy g_LockShootEnemy[ENEMY_MAX];			//狙い撃つ敵
 TankEnemy g_TankEnemy[ENEMY_MAX];					//戦車の敵
 RazerEnemy g_RazerEnemy[ENEMY_MAX];					//波動砲の敵
 
-  
-
 
 /***************************************************
 *　　敵の構造体の関数の定義
@@ -37,18 +35,11 @@ void enemyInfo::Move() {
 	if (Life <= 0) {
 		DispFlg = false;
 	}
-	if (g_MapChip[(y + h) / MAP_SIZE][x / MAP_SIZE] == 1) {			//自分の足元を見て空中だったら
-		y += GRAVITY;
-	}
 }
 
 void enemyInfo::Disp() {			//敵の表示処理
 
 	if (DispFlg) {		//敵表示
-		//DrawBox(x + MapDrawPointX - MapX * MAP_SIZE,
-		//	y - MapDrawPointY - MapY * MAP_SIZE,
-		//	(x + MapDrawPointX - MapX * MAP_SIZE) + w,
-		//	(y - MapDrawPointY - MapY * MAP_SIZE) + h, 0x000000, true);
 		DrawGraph(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE, pic, true);
 	}
 	else {				//敵非表示
@@ -62,9 +53,12 @@ void enemyInfo::Disp() {			//敵の表示処理
 /////////////歩く敵の処理////////////////////
 /////////////////////////////////////////////
 
-void WalkEnemy::Init(int Ec) {                 // 敵の初期化
-	x = Stage1_WalkEnemy[0][Ec] * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
-	y = Stage1_WalkEnemy[1][Ec] * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+void WalkEnemy::Init(int Tempx, int Tempy) {                 // 敵の初期化
+	int SetX = Tempx * MAP_SIZE + ( ( (Tempy / HEIGHT) * WIDTH) * WIDTH) , SetY = (Tempy % HEIGHT) * MAP_SIZE;
+
+
+	x = SetX;							 // 敵のX座標の初期位置(マップチップの場所)
+	y = SetY;								    // 敵のY座標の初期位置(マップチップの場所)
 
 	w = WALK_ENEMY_SIZE;						//敵の横幅
 	h = WALK_ENEMY_SIZE;						//敵の縦
@@ -103,10 +97,10 @@ void WalkEnemy::WalkMove(){
 
 
 	if (DispFlg) {//
-		
+		if (g_MapChip[y + 1][x] == 1) y += GRAVITY;
 
-		if (direct < 0) picDir = false;		//左向きなら
-		else picDir = true;					//右向きなら
+		if (direct < 0) picDir = true;		//左向きなら
+		else picDir = false;					//右向きなら
 
 		if (CheckWindow(x)) {
 			x += direct * speed;
@@ -126,15 +120,26 @@ void WalkEnemy::WalkMove(){
 
 }
 
+void WalkEnemy::Disp() {
+	if (DispFlg) {		//敵表示
+		DrawRotaGraph(x + MapDrawPointX - MapX * MAP_SIZE + w/2, y - MapDrawPointY - MapY * MAP_SIZE + h/2, 1, 0, pic,true, picDir);
+	}
+	else {				//敵非表示
 
+	}
+}
 
 ////////////////////////////////////////////
 //////////撃つ敵の処理//////////////////////
 /////////////////////////////////////////////
 
-void ShootEnemy::Init() {                 // 撃つ敵の初期化
-	x = 24 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
-	y = 15 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+void ShootEnemy::Init(int Tempx, int Tempy) {                 // 撃つ敵の初期化
+	int SetX = Tempx * MAP_SIZE + (((Tempy / HEIGHT) * WIDTH) * WIDTH), SetY = (Tempy % HEIGHT) * MAP_SIZE;
+
+
+	x = SetX;							 // 敵のX座標の初期位置(マップチップの場所)
+	y = SetY - (SHOOT_ENEMY_SIZE - MAP_SIZE);								    // 敵のY座標の初期位置(マップチップの場所)
+
 	w = SHOOT_ENEMY_SIZE;						//敵の横幅
 	h = SHOOT_ENEMY_SIZE;						//敵の縦
 
@@ -181,14 +186,21 @@ void ShootEnemy::ShootMove() {		//撃つ敵の処理
 		if (direct < 0) picDir = false;		//左向きなら
 		else picDir = true;					//右向きなら
 
+		/*if (Firecnt++ > Rate) {
+			Bullet[BulletCnt].Init(x , y + h / 2);
+			Firecnt = 0;
+			if (++BulletCnt >= 3
+				&& !Bullet[0].DispFlg
+				&& !Bullet[1].DispFlg
+				&& !Bullet[2].DispFlg) {
+				BulletCnt = 0;
+			}
+		}*/
 
 
-		if (++AnmCnt >= FrmMax) {				//アニメーションフレーム
-			if (++anm > 3) anm = 0;
-			AnmCnt = 0;
-		}
 		if (Firecnt++ >= Rate
-			&& BulletCnt < Bullet_MAX) {
+			&& BulletCnt < Bullet_MAX
+			&& !Bullet[BulletCnt].DispFlg) {
 			Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
 			BulletCnt++;
 			Firecnt = 0;
@@ -206,12 +218,12 @@ void ShootEnemy::ShootMove() {		//撃つ敵の処理
 		for (int i = 0; i < Bullet_MAX; i++) {
 			Bullet[i].Disp();
 			Bullet[i].Move(direct);			//弾丸の処理
-			if (IronToBullet(Bullet[i])) {
-				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
-			}
-			if (PlayerToEnemy(Bullet[i])) {
-				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
-			}
+			//if (IronToBullet(Bullet[i])) {
+			//	Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+			//}
+			//if (PlayerToEnemy(Bullet[i])) {
+			//	Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
+			//}
 		}
 
 		Move();			//敵共通の関数
@@ -227,9 +239,13 @@ void ShootEnemy::ShootMove() {		//撃つ敵の処理
 /////////////////////////////////////////////
 
 //狙い撃つ敵の初期化
-void LockShootEnemy::Init() {
-	x = 15 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
-	y = 8 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+void LockShootEnemy::Init(int Tempx, int Tempy) {
+	int SetX = Tempx * MAP_SIZE + (((Tempy / HEIGHT) * WIDTH) * WIDTH), SetY = (Tempy % HEIGHT) * MAP_SIZE;
+
+
+	x = SetX;							 // 敵のX座標の初期位置(マップチップの場所)
+	y = SetY;								    // 敵のY座標の初期位置(マップチップの場所)
+
 	w = SHOOT_ENEMY_SIZE;						//敵の横幅
 	h = SHOOT_ENEMY_SIZE;						//敵の縦
 
@@ -317,10 +333,10 @@ void LockShootEnemy::LockShootMove() {			//撃つ敵の処理
 }
 
 //戦車の敵(上に向かって弾を飛ばす奴)
-void TankEnemy::Init() {
+void TankEnemy::Init(int Tempx, int Tempy) {
+	x = Tempx * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
+	y = Tempy * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
 
-	x = Stage1_WalkEnemy[0][0];							 // 敵のX座標の初期位置(マップチップの場所)
-	y = Stage1_WalkEnemy[1][0];								    // 敵のY座標の初期位置(マップチップの場所)
 	w = TANK_ENEMY_SIZE;						//敵の横幅
 	h = TANK_ENEMY_SIZE;						//敵の縦幅
 
@@ -391,12 +407,7 @@ void TankEnemy::TankMove() {
 		for (int i = 0; i < Bullet_MAX; i++) {
 			Bullet[i].Disp();
 			Bullet[i].Move(direct);			//弾丸の処理
-			if (IronToBullet(Bullet[i])) {
-				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
-			}
-			if (PlayerToEnemy(Bullet[i])) {
-				Bullet[i].DispFlg = false;		//鉄球に当たっていたらとりま消す
-			}
+
 		}
 
 		Move();			//敵共通の関数
@@ -405,9 +416,10 @@ void TankEnemy::TankMove() {
 }
 
 //波動砲を撃つ敵の関数定義
-void RazerEnemy::Init(){
-	x = 15 * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
-	y = 8 * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+void RazerEnemy::Init(int Tempx, int Tempy){
+	x = Tempx * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
+	y = Tempy * MAP_SIZE;								    // 敵のY座標の初期位置(マップチップの場所)
+
 	w = TANK_ENEMY_SIZE;						//敵の横幅
 	h = TANK_ENEMY_SIZE;						//敵の縦幅
 
@@ -470,8 +482,57 @@ void RazerEnemy::Disp() {
 ***************************************************/
 
 void enemyInit() {			//敵の初期化処理
-
-		//g_LockShootEnemy[0].Init();
+	 
+	for (int y = 0; y < HEIGHT * MAP_LONG; y++) {
+		for (int x = 0; x < WIDTH; x++) {
+			if (g_MapChip[y][x] == 3) {		//歩く雑魚
+				for (int i = 0; i < ENEMY_MAX; i++) {
+					if (g_WalkEnemy[i].DispFlg == false) {
+						g_WalkEnemy[i].Init(x, y);
+						g_MapChip[y][x] = 1;
+						break;
+					}
+				}
+			}
+			else if (g_MapChip[y][x] == 4) {		//真っすぐ撃つ
+				for (int i = 0; i < ENEMY_MAX; i++) {
+					if (!g_ShootEnemy[i].DispFlg) {
+						g_ShootEnemy[i].Init(x, y);
+						g_MapChip[y][x] = 1;
+						break;
+					}
+				}
+			}
+			else if (g_MapChip[y][x] == 5) {		//頭狙うやつ
+				for (int i = 0; i < ENEMY_MAX; i++) {
+					if (!g_LockShootEnemy[i].DispFlg) {
+						g_LockShootEnemy[i].Init(x, y);
+						g_MapChip[y][x] = 1;
+						break;
+					}
+				}
+			}
+			else if (g_MapChip[y][x] == 6) {		//戦車
+				for (int i = 0; i < ENEMY_MAX; i++) {
+					if (!g_TankEnemy[i].DispFlg) {
+						g_TankEnemy[i].Init(x, y);
+						g_MapChip[y][x] = 1;
+						break;
+					}
+				}
+			}
+			else if (g_MapChip[y][x] == 7) {
+				for (int i = 0; i < ENEMY_MAX; i++) {
+					if (!g_RazerEnemy[i].DispFlg) {
+						g_RazerEnemy[i].Init(x, y);
+						g_MapChip[y][x] = 1;
+						break;
+					}
+				}
+			}
+		}
+	}
+	
 
 }
 
@@ -493,14 +554,10 @@ void enemyDisp() {
 
 void enemyMove() {
 	static bool Initflg = true;
-
 	if (Initflg) {
-		for (int i = 0; i < ENEMY_MAX; i++) {
-			g_WalkEnemy[i].Init(i);
-		}
+		enemyInit();
 		Initflg = false;
 	}
-
 
 	for (int i = 0; i < ENEMY_MAX; i++) {
 
@@ -556,7 +613,8 @@ bool CheckWindow(int x) {
 
 	int Cx = GetPlayerX();
 
-	if (Cx + WIDTH * MAP_SIZE > x) return true;
+	if (Cx  + ( WIDTH / 2 ) * MAP_SIZE> x) return true;
+	if (Cx - (WIDTH / 2) * MAP_SIZE < x) return true;
 
 	return false;
 }
