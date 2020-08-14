@@ -163,7 +163,8 @@ int LoadImages() {
 	LoadDivGraph("images/motu.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_Hold);
 	LoadDivGraph("images/motu2.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_Hold_R);
 
-
+	//ゲームタイトル背景
+	if ((g_GameTitleImage = LoadGraph("images/Title.png")) == -1) return -1;
 	//ゲームオーバー背景
 	if ((g_GameOverImage = LoadGraph("images/GameOver.png")) == -1) return -1;
 
