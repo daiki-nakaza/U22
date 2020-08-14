@@ -2,6 +2,8 @@
 
 #include "DxLib.h"
 
+extern int g_GameOverImage;//ゲームオーバー背景
+
 
 void DrawEnd(void);
 

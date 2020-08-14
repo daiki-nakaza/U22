@@ -8,6 +8,10 @@
 #include "IronToEnemy.h"
 
 
+//デバック用
+bool DebugMode = false;
+
+
 //プレイヤーの位置
 int PlayerX, PlayerY;              //0～画面半分まで。（プレイヤー位置）
 int Map_PlayerX, Map_PlayerY;      //マップ全体のスクロール位置（マップ位置）
@@ -66,7 +70,22 @@ void PlayerMove() {
 
 	//しゃがみのフラグを毎回０にする
 	Down_flg = 0;
-	
+
+	if (DebugMode) {
+		DrawFormatString(500, 0, 0xffffff, "%d", Locka.WI);
+	}
+
+	//ぶら下がっているフラグ
+	if (Locka.WI > 0) {
+		Locka.HenkaX += 2;
+		NewX += 2;
+	//	Locka.WI = 0;
+	}
+	else if (Locka.WI < 0) {
+		Locka.HenkaX -= 2;
+		NewX -= 2;
+	//	Locka.WI = 0;
+	}
 
 
 	//キー入力に応じてプレイヤーの座標を移動 上
@@ -92,6 +111,9 @@ void PlayerMove() {
 		if (Attack < 10 && g_IronBall.ThrowFlg == false) {
 			Bectl = 1;
 		}
+		if (Locka.RD > 0) {
+			Locka.RD = 0;
+		}
 	}
 	//右
 	if (g_NowKey & PAD_INPUT_RIGHT && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1) && Jump_Flg != -2) {
@@ -104,6 +126,9 @@ void PlayerMove() {
 		//攻撃しておらず、鉄球を投げていないときだけ向いている方向をかえることができる。
 		if (Attack < 10 && g_IronBall.ThrowFlg == false) {
 			Bectl = 0;
+		}
+		if (Locka.RD < 0) {
+			Locka.RD = 0;
 		}
 	}
 	
@@ -119,9 +144,9 @@ void PlayerMove() {
 	Locka.MoveCheck();
 	
 	
-
-	DrawFormatString(0, 0, 0xffffff,"%d", Jump_Flg);
-		
+	if (DebugMode) {
+		DrawFormatString(0, 0, 0xffffff, "%d", Jump_Flg);
+	}
 
 	if (NewX > 500) {
 		Map_NewX += NewX - 500;
@@ -151,6 +176,7 @@ void PlayerMove() {
 
 	//落下した場合
 	if (MapY + ((NewY + (Map_NewX % MAP_SIZE) + CHA_SIZE_Y-1) / MAP_SIZE) + MapChipNumY >= HEIGHT) {
+		//g_GameState = GAME_OVER;
 	}
 
 	//プレイヤー位置がマップをまたいでいる
@@ -203,6 +229,13 @@ void PlayerMove() {
 				Locka.New_y[i] = Locka.y[i];
 			}
 		//}
+		if (Locka.HenkaX > 0 ) {
+			Locka.RD = 2;
+		}
+		else if (Locka.HenkaX < 0) {
+			Locka.RD = -2;
+		}
+		
 		Locka.HenkaX = 0;
 		Locka.HenkaY = 0;
 
@@ -310,13 +343,22 @@ void PlayerDisp() {
 	else if (Bectl == 1 && Attack < 10 && Down_flg == 1 && g_IronBall.HoldFlg == false) {
 		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y/4*3, Player_Pic_Down_R, true);
 	}
-	DrawCircle(Locka.x[0] + MapDrawPointX - MapX * MAP_SIZE, Locka.y[0] - MapDrawPointY - MapY * MAP_SIZE, 4, GetColor(252 ,252, 252), true);
-
+	if (DebugMode) {
+		DrawCircle(Locka.x[0] + MapDrawPointX - MapX * MAP_SIZE, Locka.y[0] - MapDrawPointY - MapY * MAP_SIZE, 4, GetColor(252, 252, 252), true);
+		DrawCircle(Locka.x[1] + MapDrawPointX - MapX * MAP_SIZE, Locka.y[1] - MapDrawPointY - MapY * MAP_SIZE, 4, GetColor(252, 50, 252), true);
+	}
 }
 
 void PlayerGravity() {
 	int i = 0, j = 0, w = 0, z = 0;//ローカルなので気にしないでください!あたり判定用の補正値
 	int flg = 0;//ローカル変数です。敵キャラが移動する場所にいるかどうかのフラグ
+
+
+	// 移動する前のプレイヤーの位置を保存
+	NewX = PlayerX;
+	NewY = PlayerY;
+	Map_NewX = Map_PlayerX;
+	Map_NewY = Map_PlayerY;
 
 	//プレイヤー重力
 	NewY = PlayerY;
@@ -348,10 +390,27 @@ void PlayerGravity() {
 		Jump_Flg++;
 	}
 
-	// スライド用の０から３１までの値
-	MapDrawPointY = -(Map_PlayerY % MAP_SIZE);
+	//鎖の移動処理
+	Locka.MoveCheck();
 
-	MapY = (Map_PlayerY) / MAP_SIZE;
+	if (NewX > 500) {
+		Map_NewX += NewX - 500;
+		NewX = 500;
+	}
+	if (NewX < 64) {
+		if (Map_NewX > 0) {
+			Map_NewX -= 64 - NewX;
+			NewX = 64;
+		}
+
+	}
+
+	// スライド用の０から３１までの値
+	MapDrawPointX = -(Map_NewX % MAP_SIZE);
+	MapDrawPointY = -(Map_NewY % MAP_SIZE);
+
+	MapX = (Map_NewX) / MAP_SIZE;
+	MapY = (Map_NewY) / MAP_SIZE;
 
 	MapChipNumX = 0;
 	MapChipNumY = 0;
@@ -362,16 +421,19 @@ void PlayerGravity() {
 
 
 	//プレイヤー位置がマップをまたいでいる(右側だけ）
-	if (MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X-1) / MAP_SIZE) - MapChipNumX >= WIDTH) {
+	if (MapX + ((NewX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X-1) / MAP_SIZE) - MapChipNumX >= WIDTH) {
 		i += WIDTH;
 		j += HEIGHT;
 	}
 	//真ん中の位置がマップをまたいでいる
-	if (MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX  >= WIDTH) {
+	if (MapX + ((NewX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX  >= WIDTH) {
 		w += WIDTH;
 		z += HEIGHT;
 	}
-	//DrawFormatString(x * MAP_SIZE + MapDrawPointX, y * MAP_SIZE + MapDrawPointY, 0xffffff, "%d %d", y + MapY + MapChipNumY, x + MapX + MapChipNumX);
+
+	if (DebugMode) {
+		//DrawFormatString(x * MAP_SIZE + MapDrawPointX, y * MAP_SIZE + MapDrawPointY, 0xffffff, "%d %d", y + MapY + MapChipNumY, x + MapX + MapChipNumX);
+	}
 
 	//敵キャラが移動する場所にいたら戻す
 	for (int a = 0; a < ENEMY_MAX; a++) {
@@ -382,17 +444,16 @@ void PlayerGravity() {
 		flg = PlayerMoveCheck(g_RazerEnemy[a]);
 	}
 
-	//鎖の移動処理
-	Locka.MoveCheck();
+	
 
 	// 進入不可能なマップだった場合は重力を消す
-	if (g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y / 2 - 1) / MAP_SIZE) + MapChipNumY][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1						//左真ん中
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w ] != 1
-		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + z][MapX + ((PlayerX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w] != 1	
+	if (g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y / 2 - 1) / MAP_SIZE) + MapChipNumY][MapX + ((NewX + (Map_PlayerX % MAP_SIZE)) / MAP_SIZE) - MapChipNumX] != 1						//左真ん中
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + j][MapX + ((NewX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X - 1) / MAP_SIZE) - MapChipNumX - i] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE)) / MAP_SIZE) + MapChipNumY + z][MapX + ((NewX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w ] != 1
+		|| g_MapChip[MapY + ((NewY + (Map_PlayerY % MAP_SIZE) + CHA_SIZE_Y - 1) / MAP_SIZE) + MapChipNumY + z][MapX + ((NewX + (Map_PlayerX % MAP_SIZE) + CHA_SIZE_X / 2) / MAP_SIZE) - MapChipNumX - w] != 1	
 		)
 	{
 		/*if (Jump_Flg != 0)
@@ -411,22 +472,33 @@ void PlayerGravity() {
 		else if (Jump_Flg == 0) {
 			PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE_Y % MAP_SIZE;
 		}
-
-		
-		
+		//人が地面についたときは人に一番近い鎖だけはもとに戻す
+		Locka.New_x[0] = Locka.x[0];
+		Locka.New_y[0] = Locka.y[0];
 		
 	}//鎖の長さが大丈夫かどうか
-	else if ( (/*Locka.HenkaX != 0 ||*/ Locka.HenkaY != 0)) 
+	else if ( (Locka.HenkaX != 0 || Locka.HenkaY != 0)) 
 	{
 		if (Locka.HenkaX != 0 || Locka.HenkaY != 0) {
 			for (int i = 0; i < LOCK_MAX; i++) {
 				Locka.New_x[i] = Locka.x[i];
 				Locka.New_y[i] = Locka.y[i];
-				Jump_Flg = -2;//ここばぐるｘが原因
+	//			Jump_Flg = -2;//ここばぐるｘが原因
 			}
+			Jump_Flg = -2;//－２にしてるのは、ここだけ
+
 			Locka.HenkaX = 0;
 			Locka.HenkaY = 0;
+
+			if (Locka.New_x[0] - Locka.New_x[1] > 0) {//左に移動
+				Locka.WI = -1;
+			}
+			else if (Locka.New_x[0] - Locka.New_x[1] < 0) {
+				Locka.WI = 1;
+			}
+			
 		}
+
 	}//鉄球がある場合と敵がいた場合
 	else if ((g_IronBall.x - PlayerX - Map_PlayerX < CHA_SIZE_X + IRONBALL_R
 		  && g_IronBall.y - NewY - Map_PlayerY < CHA_SIZE_Y - 1 + IRONBALL_R
@@ -455,12 +527,18 @@ void PlayerGravity() {
 		if (Jump_Flg == -2) {
 			Jump_Flg = -1;
 		}
+		PlayerX = NewX;
 		PlayerY = NewY;
 		
 	}
+
+	
+
 	Locka.HenkaY = 0;
 	Locka.HenkaX = 0;
+	
 	Locka.Move();
+	
 }
 
 

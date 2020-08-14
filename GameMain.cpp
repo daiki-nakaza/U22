@@ -8,13 +8,16 @@
 #include "accessory.h"
 #include "UI.h"
 
-
+int reset = 0;
 
 void DrawGameMain() {
-	static int i = 0;
-	if (i++ == 0) {
+	//static int i = 0;
+	if (reset++ == 0) {
 		PlayerInit();
 		MapChipInit();
+
+	}
+	else if (reset++ == 5) {//ライフ以外のリセット
 	}
 	MapDisp();			//マップの描画
 	MapMove();			//スクリーンの処理

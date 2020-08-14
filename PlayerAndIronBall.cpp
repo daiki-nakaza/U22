@@ -132,8 +132,8 @@ void IronHoldOrThrow() {
 	Locka.MoveCheck();
 		///*
 		if (Locka.HenkaX != 0 && Locka.HI != 0) {
-			g_IronBall.x += Locka.HI;
-			Locka.New_x[LOCK_MAX - 1] += Locka.HI;
+			g_IronBall.x += Locka.HenkaX;
+			Locka.New_x[LOCK_MAX - 1] += Locka.HenkaX;
 		}
 		//*/
 	Locka.HenkaY = 0;

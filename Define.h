@@ -32,11 +32,14 @@
 typedef enum MENU_MODE {
 	GAME_TITLE,//‚O
 	GAME_MAIN,//‚P
-	GAME_END,//‚Q
-	GAME_MENU,//3
-	GAME_INIT,//4
-	GAME_CLEAR,//5
-	GAME_HELP,//6
+	GAME_HELP,//2
+	GAME_END,//3
+	GAME_MENU,//4
+	GAME_INIT,//5
+	GAME_CLEAR,//6
+	GAME_OVER,//7
+
+	
 
 
 	END = 99

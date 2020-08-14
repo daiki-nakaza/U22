@@ -33,7 +33,7 @@ int g_MouseX;//マウスｘ座標
 int g_MouseY;//マウスｙ座標
 
 
-int g_GameState = GAME_MAIN;//ゲームモード
+int g_GameState = GAME_TITLE;//ゲームモード
 
 
 
@@ -82,7 +82,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	if (LoadSounds() == -1) {
 		return -1;
 	}
-	
+	if (DebugMode) {
+		g_GameState = GAME_MAIN;//ゲームモード
+	}
 
 
 	//DrawInit();
@@ -115,6 +117,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		case GAME_MAIN:
 			DrawGameMain();
 			break;
+		case GAME_HELP:
+			DrawHelp();
+			break;
 		case GAME_END:
 			DrawEnd();
 			break;
@@ -127,9 +132,10 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		case GAME_CLEAR:
 			DrawClear();
 			break;
-		case GAME_HELP:
-			DrawHelp();
+		case GAME_OVER:
+			DrawGameOver();
 			break;
+		
 		}
 
 		ScreenFlip();
@@ -156,6 +162,10 @@ int LoadImages() {
 	Player_Pic_Down_R = LoadGraph("images/shagami2.png", true);
 	LoadDivGraph("images/motu.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_Hold);
 	LoadDivGraph("images/motu2.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_Hold_R);
+
+
+	//ゲームオーバー背景
+	if ((g_GameOverImage = LoadGraph("images/GameOver.png")) == -1) return -1;
 
 
 	return 0;

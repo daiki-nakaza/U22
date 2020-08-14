@@ -14,10 +14,12 @@ struct BulletInfo {
 
 	int direct;			//“G‚ÌŒü‚« (‰E:1  ¶:-1)
 	bool picDir;			//‰æ‘œ‚ÌŒü‚«
+	int MoveSum;			//ˆÚ“®—Ê‡Œv
 
 	int Speed;	//’eŠÛ‚ÌƒXƒs[ƒh
 
 	void Disp();			//’eŠÛ‚Ì•\¦ˆ—
+	bool CheckHit();
 
 };
 
@@ -63,3 +65,4 @@ struct RazerBullet : public BulletInfo			//”g“®–C
 	void Init(const int Ex, const int Ey);			//’eŠÛ‚Ì‰Šú‰»ˆ—
 	void Move(const int dir);			//’eŠÛ‚Ìˆ—
 };
+
