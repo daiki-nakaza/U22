@@ -6,6 +6,8 @@
 *   変数の宣言
 *****************************************************************/
 
+extern bool DebugMode;//デバック用		true：デバック中			false：提出用
+
 //プレイヤーの位置
 extern int PlayerX, PlayerY;              //0～画面半分まで。（プレイヤー位置）
 extern int Map_PlayerX, Map_PlayerY;      //マップ全体のスクロール位置（マップ位置）
@@ -31,6 +33,9 @@ extern int g_NowKey2;
 extern int g_KeyFlg2;
 extern int g_MouseX;  //マウスｘ座標
 extern int g_MouseY;  //マウスｙ座標
+
+extern int g_GameState;  //ゲームモード
+
 
 extern int Player_Pic[4];//プレイヤー移動の画像
 extern int Player_Pic_R[4];//逆プレイヤー移動の画像
