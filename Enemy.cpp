@@ -242,9 +242,6 @@ void ShootEnemy::ShootMove() {		//Œ‚‚Â“G‚Ìˆ—
 		for (int i = 0; i < Bullet_MAX; i++) {
 			Bullet[i].Disp();
 			Bullet[i].Move(direct);			//’eŠÛ‚Ìˆ—
-			if (Bullet[i].DispFlg) {
-				DrawFormatString(150, 100 + i * 30, 0x000000, "%d  x =  %d", i, Bullet[i].x);
-			}
 		}
 
 		Move();			//“G‹¤’Ê‚ÌŠÖ”
@@ -586,11 +583,7 @@ void enemyDisp() {
 		g_LockShootEnemy[i].Disp();
 		g_TankEnemy[i].Disp();
 		g_RazerEnemy[i].Disp();
-
-		DrawFormatString(100, 100 + i * 30, 0x000000, "%d  out = %d", (g_WalkEnemy[i].x + MapDrawPointX - MapX * MAP_SIZE) - PlayerX, g_WalkEnemy[i].outtime);
 	}
-	
-	//EnemyShoot();
 }
 
 
