@@ -49,6 +49,15 @@ extern int Player_Pic_Down_R;//‹tƒvƒŒƒCƒ„[‚µ‚á‚ª‚İ‚Ì‰æ‘œ
 extern int Player_Pic_Hold[4];//ƒvƒŒƒCƒ„[‚ª“S‹…‚ğ‚à‚Á‚ÄˆÚ“®‚·‚é‰æ‘œ
 extern int Player_Pic_Hold_R[4];//‹tƒvƒŒƒCƒ„[‚ª“S‹…‚ğ‚à‚Á‚ÄˆÚ“®‚·‚é‰æ‘œ
 
+//extern int g_IronDamage;	  // “S‹…‚ª“G‚É“–‚½‚Á‚½SEŠi”[•Ï”
+extern int g_IronSlide;		  // “S‹…‚ğˆø‚Á’£‚éSEŠi”[•Ï”
+extern int g_IronSwing;		  // “S‹…‚ğ“Š‚°‚éSEŠi”[•Ï”
+extern int g_Landing;		  // ƒvƒŒƒCƒ„[‚ª’n–Ê‚É’…’n‚µ‚½‚ÌSEŠi”[•Ï”
+extern int g_Player_Damage;   // ƒvƒŒƒCƒ„[‚ª”í’e‚µ‚½‚Æ‚«‚ÌSEŠi”[•Ï”
+extern int g_Player_Jump;	  // ƒWƒƒƒ“ƒvSEŠi”[•Ï”
+extern int g_Sword_Damage;    // Œ•‚Å“G‚ğØ‚Á‚½SEŠi”[•Ï”
+extern int g_Sword_Swing;	  // Œ•‚ğU‚éSEŠi”[•Ï”
+
 
 
 /***************************************************************************
