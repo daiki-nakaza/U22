@@ -24,3 +24,17 @@ extern int g_MapChip[HEIGHT * MAP_LONG][WIDTH];
 
 extern int MapTip;	//ƒ}ƒbƒvƒ`ƒbƒv‰æ‘œ•Ï”
 extern int g_BackGroundImage;//”wŒi‰æ‘œ
+
+
+extern int g_Stage1; // ƒXƒe[ƒW1‚Ì‹ÈŠi”[•Ï”
+extern int g_Stage2; // ƒXƒe[ƒW2‚Ì‹ÈŠi”[•Ï”
+extern int g_Stage3; // ƒXƒe[ƒW3‚Ì‹ÈŠi”[•Ï”
+extern int g_Boss;	 // ƒ{ƒXí‚Ì‹ÈŠi”[•Ï”
+
+
+// «“G‚ÌŒø‰Ê‰¹“™« //
+extern int g_ColorL; // 2F‚Ì’e‚ğ‹ó’†‚É‘Å‚¿ã‚°‚éSEŠi”[•Ï”
+extern int g_Hadou;  // ”g“®–C‚ÌSEŠi”[•Ï”
+extern int g_Kakusan;// ŠgU’e‚ÌSEŠi”[•Ï”
+extern int g_Shot;   // ’Êí’e‚ÌSEŠi”[•Ï”(ƒ{ƒX‚ÆG‹›“G)
+extern int g_Warp;   // ƒ{ƒX‚Ìƒ[ƒvSEŠi”[•Ï”
