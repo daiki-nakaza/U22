@@ -15,7 +15,7 @@ void DrawGameMain() {
 	if (reset++ == 0) {
 		PlayerInit();
 		MapChipInit();
-
+		PlaySoundMem(g_Stage1, DX_PLAYTYPE_LOOP); //
 	}
 	else if (reset++ == 5) {//ライフ以外のリセット
 	}

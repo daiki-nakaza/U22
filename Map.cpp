@@ -9,6 +9,10 @@ int MapX, MapY;                    //マップのｘ、ｙ
 int MapTip;		//マップチップ画像
 
 int g_BackGroundImage;//
+int g_Stage1;
+int g_Stage2;
+int g_Stage3;
+int g_Boss;
 
 int g_MapChip[HEIGHT * MAP_LONG][WIDTH] = {
 

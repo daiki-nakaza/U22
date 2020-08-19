@@ -20,6 +20,13 @@ LockShootEnemy g_LockShootEnemy[ENEMY_MAX];			//‘_‚¢Œ‚‚Â“G
 TankEnemy g_TankEnemy[ENEMY_MAX];					//íÔ‚Ì“G
 RazerEnemy g_RazerEnemy[ENEMY_MAX];					//”g“®–C‚Ì“G
 
+// «“G‚ÌŒø‰Ê‰¹“™« //
+int g_ColorL;
+int g_Hadou;  // ”g“®–C‚ÌSEŠi”[•Ï”
+int g_Kakusan;// ŠgU’e‚ÌSEŠi”[•Ï”
+int g_Shot;   // ’Êí’e‚ÌSEŠi”[•Ï”(ƒ{ƒX‚ÆG‹›“G)
+int g_Warp;   // ƒ{ƒX‚Ìƒ[ƒvSEŠi”[•Ï”
+
 
 /***************************************************
 *@@“G‚Ì\‘¢‘Ì‚ÌŠÖ”‚Ì’è‹`

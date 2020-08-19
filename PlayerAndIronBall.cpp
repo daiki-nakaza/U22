@@ -8,6 +8,10 @@
 #include "Enemy.h"
 #include "Map.h"
 
+// “S‹…ƒAƒNƒVƒ‡ƒ“‚ÌŒø‰Ê‰¹//
+int g_IronSlide;		  // “S‹…‚ğˆø‚Á’£‚ése
+int g_IronSwing;		  // “S‹…‚ğ“Š‚°‚ése
+
 /**************************************
 *	ŠÖ”‚Ì’è‹`
 ***************************************/
@@ -65,6 +69,7 @@ void IronHoldOrThrow() {
 				g_IronBall.New_y -= 4;//d—Í‚Ì‚¹‚¢‚Å“S‹…‚ª‰º‚É‚ß‚è‚ñ‚Å‚¢‚é‚Ì‚Å‚È‚­‚·
 				if (!g_IronBall.HitCheck()) {//³í‚É‚Ğ‚¯‚½
 					//g_IronBall.x += 2;
+					//ˆø‚Á’£‚éŒø‰Ê‰¹
 					Locka.HenkaX += 2;
 					Locka.HI = 2;
 				}
@@ -123,6 +128,7 @@ void IronHoldOrThrow() {
 	}
 	else if (g_IronBall.HoldFlg && !g_IronBall.ThrowFlg	//“S‹…‚ğ‚Á‚Ä‚¢‚Ä‚©‚Â“S‹…‚ª“Š‚°‚ç‚ê‚Ä‚¢‚È‚¢
 		&& g_NowKey & PAD_INPUT_2) {
+		PlaySoundMem(g_IronSwing, DX_PLAYTYPE_BACK);//“S‹…‚ğ“Š‚°‚é
 		g_IronBall.HoldFlg = false;
 		g_IronBall.ThrowFlg = true;
 	}
@@ -132,6 +138,7 @@ void IronHoldOrThrow() {
 	Locka.MoveCheck();
 		///*
 		if (Locka.HenkaX != 0 && Locka.HI != 0) {
+			PlaySoundMem(g_IronSlide, DX_PLAYTYPE_BACK); //“S‹…‚ğˆø‚Á’£‚é
 			g_IronBall.x += Locka.HenkaX;
 			Locka.New_x[LOCK_MAX - 1] += Locka.HenkaX;
 		}
