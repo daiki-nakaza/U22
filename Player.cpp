@@ -10,6 +10,7 @@
 
 //デバック用
 bool DebugMode = false;
+int zzze = 0;
 
 
 //プレイヤーの位置
@@ -57,10 +58,22 @@ void PlayerMove() {
 
 	int i = 0, j = 0, w = 0, z = 0;//ローカルなので気にしないでください!あたり判定用の補正値
 	int flg = 0;//ローカル変数で、敵との当たり判定につかっています
+	int aoi = 0;
+
+	if (DebugMode) {
+		if (Locka.x[0] != (PlayerX + Map_PlayerX + 16)) {
+			aoi = 1;
+		}
+	}
 
 	//プレイヤー重力
-	PlayerGravity();
+	PlayerGravity(0);
 	
+	if (DebugMode) {
+		if (Locka.x[0] != (PlayerX + Map_PlayerX + 16)) {
+			aoi = 1;
+		}
+	}
 
 	// 移動する前のプレイヤーの位置を保存
 	NewX = PlayerX;
@@ -76,32 +89,34 @@ void PlayerMove() {
 	}
 
 	//ぶら下がっているフラグ
-	if (Locka.WI > 0) {
-		Locka.HenkaX += 2;
-		NewX += 2;
-	//	Locka.WI = 0;
-	}
-	else if (Locka.WI < 0) {
-		Locka.HenkaX -= 2;
-		NewX -= 2;
-	//	Locka.WI = 0;
-	}
+	//if (Locka.WI > 0) {
+	//	Locka.HenkaX += 2;
+	//	NewX += 2;
+	////	Locka.WI = 0;
+	//}
+	//else if (Locka.WI < 0) {
+	//	Locka.HenkaX -= 2;
+	//	NewX -= 2;
+	////	Locka.WI = 0;
+	//}
 
 
 	//キー入力に応じてプレイヤーの座標を移動 上
 	if (g_NowKey & PAD_INPUT_UP && g_IronBall.HoldFlg == false && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1)) {
 		if (Jump_Flg == 0) {
+
 			y_prev = PlayerY;
 			NewY -= 16;
 			Locka.HenkaY -= 16;
 			Jump_Flg = 1;
+			PlayerGravity(1);
 		}
 		else if (Jump_Flg == 3) {
 			Jump_Flg = 1;
 		}
 	}
 	//  左
-	if (g_NowKey & PAD_INPUT_LEFT && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1) && Jump_Flg != -2) {
+	if (g_NowKey & PAD_INPUT_LEFT && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1) && Jump_Flg != -2 && !(Locka.RD < 0 && Jump_Flg != 0)) {
 		NewX -= 2;
 		Locka.HenkaX -= 2;
 		if (g_IronBall.HoldFlg == true) {//鉄球を持っている場合
@@ -116,7 +131,7 @@ void PlayerMove() {
 		}
 	}
 	//右
-	if (g_NowKey & PAD_INPUT_RIGHT && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1) && Jump_Flg != -2) {
+	if (g_NowKey & PAD_INPUT_RIGHT && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1) && Jump_Flg != -2 && !(Locka.RD > 0 && Jump_Flg != 0)) {
 		NewX += 2; 
 		Locka.HenkaX += 2;
 		if (g_IronBall.HoldFlg == true) {//鉄球を持っている場合
@@ -142,6 +157,7 @@ void PlayerMove() {
 	//鎖の移動できるか処理
 	//Locka.HenkaY = 0;
 	Locka.MoveCheck();
+	
 	
 	
 	if (DebugMode) {
@@ -257,6 +273,7 @@ void PlayerMove() {
 			MapChipNumX += WIDTH;
 			MapChipNumY += HEIGHT;
 		}
+		zzze = 10;
 		
 	}
 	else {	
@@ -267,10 +284,14 @@ void PlayerMove() {
 
 			Locka.LenkaX = 0;//移動成功なら、鉄球に引っ張られていても、成功ということで０にする
 			Locka.LenkaY = 0;//移動成功なら、鉄球に引っ張られていても、成功ということで０にする
-
+			zzze = 11;
 	}
-	Locka.Move();
-	
+	Locka.Move(1);
+	// 移動する前のプレイヤーの位置を保存
+	NewX = PlayerX;
+	NewY = PlayerY;
+	Map_NewX = Map_PlayerX;
+	Map_NewY = Map_PlayerY;
 }
 
 void PlayerDisp() {
@@ -346,48 +367,51 @@ void PlayerDisp() {
 	if (DebugMode) {
 		DrawCircle(Locka.x[0] + MapDrawPointX - MapX * MAP_SIZE, Locka.y[0] - MapDrawPointY - MapY * MAP_SIZE, 4, GetColor(252, 252, 252), true);
 		DrawCircle(Locka.x[1] + MapDrawPointX - MapX * MAP_SIZE, Locka.y[1] - MapDrawPointY - MapY * MAP_SIZE, 4, GetColor(252, 50, 252), true);
+		DrawCircle(g_IronBall.New_x,g_IronBall.New_y, 4, GetColor(252, 50, 252), true);
+
 	}
 }
 
-void PlayerGravity() {
+void PlayerGravity(int bn) {
 	int i = 0, j = 0, w = 0, z = 0;//ローカルなので気にしないでください!あたり判定用の補正値
 	int flg = 0;//ローカル変数です。敵キャラが移動する場所にいるかどうかのフラグ
 
+	if (bn == 0) {
+		// 移動する前のプレイヤーの位置を保存
+		NewX = PlayerX;
+		NewY = PlayerY;
+		Map_NewX = Map_PlayerX;
+		Map_NewY = Map_PlayerY;
 
-	// 移動する前のプレイヤーの位置を保存
-	NewX = PlayerX;
-	NewY = PlayerY;
-	Map_NewX = Map_PlayerX;
-	Map_NewY = Map_PlayerY;
+		//プレイヤー重力
+		NewY = PlayerY;
 
-	//プレイヤー重力
-	NewY = PlayerY;
+		if (Jump_Flg == 0 || Jump_Flg == -1 || Jump_Flg == -2) {
+			NewY += GRAVITY;
+			if (Jump_Flg == -1 || Jump_Flg == -2) {
+				Locka.HenkaY += GRAVITY;
+			}
 
-	if (Jump_Flg == 0 || Jump_Flg == -1 || Jump_Flg == -2) {
-		NewY += GRAVITY;
-		if (Jump_Flg == -1 || Jump_Flg == -2) {
-			Locka.HenkaY += GRAVITY;
 		}
-		
-	}
-	//ジャンプ処理
-	else if (Jump_Flg == 4 || Jump_Flg == 6) {
-		y_temp = NewY;
-		Locka.HenkaY += (NewY - y_prev) + 2;
-		NewY += (NewY - y_prev) + 2;
-		y_prev = y_temp;
-		Jump_Flg = 5;
-	}
-	else if (Jump_Flg == 2) {
-		y_temp = NewY;
-		Locka.HenkaY += (NewY - y_prev) + 1;
-		NewY += (NewY - y_prev) + 1;
-		y_prev = y_temp;
-		//NewY -= 12;
-		Jump_Flg = 3;
-	}
-	else if(Jump_Flg>0){
-		Jump_Flg++;
+		//ジャンプ処理
+		else if (Jump_Flg == 4 || Jump_Flg == 6) {
+			y_temp = NewY;
+			Locka.HenkaY += (NewY - y_prev) + 2;
+			NewY += (NewY - y_prev) + 2;
+			y_prev = y_temp;
+			Jump_Flg = 5;
+		}
+		else if (Jump_Flg == 2) {
+			y_temp = NewY;
+			Locka.HenkaY += (NewY - y_prev) + 1;
+			NewY += (NewY - y_prev) + 1;
+			y_prev = y_temp;
+			//NewY -= 12;
+			Jump_Flg = 3;
+		}
+		else if (Jump_Flg > 0) {
+			Jump_Flg++;
+		}
 	}
 
 	//鎖の移動処理
@@ -464,17 +488,25 @@ void PlayerGravity() {
 		if (Jump_Flg == -1) {
 			PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE_Y % MAP_SIZE;
 			Jump_Flg = 0;
+			/*Locka.New_x[0] = Locka.x[0];
+			Locka.New_y[0] = PlayerY + 58;*/
 		}
 		else if(Jump_Flg != 0) 
 		{
 			Jump_Flg = -1;
+			for (int i = 0; i < LOCK_MAX; i++) {
+				Locka.New_x[i] = Locka.x[i];
+				Locka.New_y[i] = Locka.y[i];
+				//			Jump_Flg = -2;//ここばぐるｘが原因
+			}
 		}
 		else if (Jump_Flg == 0) {
 			PlayerY = (NewY / MAP_SIZE) * MAP_SIZE + CHA_SIZE_Y % MAP_SIZE;
 		}
 		//人が地面についたときは人に一番近い鎖だけはもとに戻す
-		Locka.New_x[0] = Locka.x[0];
-		Locka.New_y[0] = Locka.y[0];
+		/*Locka.New_x[0] = Locka.x[0];
+		Locka.New_y[0] = Locka.y[0];*/
+		zzze = 1;
 		
 	}//鎖の長さが大丈夫かどうか
 	else if ( (Locka.HenkaX != 0 || Locka.HenkaY != 0)) 
@@ -498,6 +530,7 @@ void PlayerGravity() {
 			}
 			
 		}
+		zzze = 2;
 
 	}//鉄球がある場合と敵がいた場合
 	else if ((g_IronBall.x - PlayerX - Map_PlayerX < CHA_SIZE_X + IRONBALL_R
@@ -519,6 +552,7 @@ void PlayerGravity() {
 			Locka.New_y[i] = Locka.y[i];
 		//	Jump_Flg = -2;//ここばぐるｘが原因
 		}
+		zzze = 3;
 	}
 	else {
 		if (Jump_Flg == 0) {
@@ -529,7 +563,7 @@ void PlayerGravity() {
 		}
 		PlayerX = NewX;
 		PlayerY = NewY;
-		
+		zzze = 4;
 	}
 
 	
@@ -537,8 +571,13 @@ void PlayerGravity() {
 	Locka.HenkaY = 0;
 	Locka.HenkaX = 0;
 	
-	Locka.Move();
-	
+	Locka.Move(2);
+
+	// 移動する前のプレイヤーの位置を保存
+	NewX = PlayerX;
+	NewY = PlayerY;
+	Map_NewX = Map_PlayerX;
+	Map_NewY = Map_PlayerY;
 }
 
 
@@ -546,6 +585,7 @@ void PlayerGravity() {
 void PlayerAttack() {
 	if (g_NowKey & PAD_INPUT_3 && g_IronBall.HoldFlg == false) {
 		if (Attack == 0) {
+
 			Attack = 30;
 		}
 	}

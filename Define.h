@@ -10,7 +10,7 @@
 #define CHA_SIZE_Y 64//64ドット
 #define GRAVITY 4//1,2,4,8,16,32のパターンあり
 
-#define LOCK_MAX 12
+#define LOCK_MAX 16
 
 #define ENEMY_MAX 10
 #define WALK_ENEMY_SIZE 48	//敵の大きさ

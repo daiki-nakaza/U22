@@ -19,12 +19,14 @@ void DrawGameMain() {
 	}
 	else if (reset++ == 5) {//ライフ以外のリセット
 	}
+
 	MapDisp();			//マップの描画
 	MapMove();			//スクリーンの処理
 
 	IronBallDisp();		//鉄球の描画処理
 	IronBallMove();		//	鉄球の動きの処理
-
+	
+	
 	PlayerMove();
 	PlayerDisp();
 
@@ -35,5 +37,6 @@ void DrawGameMain() {
 	PlayerAttack();		//プレイヤー攻撃
 
 	HUDDisp();
+
 }
 

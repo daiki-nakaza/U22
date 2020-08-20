@@ -1,4 +1,5 @@
 #include "DxLib.h"
+#include "Math.h"
 
 #include "Define.h"
 #include "PlayerAndIronBall.h"
@@ -11,6 +12,7 @@
 // 鉄球アクションの効果音//
 int g_IronSlide;		  // 鉄球を引っ張るse
 int g_IronSwing;		  // 鉄球を投げるse
+
 
 /**************************************
 *	関数の定義
@@ -40,6 +42,7 @@ void IronHoldOrThrow() {
 	if (!g_IronBall.HoldFlg && !g_IronBall.ThrowFlg		//鉄球を持っていないかつ鉄球が投げられていない
 		&& g_NowKey & PAD_INPUT_1 && (Jump_Flg == 0 ||  Jump_Flg == -2)
 		) {
+		Locka.RD = 0;//鉄球を引っ張ったとき、鎖の重力をかける
 
 		g_IronBall.New_x = g_IronBall.x;
 		g_IronBall.New_y = g_IronBall.y;//最終的なリセット
@@ -68,8 +71,8 @@ void IronHoldOrThrow() {
 				g_IronBall.New_x += 2;
 				g_IronBall.New_y -= 4;//重力のせいで鉄球が下にめり込んでいるのでなくす
 				if (!g_IronBall.HitCheck()) {//正常にひけた
+
 					//g_IronBall.x += 2;
-					//引っ張る効果音
 					Locka.HenkaX += 2;
 					Locka.HI = 2;
 				}
@@ -125,9 +128,33 @@ void IronHoldOrThrow() {
 
 		g_IronBall.New_x = g_IronBall.x;
 		g_IronBall.New_y = g_IronBall.y;//最終的なリセット
+
+		Locka.MoveCheck();
+		///*
+		if (Locka.HenkaX != 0 && Locka.HI != 0) {
+			PlaySoundMem(g_IronSlide, DX_PLAYTYPE_BACK); //鉄球を引っ張る
+			if (Locka.HenkaX > 0) {
+				while (pow((double)Locka.New_x[LOCK_MAX - 1] - (double)Locka.New_x[LOCK_MAX - 2], 2.0) + pow((double)Locka.New_y[LOCK_MAX - 1] - (double)Locka.New_y[LOCK_MAX - 2], 2.0) >= pow(IRONBALL_R, 2.0)) {
+					g_IronBall.x++;
+					Locka.New_x[LOCK_MAX - 1]++;
+				}
+			}
+			else if (Locka.HenkaX < 0) {
+				while (pow((double)Locka.New_x[LOCK_MAX - 1] - (double)Locka.New_x[LOCK_MAX - 2], 2.0) + pow((double)Locka.New_y[LOCK_MAX - 1] - (double)Locka.New_y[LOCK_MAX - 2], 2.0) >= pow(IRONBALL_R, 2.0)) {
+					g_IronBall.x--;
+					Locka.New_x[LOCK_MAX - 1]--;
+				}
+			}
+		}
+		//*/
+		Locka.HenkaY = 0;
+		Locka.HenkaX = 0;
+		Locka.HI = 0;
+		Locka.Move(3);
 	}
 	else if (g_IronBall.HoldFlg && !g_IronBall.ThrowFlg	//鉄球を持っていてかつ鉄球が投げられていない
 		&& g_NowKey & PAD_INPUT_2) {
+
 		PlaySoundMem(g_IronSwing, DX_PLAYTYPE_BACK);//鉄球を投げる
 		g_IronBall.HoldFlg = false;
 		g_IronBall.ThrowFlg = true;
@@ -135,18 +162,7 @@ void IronHoldOrThrow() {
 	if (true) {
 
 	}
-	Locka.MoveCheck();
-		///*
-		if (Locka.HenkaX != 0 && Locka.HI != 0) {
-			PlaySoundMem(g_IronSlide, DX_PLAYTYPE_BACK); //鉄球を引っ張る時
-			g_IronBall.x += Locka.HenkaX;
-			Locka.New_x[LOCK_MAX - 1] += Locka.HenkaX;
-		}
-		//*/
-	Locka.HenkaY = 0;
-	Locka.HenkaX = 0;
-	Locka.HI = 0;
-	Locka.Move();
+	
 }
 
 

@@ -50,9 +50,10 @@ struct Lock
 	void Init();             //鎖の初期化処理
 	void Disp();             //鎖の描画処理
 	void MoveCheck();		 //鎖が移動できるかどうか確かめる
-	void Move();             //鎖の移動処理
+	void Move(int eeee);             //鎖の移動処理
 	void Throw();            //鎖が飛んでいく処理
 	void Gravity();			 //鎖の重力処理
+	void Cheat();//鉄球をもっているときのチート処理
 };
 
 

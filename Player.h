@@ -59,7 +59,6 @@ extern int g_Sword_Damage;    // Œ•‚Å“G‚ğØ‚Á‚½SEŠi”[•Ï”
 extern int g_Sword_Swing;	  // Œ•‚ğU‚éSEŠi”[•Ï”
 
 
-
 /***************************************************************************
 *          ŠÖ”‚Ìƒvƒƒgƒ^ƒCƒvéŒ¾  
 ********************************************************************************/
@@ -67,5 +66,5 @@ extern int g_Sword_Swing;	  // Œ•‚ğU‚éSEŠi”[•Ï”
 void PlayerInit();
 void PlayerMove();
 void PlayerDisp();
-void PlayerGravity();
+void PlayerGravity(int bn);
 void PlayerAttack();
