@@ -16,7 +16,6 @@ struct BulletInfo {
 
 	int direct;			//敵の向き (右:1  左:-1)
 	bool picDir;			//画像の向き
-	int MoveSum;			//移動量合計
 
 	int Speed;	//弾丸のスピード
 
@@ -41,11 +40,17 @@ struct NormalBullet : public BulletInfo
 
 struct LockBullet : public BulletInfo
 {
+	float y;			//y座標をfloat型で作り直す
 	float SpeedY;			//縦のスピード
 
 
+	void Disp();			//弾丸の表示処理
 	void Init(const int Ex, const int Ey);			//弾丸の初期化処理
 	void Move(const int dir);			//弾丸の処理
+
+	bool CheckHitBall(int By);		//鉄球にあたっていたら
+	bool CheckHitPlayer(int By);		//プレイヤーにあたっていたら
+
 };
 
 //上に向かって飛んだなんたらする弾丸

@@ -242,6 +242,7 @@ void ShootEnemy::ShootMove() {		//Œ‚‚Â“G‚Ìˆ—
 		for (int i = 0; i < Bullet_MAX; i++) {
 			Bullet[i].Disp();
 			Bullet[i].Move(direct);			//’eŠÛ‚Ìˆ—
+
 		}
 
 		Move();			//“G‹¤’Ê‚ÌŠÖ”
@@ -284,7 +285,7 @@ void LockShootEnemy::Init(int Tempx, int Tempy) {
 
 	AttckFlg = false;			//UŒ‚—p‚Ìƒtƒ‰ƒO
 
-	pic = LoadGraph("images/teki.png");
+	pic = LoadGraph("images/Variant Enemy Soldier.png");
 
 	DispFlg = TRUE;					//“G‚ğ•\¦
 
@@ -333,12 +334,7 @@ void LockShootEnemy::LockShootMove() {			//Œ‚‚Â“G‚Ìˆ—
 		for (int i = 0; i < Bullet_MAX; i++) {
 			Bullet[i].Disp();
 			Bullet[i].Move(direct);			//’eŠÛ‚Ìˆ—
-			if (IronToBullet(Bullet[i])) {
-				Bullet[i].DispFlg = false;		//“S‹…‚É“–‚½‚Á‚Ä‚¢‚½‚ç‚Æ‚è‚ÜÁ‚·
-			}
-			if (PlayerToEnemy(Bullet[i])) {
-				Bullet[i].DispFlg = false;		//“S‹…‚É“–‚½‚Á‚Ä‚¢‚½‚ç‚Æ‚è‚ÜÁ‚·
-			}
+			if (DebugMode) DrawFormatString(100, 140 + i * 30, 0x000000, "%f", Bullet[i].SpeedY);
 		}
 
 		Move();			//“G‹¤’Ê‚ÌŠÖ”
@@ -533,7 +529,7 @@ void enemyInit() {			//“G‚Ì‰Šú‰»ˆ—
 					}
 				}
 			}
-			else if (g_MapChip[y][x] == 5) {		//^‚Á‚·‚®Œ‚‚Â
+			else if (g_MapChip[y][x] == 4) {		//^‚Á‚·‚®Œ‚‚Â
 				for (int i = 0; i < ENEMY_MAX; i++) {
 					if (!g_ShootEnemy[i].DispFlg) {
 						g_ShootEnemy[i].Init(x, y);
@@ -542,7 +538,7 @@ void enemyInit() {			//“G‚Ì‰Šú‰»ˆ—
 					}
 				}
 			}
-			else if (g_MapChip[y][x] == 4) {		//“ª‘_‚¤‚â‚Â
+			else if (g_MapChip[y][x] == 5) {		//“ª‘_‚¤‚â‚Â
 				for (int i = 0; i < ENEMY_MAX; i++) {
 					if (!g_LockShootEnemy[i].DispFlg) {
 						g_LockShootEnemy[i].Init(x, y);

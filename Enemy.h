@@ -49,6 +49,7 @@ struct WalkEnemy : public enemyInfo
 //まっすぐ撃つ敵の構造体
 struct ShootEnemy : public enemyInfo
 {
+
 	int Firecnt = 0;		 //発射のカウント
 	int BulletCnt = 0;		//３発連続で弾を発射させる
 	int ReloadCnt = 0;		//リロードの時間カウント

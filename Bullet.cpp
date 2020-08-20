@@ -17,7 +17,6 @@ void NormalBullet::Init(const int Ex, const int Ey) {			//弾丸の初期化処理
 	const int valanceY = 10;		//弾丸の高さの補正値
 
 	Speed = 4;							//横の弾丸のスピード
-	MoveSum = 0;
 
 	x = Ex;		//敵キャラの座標にSet
 	y = Ey - valanceY;
@@ -39,7 +38,6 @@ void NormalBullet::Move(const int dir) {			//弾丸の処理
 		else picDir = true;					//右向きなら
 
 		x += dir * Speed;
-		MoveSum += Speed;
 
 		if (CheckWindow() || CheckHitBall())DispFlg = false;
 
@@ -56,12 +54,16 @@ void NormalBullet::Move(const int dir) {			//弾丸の処理
 //プレイヤーの頭に向かって飛ぶ弾丸
 void LockBullet::Init(const int Ex, const int Ey) {			//弾丸の初期化処理
 	const int valanceY = 10;		//弾丸の高さの補正値
-	int rangeX = abs(PlayerX - Ex + MapDrawPointX - MapX * MAP_SIZE);
-	int rangeY = (PlayerY - Ey + MapDrawPointY - MapY * MAP_SIZE) + (CHA_SIZE_Y / 2);
+	int rangeX;
+	int rangeY;
+
+	rangeX = abs(PlayerX - Ex + MapDrawPointX - MapX * MAP_SIZE);
+	rangeY = ((PlayerY) - (Ey + MapDrawPointY - MapY * MAP_SIZE) ) + (CHA_SIZE_Y / 2);
 
 	Speed = 4;							//横の弾丸のスピード
 
-	SpeedY = rangeY / (rangeX / Speed);
+	SpeedY = (float)rangeY / (float)(rangeX / Speed);
+
 
 	x = Ex;		//敵キャラの座標にSet
 	y = Ey - valanceY;
@@ -85,11 +87,11 @@ void LockBullet::Move(const int dir) {			//弾丸の処理
 
 		x += dir * Speed;
 
-		(y) += -dir * SpeedY;
+		y += SpeedY;
 
-		if (CheckWindow() || CheckHitBall())DispFlg = false;
+		if (CheckWindow() || CheckHitBall((int)y))DispFlg = false;
 
-		if (CheckHitPlayer()) {		//プレイヤーにあたっていたら
+		if (CheckHitPlayer((int)y)) {		//プレイヤーにあたっていたら
 			DispFlg = false;
 		}
 	}
@@ -193,7 +195,6 @@ void RazerBullet::Init(const int Ex, const int Ey) {
 	h = MAP_SIZE;
 
 	BWidth = 0;
-	MoveSum = 0;
 
 	pic = LoadGraph("images/Laser.png");
 
@@ -205,7 +206,6 @@ void RazerBullet::Move(int direct) {
 
 	if (DispFlg) {
 		x += direct * Speed;
-		MoveSum += Speed;
 
 		if(BWidth < rangeX) BWidth -= direct * Speed;
 
@@ -224,6 +224,14 @@ void BulletInfo::Disp() {			//弾丸の表示処理
 	if (DispFlg) {
 		DrawBox(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE,
 			x + w + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, 0x000000, true);
+	}
+}
+
+
+void LockBullet::Disp() {			//弾丸の表示処理
+	if (DispFlg) {
+		DrawBox(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE,
+			x + w + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, 0xff0000, true);
 	}
 }
 
@@ -284,3 +292,33 @@ bool BulletInfo::CheckWindow() {		//画面に入っているか
 
 	return false;
 }
+
+
+
+//狙い撃つ弾丸
+bool LockBullet::CheckHitBall(int By) {		//鉄球との当たり判定
+	if (By - MapDrawPointY - MapY * MAP_SIZE < (g_IronBall.y + MapDrawPointY - MapY * MAP_SIZE) + g_IronBall.r
+		&& By + h - MapDrawPointY - MapY * MAP_SIZE >(g_IronBall.y + MapDrawPointY - MapY * MAP_SIZE) - g_IronBall.r) {
+		if ((x + MapDrawPointX - MapX * MAP_SIZE) < ((g_IronBall.x + MapDrawPointX - MapX * MAP_SIZE) + g_IronBall.r)
+			&& (x + w + MapDrawPointX - MapX * MAP_SIZE) > ((g_IronBall.x + MapDrawPointX - MapX * MAP_SIZE) - g_IronBall.r)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+//当たり判定
+bool LockBullet::CheckHitPlayer(int By) {		//プレイヤーとの当たり判定
+
+	if (By - MapDrawPointY - MapY * MAP_SIZE < PlayerY + CHA_SIZE_Y
+		&& By + h - MapDrawPointY - MapY * MAP_SIZE > PlayerY) {
+		if (x + MapDrawPointX - MapX * MAP_SIZE < (PlayerX + CHA_SIZE_X)
+			&& x + w + MapDrawPointX - MapX * MAP_SIZE >(PlayerX)) {
+			return true;
+		}
+	}
+	return false;
+}
+

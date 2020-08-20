@@ -24,7 +24,7 @@
 #define BULLET_W 20
 #define BULLET_H 10
 
-#define MAP_LONG 10
+#define MAP_LONG 11
 
 /****************************************************
 *�񋓑̂̐錾
