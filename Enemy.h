@@ -14,7 +14,8 @@ struct enemyInfo
 	int direct;			//敵の向き (右:1  左:-1)
 	int speed;			//敵のスピード
 	int type;			//敵のタイプ//一度攻撃をもらったらしばらく無敵
-	int outtime;		
+	int outtime;
+	int AnmCnt = 0;
 
 	int pic;			//画像用変数
 	int anm;			//アニメーション用変数
@@ -28,12 +29,17 @@ struct enemyInfo
 
 	void Disp();				//敵の描画処理
 	void Move();
+	bool CheckHitBall();			//当たり判定
+	bool CheckHitPlayer();			//当たり判定
+	bool CheckWindow();							//ウィンドウの中にいるかどうか 入っていたらtrue
 };
 
 
 //歩く敵の構造体
 struct WalkEnemy : public enemyInfo
 {
+	int pic[4];
+
 	void Init(int Tempx,int Tempy);			//徘徊している敵の初期化処理
 	void WalkMove();			//徘徊している敵の処理
 	void Disp();
@@ -43,6 +49,11 @@ struct WalkEnemy : public enemyInfo
 //まっすぐ撃つ敵の構造体
 struct ShootEnemy : public enemyInfo
 {
+
+	int Firecnt = 0;		 //発射のカウント
+	int BulletCnt = 0;		//３発連続で弾を発射させる
+	int ReloadCnt = 0;		//リロードの時間カウント
+
 	NormalBullet Bullet[Bullet_MAX];			//真っすぐ撃つ敵が使う弾丸３発
 
 	void Init(int Tempx, int Tempy);			//撃つ敵の初期化処理
@@ -55,6 +66,10 @@ struct ShootEnemy : public enemyInfo
 struct LockShootEnemy : public enemyInfo
 {
 
+	int Firecnt = 0;		 //発射のカウント
+	int BulletCnt = 0;		//３発連続で弾を発射させる
+	int ReloadCnt = 0;		//リロードの時間カウント
+
 	LockBullet Bullet[Bullet_MAX];			//弾丸3発
 
 	void Init(int Tempx, int Tempy);			//狙い撃つ敵の初期化処理
@@ -65,15 +80,22 @@ struct LockShootEnemy : public enemyInfo
 //戦車の敵(上に向かって弾を飛ばす奴)
 struct TankEnemy : public enemyInfo
 {
+	int pic[2];			//画像用変数
+
+	int Firecnt = 0;		 //発射のカウント
+	int BulletCnt = 0;		//３発連続で弾を発射させる
+	int ReloadCnt = 0;		//リロードの時間カウント
 	ChargeBullet Bullet[Bullet_MAX];		//弾丸3発
 
 	void Init(int Tempx, int Tempy);			//戦車の初期化処理
 	void TankMove();		//戦車の処理
+	void Disp();
 };
 
 struct RazerEnemy : public enemyInfo
 {
 	RazerBullet Bullet;			//波動砲変数
+	int Reload = 0;
 
 	int pic[3];
 
@@ -91,7 +113,6 @@ void enemyMove();			//敵の動き
 void enemyInit();			//敵の初期化処理
 
 bool EnemyCheckHit(int x,int y,int direct);		//敵側の当たり判定チェック
-bool CheckWindow(int x);							//ウィンドウの中にいるかどうか 入っていたらtrue
 
 //void EnemyShoot();
 
