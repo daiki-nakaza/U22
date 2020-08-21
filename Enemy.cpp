@@ -3,6 +3,8 @@
 #include "Enemy.h"
 #include "Define.h"
 #include "Map.h"
+#include "accessory.h"
+#include "Boss.h"
 
 #include "PlayerAndIronBall.h"
 #include "IronToEnemy.h"
@@ -110,7 +112,6 @@ void WalkEnemy::Init(int Tempx, int Tempy) {                 // 敵の初期化
 	direct = -1;						//左向きから始める
 	picDir = true;
 
-	AttckFlg = false;
 
 	speed = 2;						//敵のスピード
 
@@ -128,7 +129,8 @@ void WalkEnemy::Init(int Tempx, int Tempy) {                 // 敵の初期化
 
 
 void WalkEnemy::WalkMove(){
-
+	NewDir = direct;
+	NewX = x;
 
 	const int FrmMax = 20;		//アニメーションフレームの間
 
@@ -145,10 +147,25 @@ void WalkEnemy::WalkMove(){
 
 		x += direct * speed;
 
-		if (EnemyCheckHit(x,y,direct))direct *= -1;
-		Move();			//敵共通の関数
+		if (EnemyCheckHit(x, y, direct)) {
+			if (x % 32 <= 16) {
+				direct *= -1;
+				x -= x % 32;
+			}
+			else {
+				direct *= -1;
+				x += x % 32;
+			}
+		}
+		Move();			//敵共通の関数	
 
-		if (CheckHitBall() || CheckHitPlayer()) direct *= -1;
+
+		if (CheckHitPlayer() 
+			&& outtime == 0
+			&& Playerouttime == 0) {		//どっちも無傷の状態で雑魚的とぶつかったら
+			direct *= -1; 
+			PlayerDamage();
+		}
 
 
 		if (++AnmCnt >= FrmMax) {
@@ -156,6 +173,15 @@ void WalkEnemy::WalkMove(){
 			AnmCnt = 0;
 		}
 
+		if (CheckHitBall()) {
+			direct *= -1;
+			if ((x + MapDrawPointX - MapX * MAP_SIZE) - (g_IronBall.x + MapDrawPointX - MapX * MAP_SIZE) < 0) {
+				x -= x % 32;
+			}
+			else {
+				x += x % 32;
+			}
+		}
 	}
 
 }
@@ -204,8 +230,6 @@ void ShootEnemy::Init(int Tempx, int Tempy) {                 // 撃つ敵の初期化
 
 	type = 1;					//敵のタイプ
 
-	AttckFlg = false;			//攻撃用のフラグ
-
 	pic = LoadGraph("images/Enemy Soldier.png");
 
 	DispFlg = TRUE;					//敵を表示
@@ -236,6 +260,7 @@ void ShootEnemy::ShootMove() {		//撃つ敵の処理
 			Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
 			BulletCnt++;
 			Firecnt = 0;
+			if (BulletCnt >= Bullet_MAX - 1) ReloadCnt = 0;
 		}
 
 		if (!Bullet[0].DispFlg
@@ -290,8 +315,6 @@ void LockShootEnemy::Init(int Tempx, int Tempy) {
 
 	type = 1;					//敵のタイプ
 
-	AttckFlg = false;			//攻撃用のフラグ
-
 	pic = LoadGraph("images/Variant Enemy Soldier.png");
 
 	DispFlg = TRUE;					//敵を表示
@@ -327,6 +350,7 @@ void LockShootEnemy::LockShootMove() {			//撃つ敵の処理
 			Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
 			BulletCnt++;
 			Firecnt = 0;
+			if (BulletCnt >= Bullet_MAX - 1) ReloadCnt = 0;
 		}
 
 		if (!Bullet[0].DispFlg
@@ -372,8 +396,6 @@ void TankEnemy::Init(int Tempx, int Tempy) {
 	Life = 3;					//敵のHP　とりま３
 
 	type = 1;					//敵のタイプ
-
-	AttckFlg = false;			//攻撃用のフラグ
 
 	LoadDivGraph("images/TankEnemy.png", 2, 2, 1, TANK_ENEMY_SIZE, TANK_ENEMY_SIZE, pic);
 
@@ -467,8 +489,6 @@ void RazerEnemy::Init(int Tempx, int Tempy){
 
 	type = 1;					//敵のタイプ
 
-	AttckFlg = false;			//攻撃用のフラグ
-
 	LoadDivGraph("images/HadouhouAll.png",3,3,1, TANK_ENEMY_SIZE, TANK_ENEMY_SIZE,pic);
 
 	//pic[2] = LoadGraph("images/Hadouhou2.png");
@@ -524,6 +544,7 @@ void RazerEnemy::Disp() {
 ***************************************************/
 
 void enemyInit() {			//敵の初期化処理
+	SetTP = 0;
 	 
 	for (int y = 0; y < HEIGHT * MAP_LONG; y++) {
 		for (int x = 0; x < WIDTH; x++) {
@@ -572,6 +593,14 @@ void enemyInit() {			//敵の初期化処理
 					}
 				}
 			}
+			else if (g_MapChip[y][x] == 8) {			//ボス
+				g_Boss.BossInit(x, y);
+				break;
+			}
+			else if (g_MapChip[y][x] == 9) {			//ボスのテレポート先
+				g_Boss.TPInit(x, y);
+				break;
+			}
 		}
 	}
 	
@@ -580,13 +609,18 @@ void enemyInit() {			//敵の初期化処理
 
 void enemyDisp() {
 
-	for (int i = 0; i < ENEMY_MAX; i++) {
-		g_WalkEnemy[i].Disp();
-		g_ShootEnemy[i].Disp();
-		g_LockShootEnemy[i].Disp();
-		g_TankEnemy[i].Disp();
-		g_RazerEnemy[i].Disp();
+	if (g_Boss.CheckWindow()) {
+		g_Boss.Disp();
+	} else {
+		for (int i = 0; i < ENEMY_MAX; i++) {
+			g_WalkEnemy[i].Disp();
+			g_ShootEnemy[i].Disp();
+			g_LockShootEnemy[i].Disp();
+			g_TankEnemy[i].Disp();
+			g_RazerEnemy[i].Disp();
+		}
 	}
+	
 }
 
 
@@ -598,16 +632,23 @@ void enemyMove() {
 		enemyInit();
 		Initflg = false;
 	}
+	if (g_Boss.CheckWindow()) {
+		g_Boss.BossMove();
+	}
+	else {
+		for (int i = 0; i < ENEMY_MAX; i++) {
 
-	for (int i = 0; i < ENEMY_MAX; i++) {
+			g_WalkEnemy[i].WalkMove();
+			g_ShootEnemy[i].ShootMove();
+			g_LockShootEnemy[i].LockShootMove();
+			g_TankEnemy[i].TankMove();
+			g_RazerEnemy[i].ShotMove();
+		}
+	}
 
-		g_WalkEnemy[i].WalkMove();
-		g_ShootEnemy[i].ShootMove();
-		g_LockShootEnemy[i].LockShootMove();
-		g_TankEnemy[i].TankMove();
-		g_RazerEnemy[i].ShotMove();
-
-	}	
+	if (DebugMode) {
+		DrawFormatString(100, 300, 0xff0000, "%d %d", g_Boss.x, g_Boss.y);
+	}
 }
 
 bool EnemyCheckHit(int x, int y, int direct) {
