@@ -168,6 +168,8 @@ int LoadImages() {
 	if ((g_GameTitleImage = LoadGraph("images/Title.png")) == -1) return -1;
 	//ゲームオーバー背景
 	if ((g_GameOverImage = LoadGraph("images/GameOver.png")) == -1) return -1;
+	//クリア用ドア画像
+	if (( LoadDivGraph("images/Door.png",3,3,1,128,128,g_Door)) == -1) return -1;
 	//ゲームクリア背景
 	if ((g_GameClearImage = LoadGraph("images/GameClear.png")) == -1)return -1;
 
@@ -180,7 +182,7 @@ int LoadSounds() {
 	g_Stage1 = LoadSoundMem("bgm,se/BGM/Stage1.mp3"); //g_Stage1～3 g_BossはMap.hで宣言してる
 	g_Stage2 = LoadSoundMem("bgm,se/BGM/Stage2.mp3");
 	g_Stage3 = LoadSoundMem("bgm,se/BGM/Stage3.mp3");
-	g_Boss = LoadSoundMem("bgm,se/BGM/BossBattle.mp3");
+	g_BossSound = LoadSoundMem("bgm,se/BGM/BossBattle.mp3");
 
 	g_ColorL = LoadSoundMem("bgm,se/Enemy_SE/color_laser.mp3");
 	g_Hadou = LoadSoundMem("bgm,se/Enemy_SE/hadou.mp3");

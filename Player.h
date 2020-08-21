@@ -39,6 +39,10 @@ extern int g_MouseY;  //マウスｙ座標
 extern int g_GameState;  //ゲームモード
 
 
+extern int ClearTime;  //クリア制御用変数
+
+
+
 extern int Player_Pic[4];//プレイヤー移動の画像
 extern int Player_Pic_R[4];//逆プレイヤー移動の画像
 

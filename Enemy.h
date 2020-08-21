@@ -22,6 +22,7 @@ struct enemyInfo
 	bool picDir;			//‰æ‘œ‚ÌŒü‚«
 
 	bool DispFlg = false;		//“G‚ğ‚Ì•\¦‚Ìƒtƒ‰ƒO
+	bool AttckFlg = false;		//“G‚ÌUŒ‚ƒtƒ‰ƒO
 
 	int Life = 0;				//“G‚Ìƒ‰ƒCƒt
 
@@ -37,10 +38,9 @@ struct enemyInfo
 //•à‚­“G‚Ì\‘¢‘Ì
 struct WalkEnemy : public enemyInfo
 {
-	int NewDir;			//Œü‚«‚Ì•Û‘¶—p•Ï”	
-	int NewX;			//X
 	int pic[4];
-
+	int NewDir;
+	int NewX;
 	void Init(int Tempx,int Tempy);			//œpœj‚µ‚Ä‚¢‚é“G‚Ì‰Šú‰»ˆ—
 	void WalkMove();			//œpœj‚µ‚Ä‚¢‚é“G‚Ìˆ—
 	void Disp();
@@ -134,10 +134,4 @@ extern TankEnemy g_TankEnemy[ENEMY_MAX];			//Ô‚Æ—Î‚Ì’eŠÛ‚ğŒ‚‚Â“G
 extern RazerEnemy g_RazerEnemy[ENEMY_MAX];					//”g“®–C‚Ì“G
 
 //extern BulletInfo Bullet[]
-// «“G‚ÌŒø‰Ê‰¹“™« //
-extern int g_ColorL;
-extern int g_Hadou;  // ”g“®–C‚ÌSEŠi”[•Ï”
-extern int g_Kakusan;// ŠgU’e‚ÌSEŠi”[•Ï”
-extern int g_Shot;   // ’Êí’e‚ÌSEŠi”[•Ï”(ƒ{ƒX‚ÆG‹›“G)
-extern int g_Warp;   // ƒ{ƒX‚Ìƒ[ƒvSEŠi”[•Ï”
 

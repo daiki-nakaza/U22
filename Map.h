@@ -24,12 +24,13 @@ extern int g_MapChip[HEIGHT * MAP_LONG][WIDTH];
 
 extern int MapTip;	//マップチップ画像変数
 extern int g_BackGroundImage;//背景画像
+extern int g_Door[3];//クリア用のドア画像
 
 
 extern int g_Stage1; // ステージ1の曲格納変数
 extern int g_Stage2; // ステージ2の曲格納変数
 extern int g_Stage3; // ステージ3の曲格納変数
-extern int g_Boss;	 // ボス戦の曲格納変数
+extern int g_BossSound;	 // ボス戦の曲格納変数
 
 
 // ↓敵の効果音等↓ //
