@@ -3,6 +3,7 @@
 #include "DxLib.h"
 
 extern int g_GameOverImage;//ゲームオーバー背景
+extern int g_GameClearImage;//ゲームクリア背景
 
 
 void DrawEnd(void);

@@ -168,6 +168,8 @@ int LoadImages() {
 	if ((g_GameTitleImage = LoadGraph("images/Title.png")) == -1) return -1;
 	//ƒQ[ƒ€ƒI[ƒo[”wŒi
 	if ((g_GameOverImage = LoadGraph("images/GameOver.png")) == -1) return -1;
+	//ƒQ[ƒ€ƒNƒŠƒA”wŒi
+	if ((g_GameClearImage = LoadGraph("images/GameClear.png")) == -1)return -1;
 
 
 	return 0;
