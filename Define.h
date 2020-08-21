@@ -33,7 +33,7 @@
 #define BOSS_BULLET_W 20
 #define BOSS_BULLET_H 10
 
-#define MAP_LONG 11
+#define MAP_LONG 10
 
 /****************************************************
 *�񋓑̂̐錾
