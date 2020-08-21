@@ -41,8 +41,9 @@ void NormalBullet::Move(const int dir) {			//弾丸の処理
 
 		if (CheckWindow() || CheckHitBall())DispFlg = false;
 
-		if (CheckHitPlayer()) {		//プレイヤーにあたっていたら
+		if (CheckHitPlayer() && Playerouttime == 0) {		//プレイヤーにあたっていたら
 			DispFlg = false;
+			PlayerDamage();
 		}
 	}
 	else {
@@ -91,8 +92,9 @@ void LockBullet::Move(const int dir) {			//弾丸の処理
 
 		if (CheckWindow() || CheckHitBall((int)y))DispFlg = false;
 
-		if (CheckHitPlayer((int)y)) {		//プレイヤーにあたっていたら
+		if (CheckHitPlayer((int)y) && Playerouttime == 0) {		//プレイヤーにあたっていたら
 			DispFlg = false;
+			PlayerDamage();
 		}
 	}
 	else {
@@ -137,9 +139,11 @@ void ChargeBullet::Move(const int dir) {			//弾丸の処理
 		direct = dir; 
 		if (CheckHitBall())DispFlg = false;
 
-		if (CheckHitPlayer()) {		//プレイヤーにあたっていたら
+		if (CheckHitPlayer() && Playerouttime == 0) {		//プレイヤーにあたっていたら
 			DispFlg = false;
+			PlayerDamage();
 		}
+
 		if (CheckWindow() && sequence > 1 && y > (WIDTH / 2 * MAP_SIZE))DispFlg = false;
 
 		switch (sequence)
@@ -211,6 +215,10 @@ void RazerBullet::Move(int direct) {
 
 		if (x + BWidth + MapDrawPointX - MapX * MAP_SIZE < 0) {
 			DispFlg = false;
+		}
+
+		if (CheckHitPlayer() && Playerouttime == 0) {		//プレイヤーにあたっていたら
+			PlayerDamage();
 		}
 	}
 }

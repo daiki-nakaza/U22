@@ -6,6 +6,7 @@
 #include "PlayerAndIronBall.h"
 #include "Enemy.h"
 #include "IronToEnemy.h"
+#include "GameMain.h"
 
 
 //デバック用
@@ -22,6 +23,8 @@ int Jump_Flg;
 int y_temp;
 int y_prev;
 int Down_flg;//しゃがみのフラグ
+int PlayerLife;
+int Playerouttime;
 
 int Bectl;
 int Attack;
@@ -45,6 +48,9 @@ void PlayerInit() {
 	PlayerY = 54;//544
 	Map_PlayerX = 0;
 	Map_PlayerY = 0;
+
+	PlayerLife = 7;		//ライフ
+	Playerouttime = 0;
 
 	Jump_Flg = false;
 
@@ -292,6 +298,8 @@ void PlayerMove() {
 	NewY = PlayerY;
 	Map_NewX = Map_PlayerX;
 	Map_NewY = Map_PlayerY;
+
+	if (Playerouttime-- <= 0) Playerouttime = 0;
 }
 
 void PlayerDisp() {
@@ -302,74 +310,78 @@ void PlayerDisp() {
 	//	GetColor(255, 255, 255), TRUE);//左下に当たり判定あり
 	//DrawGraph(PlayerX, PlayerY, Player_Pic[0], false);
 	// プレイヤーの描画右
-	if (g_NowKey & PAD_INPUT_RIGHT && Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic[i/10], true);
-		if (++i >= 40) {
-			i = 0;
+	if (Playerouttime == 0 || Playerouttime % 2 == 1) {
+		if (g_NowKey & PAD_INPUT_RIGHT && Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic[i / 10], true);
+			if (++i >= 40) {
+				i = 0;
+			}
 		}
-	}
-	else if(Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false){
-		i = 0;
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic[0], true);
-	}
-
-	// プレイヤーの描画左
-	else if (g_NowKey & PAD_INPUT_LEFT && Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_R[3 - i / 10], true);
-		if (++i >= 40) {
+		else if (Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
 			i = 0;
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic[0], true);
 		}
-	}
-	else if (Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
-		i = 0;
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_R[3], true);
-	}
-	//プレイヤーが鉄球をもっている画像右
-	else if (g_NowKey & PAD_INPUT_RIGHT && Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true) {
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Hold[i / 10], true);
-		if (++i >= 40) {
+
+		// プレイヤーの描画左
+		else if (g_NowKey & PAD_INPUT_LEFT && Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_R[3 - i / 10], true);
+			if (++i >= 40) {
+				i = 0;
+			}
+		}
+		else if (Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
 			i = 0;
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_R[3], true);
 		}
-	}
-	else if (Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true) {
-		i = 0;
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Hold[0], true);
-	}
-
-	//プレイヤーが鉄球をもっている画像右
-	else if (g_NowKey & PAD_INPUT_LEFT && Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true) {
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Hold_R[3 - i / 10], true);
-		if (++i >= 40) {
+		//プレイヤーが鉄球をもっている画像右
+		else if (g_NowKey & PAD_INPUT_RIGHT && Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true) {
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Hold[i / 10], true);
+			if (++i >= 40) {
+				i = 0;
+			}
+		}
+		else if (Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true) {
 			i = 0;
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Hold[0], true);
 		}
-	}
-	else if (Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true) {
-		i = 0;
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Hold_R[3], true);
-	}
 
-	//攻撃用画像右
-	if (Attack >= 10 && Bectl == 0 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X*2, PlayerY + CHA_SIZE_Y, Player_Pic_Attack[5 - Attack/5], true);
-	}
-	//攻撃用画像左
-	else if (Attack >= 10 && Bectl == 1 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
-		DrawExtendGraph(PlayerX - CHA_SIZE_X, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Attack_R[Attack / 5], true);
-	}
+		//プレイヤーが鉄球をもっている画像右
+		else if (g_NowKey & PAD_INPUT_LEFT && Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true) {
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Hold_R[3 - i / 10], true);
+			if (++i >= 40) {
+				i = 0;
+			}
+		}
+		else if (Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true) {
+			i = 0;
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Hold_R[3], true);
+		}
 
-	//しゃがみ画像
-	if (Bectl == 0 && Attack < 10 && Down_flg == 1 && g_IronBall.HoldFlg == false) {
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y/4*3, Player_Pic_Down, true);
-	}
-	else if (Bectl == 1 && Attack < 10 && Down_flg == 1 && g_IronBall.HoldFlg == false) {
-		DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y/4*3, Player_Pic_Down_R, true);
+		//攻撃用画像右
+		if (Attack >= 10 && Bectl == 0 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X * 2, PlayerY + CHA_SIZE_Y, Player_Pic_Attack[5 - Attack / 5], true);
+		}
+		//攻撃用画像左
+		else if (Attack >= 10 && Bectl == 1 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
+			DrawExtendGraph(PlayerX - CHA_SIZE_X, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Attack_R[Attack / 5], true);
+		}
+
+		//しゃがみ画像
+		if (Bectl == 0 && Attack < 10 && Down_flg == 1 && g_IronBall.HoldFlg == false) {
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y / 4 * 3, Player_Pic_Down, true);
+		}
+		else if (Bectl == 1 && Attack < 10 && Down_flg == 1 && g_IronBall.HoldFlg == false) {
+			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y / 4 * 3, Player_Pic_Down_R, true);
+		}
+		
 	}
 	if (DebugMode) {
 		DrawCircle(Locka.x[0] + MapDrawPointX - MapX * MAP_SIZE, Locka.y[0] - MapDrawPointY - MapY * MAP_SIZE, 4, GetColor(252, 252, 252), true);
 		DrawCircle(Locka.x[1] + MapDrawPointX - MapX * MAP_SIZE, Locka.y[1] - MapDrawPointY - MapY * MAP_SIZE, 4, GetColor(252, 50, 252), true);
-		DrawCircle(g_IronBall.New_x,g_IronBall.New_y, 4, GetColor(252, 50, 252), true);
+		DrawCircle(g_IronBall.New_x, g_IronBall.New_y, 4, GetColor(252, 50, 252), true);
 
 	}
+	
 }
 
 void PlayerGravity(int bn) {
@@ -601,5 +613,18 @@ void PlayerAttack() {
 	}
 	else if (Attack < 0) {
 		Attack = 0;
+	}
+}
+
+
+void PlayerDamage() {		//プレイヤーのdamage処理
+	if (Playerouttime == 0) {
+		PlayerLife--;
+		Playerouttime = 180;
+	}
+
+	if (PlayerLife <= 0) {
+		g_GameState = GAME_OVER;
+		reset = 0;
 	}
 }

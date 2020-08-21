@@ -21,6 +21,8 @@ extern int Attack;		//プレイヤーの攻撃用
 extern int Jump_Flg;  //ジャンプ用変数 8ずつずれるのを５回繰り返す
 extern int y_temp;
 extern int y_prev;
+extern int PlayerLife;		//プレイヤーのライフ
+extern int Playerouttime;
 
 extern int y_prev;//しゃがみのフラグ
 
@@ -68,3 +70,4 @@ void PlayerMove();
 void PlayerDisp();
 void PlayerGravity(int bn);
 void PlayerAttack();
+void PlayerDamage();
