@@ -647,7 +647,7 @@ void enemyMove() {
 	}
 
 	if (DebugMode) {
-		DrawFormatString(100, 300, 0xff0000, "%d %d", g_Boss.x, g_Boss.y);
+	//	DrawFormatString(100, 300, 0xff0000, "%d %d", g_Boss.x, g_Boss.y);
 	}
 }
 

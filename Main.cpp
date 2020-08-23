@@ -162,6 +162,15 @@ int LoadImages() {
 	Player_Pic_Down_R = LoadGraph("images/shagami2.png", true);
 	LoadDivGraph("images/motu.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_Hold);
 	LoadDivGraph("images/motu2.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_Hold_R);
+	Player_HP[0] = LoadGraph("images/Life bar.png", true);//プレイヤーHPの画像
+	Player_HP[1] = LoadGraph("images/Life bar1.png", true);//プレイヤーHPの画像
+	Player_HP[2] = LoadGraph("images/Life bar2.png", true);//プレイヤーHPの画像
+	Player_HP[3] = LoadGraph("images/Life bar3.png", true);//プレイヤーHPの画像
+	Player_HP[4] = LoadGraph("images/Life bar4.png", true);//プレイヤーHPの画像
+	Player_HP[5] = LoadGraph("images/Life bar5.png", true);//プレイヤーHPの画像
+	Player_HP[6] = LoadGraph("images/Life bar6.png", true);//プレイヤーHPの画像
+	Player_HP[7] = LoadGraph("images/Life bar7.png", true);//プレイヤーHPの画像
+
 
 
 	//ゲームタイトル背景

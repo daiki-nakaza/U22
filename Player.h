@@ -55,6 +55,8 @@ extern int Player_Pic_Down_R;//‹tƒvƒŒƒCƒ„[‚µ‚á‚ª‚İ‚Ì‰æ‘œ
 extern int Player_Pic_Hold[4];//ƒvƒŒƒCƒ„[‚ª“S‹…‚ğ‚à‚Á‚ÄˆÚ“®‚·‚é‰æ‘œ
 extern int Player_Pic_Hold_R[4];//‹tƒvƒŒƒCƒ„[‚ª“S‹…‚ğ‚à‚Á‚ÄˆÚ“®‚·‚é‰æ‘œ
 
+extern int Player_HP[8];//ƒvƒŒƒCƒ„[HP‚Ì‰æ‘œ
+
 //extern int g_IronDamage;	  // “S‹…‚ª“G‚É“–‚½‚Á‚½SEŠi”[•Ï”
 extern int g_IronSlide;		  // “S‹…‚ğˆø‚Á’£‚éSEŠi”[•Ï”
 extern int g_IronSwing;		  // “S‹…‚ğ“Š‚°‚éSEŠi”[•Ï”

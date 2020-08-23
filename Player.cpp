@@ -41,6 +41,8 @@ int Player_Pic_Down_R;
 int Player_Pic_Hold[4];//プレイヤーが鉄球をもって移動する画像
 int Player_Pic_Hold_R[4];//逆プレイヤーが鉄球をもって移動する画像
 
+int Player_HP[8];//プレイヤーHPの画像
+
 void PlayerInit() {
 
 	// プレイヤーの初期位置をセット
@@ -155,8 +157,8 @@ void PlayerMove() {
 	
 	//しゃがみ用、自由落下中はJump_Flgが-1なので、地面についているときだけ作用する
 	if (g_NowKey & PAD_INPUT_DOWN && Jump_Flg == 0 && g_IronBall.HoldFlg == false && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1)) {
-		PlayerY += 16;
-		NewY += 16; 
+	//	PlayerY += 16;
+	//	NewY += 16; 
 		Down_flg = 1;
 	}
 
@@ -309,6 +311,14 @@ void PlayerDisp() {
 	//	(PlayerX)+CHA_SIZE_X, (PlayerY)+CHA_SIZE_Y,
 	//	GetColor(255, 255, 255), TRUE);//左下に当たり判定あり
 	//DrawGraph(PlayerX, PlayerY, Player_Pic[0], false);
+
+
+	//HPの表示
+
+	DrawExtendGraph(10, 10, 112, 42, Player_HP[7 - PlayerLife], true);
+
+
+
 	// プレイヤーの描画右
 	if (Playerouttime == 0 || Playerouttime % 2 == 1) {
 		if (g_NowKey & PAD_INPUT_RIGHT && Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
@@ -368,10 +378,10 @@ void PlayerDisp() {
 
 		//しゃがみ画像
 		if (Bectl == 0 && Attack < 10 && Down_flg == 1 && g_IronBall.HoldFlg == false) {
-			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y / 4 * 3, Player_Pic_Down, true);
+			DrawExtendGraph(PlayerX, PlayerY + 16, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Down, true);
 		}
 		else if (Bectl == 1 && Attack < 10 && Down_flg == 1 && g_IronBall.HoldFlg == false) {
-			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y / 4 * 3, Player_Pic_Down_R, true);
+			DrawExtendGraph(PlayerX, PlayerY + 16, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Down_R, true);
 		}
 		
 	}
