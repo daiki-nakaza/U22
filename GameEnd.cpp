@@ -15,6 +15,7 @@ int g_GameOverImage;
 int g_GameClearImage;
 
 int ClearTime = 0;
+int g_Cursor2;
 
 
 void DrawEnd() {			//
@@ -98,13 +99,14 @@ void DrawGameOver(void) {			//ゲームオーバー描画処理
 	//メニューカーソル移動処理
 	if (--g_OverTime <= 0) {
 		if (g_KeyFlg & PAD_INPUT_DOWN) {
-
+			PlaySoundMem(g_Cursor2, DX_PLAYTYPE_BACK);
 			if (++g_OverNumber > 1) {
 				g_OverNumber = 0;
 			}
 			g_OverTime = 10;
 		}
 		if (g_KeyFlg & PAD_INPUT_UP) {
+			PlaySoundMem(g_Cursor2, DX_PLAYTYPE_BACK);
 			if (--g_OverNumber < 0) {
 				g_OverNumber = 1;
 			}

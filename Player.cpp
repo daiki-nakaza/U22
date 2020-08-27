@@ -43,6 +43,11 @@ int Player_Pic_Hold_R[4];//逆プレイヤーが鉄球をもって移動する画像
 
 int Player_HP[8];//プレイヤーHPの画像
 
+int g_Sword_Swing; //剣を振るse
+int g_Player_Jump; //ジャンプse
+int g_Player_Damage; //敵に当たった時のse
+//int g_Sword_Damage;//てきを切ったときのse
+
 void PlayerInit() {
 
 	// プレイヤーの初期位置をセット
@@ -112,7 +117,7 @@ void PlayerMove() {
 	//キー入力に応じてプレイヤーの座標を移動 上
 	if (g_NowKey & PAD_INPUT_UP && g_IronBall.HoldFlg == false && g_IronBall.ThrowFlg == false && !(g_NowKey & PAD_INPUT_1)) {
 		if (Jump_Flg == 0) {
-
+			PlaySoundMem(g_Player_Jump, DX_PLAYTYPE_BACK);// ジャンプ音
 			y_prev = PlayerY;
 			NewY -= 16;
 			Locka.HenkaY -= 16;
@@ -607,7 +612,7 @@ void PlayerGravity(int bn) {
 void PlayerAttack() {
 	if (g_NowKey & PAD_INPUT_3 && g_IronBall.HoldFlg == false) {
 		if (Attack == 0) {
-
+			PlaySoundMem(g_Sword_Swing, DX_PLAYTYPE_BACK);//剣を振る
 			Attack = 30;
 		}
 	}
@@ -629,6 +634,7 @@ void PlayerAttack() {
 
 void PlayerDamage() {		//プレイヤーのdamage処理
 	if (Playerouttime == 0) {
+		PlaySoundMem(g_Player_Damage, DX_PLAYTYPE_BACK);
 		PlayerLife--;
 		Playerouttime = 180;
 	}

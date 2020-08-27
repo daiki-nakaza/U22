@@ -10,19 +10,21 @@ int titleTime = 0;
 int g_MenuY = 0;
 
 int g_GameTitleImage;
+int g_Cursor;
 
 
 void DrawGameTitle() {		//ゲームタイトル描画処理
 	//メニューカーソル移動処理
 	if (--g_MenuTime <= 0) {
 		if (g_KeyFlg & PAD_INPUT_DOWN) {
-
+			PlaySoundMem(g_Cursor, DX_PLAYTYPE_BACK);//ここでseならせる
 			if (++g_MenuNumber > 2) {
 				g_MenuNumber = 0;
 			}
 			g_MenuTime = 10;
 		}
 		if (g_KeyFlg & PAD_INPUT_UP) {
+			PlaySoundMem(g_Cursor, DX_PLAYTYPE_BACK);
 			if (--g_MenuNumber < 0) {
 				g_MenuNumber = 2;
 			}

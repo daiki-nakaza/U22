@@ -32,6 +32,9 @@ int g_KeyFlg2;
 int g_MouseX;//マウスｘ座標
 int g_MouseY;//マウスｙ座標
 
+int g_Title; //タイトルbgm
+int g_GameOver; // ゲームオーバーbgm
+
 
 int g_GameState = GAME_TITLE;//ゲームモード
 
@@ -93,7 +96,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	while (ProcessMessage() == 0 && g_GameState != END && !(g_KeyFlg & PAD_INPUT_START)) {
 
-		//PlaySoundMem(g_TitleBGM, DX_PLAYTYPE_LOOP, FALSE);
+		PlaySoundMem(g_Title, DX_PLAYTYPE_LOOP, FALSE);
 
 		g_OldKey = g_NowKey;
 		g_NowKey = GetJoypadInputState(DX_INPUT_KEY_PAD1);
@@ -112,9 +115,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 		switch (g_GameState) {
 		case GAME_TITLE:
+			StopSoundMem(g_GameOver);
 			DrawGameTitle();
 			break;
 		case GAME_MAIN:
+			StopSoundMem(g_Title);
 			DrawGameMain();
 			break;
 		case GAME_HELP:
@@ -133,6 +138,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			DrawClear();
 			break;
 		case GAME_OVER:
+			StopSoundMem(g_Stage1);
+			StopSoundMem(g_Title);
+			PlaySoundMem(g_GameOver, DX_PLAYTYPE_LOOP, FALSE);
 			DrawGameOver();
 			break;
 		
@@ -192,6 +200,8 @@ int LoadSounds() {
 	g_Stage2 = LoadSoundMem("bgm,se/BGM/Stage2.mp3");
 	g_Stage3 = LoadSoundMem("bgm,se/BGM/Stage3.mp3");
 	g_BossSound = LoadSoundMem("bgm,se/BGM/BossBattle.mp3");
+	g_Title = LoadSoundMem("bgm,se/BGM/Title.mp3");
+	g_GameOver = LoadSoundMem("bgm,se/BGM/GameOver.mp3");
 
 	g_ColorL = LoadSoundMem("bgm,se/Enemy_SE/color_laser.mp3");
 	g_Hadou = LoadSoundMem("bgm,se/Enemy_SE/hadou.mp3");
@@ -203,10 +213,13 @@ int LoadSounds() {
 	g_IronSlide = LoadSoundMem("bgm,se/Player_SE/iron_slide.mp3");
 	g_IronSwing = LoadSoundMem("bgm,se/Player_SE/iron_swing.mp3");
 	//g_Landing = LoadSoundMem("bgm,se/Player_SE/landing.mp3"); // 使わないかも
-	//g_Player_Damage = LoadSoundMem("bgm,se/Player_SE/player_damage.mp3");
-	//g_Player_Jump = LoadSoundMem("bgm,se/Player_SE/player_jump.mp3");
+	g_Player_Damage = LoadSoundMem("bgm,se/Player_SE/player_damage.mp3");
+	g_Player_Jump = LoadSoundMem("bgm,se/Player_SE/player_jump.mp3");
 	//g_Sword_Damage = LoadSoundMem("bgm,se/Player_SE/sword_damage.mp3");
-	//g_Sword_Swing = LoadSoundMem("bgm,se/Player_SE/sword_swing.mp3");
+	g_Sword_Swing = LoadSoundMem("bgm,se/Player_SE/sword_swing.mp3");
+
+	g_Cursor = LoadSoundMem("bgm,se/Player_SE/cursor-01.wav");
+	g_Cursor2 = LoadSoundMem("bgm,se/Player_SE/cursor-01.wav");
 
 	return 0;
 }
