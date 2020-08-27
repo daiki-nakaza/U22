@@ -4,6 +4,7 @@
 #include "Player.h" 
 #include "Map.h"
 #include "GameEnd.h" 
+#include "GameMain.h"
 #include "GameTitle.h"
 #include "accessory.h"
 
@@ -60,11 +61,14 @@ void DrawClear(void) {				//ゲームクリア描画処理
 		if (--g_OverTime <= 0) {
 			if (g_KeyFlg & PAD_INPUT_A) {
 				if (g_OverNumber == 1) {
-					g_GameState = 0;
+					g_GameState = GAME_END;
+					ClearTime = 0;
+					reset = 0;
 				}
 				else {
-					g_GameState = 0;
-
+					g_GameState = GAME_TITLE;
+					ClearTime = 0;
+					reset = 0;
 				}
 
 				g_MenuTime = 20;
@@ -87,9 +91,9 @@ void DrawClear(void) {				//ゲームクリア描画処理
 		MapDisp();
 		IronBallDisp();		//鉄球の描画処理
 		PlayerDisp();
-		
+		ClearTime++;
 	}
-	ClearTime++;
+	
 }
 
 
@@ -100,6 +104,7 @@ void DrawGameOver(void) {			//ゲームオーバー描画処理
 	if (--g_OverTime <= 0) {
 		if (g_KeyFlg & PAD_INPUT_DOWN) {
 			PlaySoundMem(g_Cursor2, DX_PLAYTYPE_BACK);
+
 			if (++g_OverNumber > 1) {
 				g_OverNumber = 0;
 			}
@@ -119,11 +124,12 @@ void DrawGameOver(void) {			//ゲームオーバー描画処理
 	if (--g_OverTime <= 0) {
 		if (g_KeyFlg & PAD_INPUT_A) {
 			if (g_OverNumber == 1) {
-				g_GameState = GAME_END;
+				g_GameState = GAME_TITLE;
+				reset = 0;
 			}
 			else {
-				g_GameState = 0;
-
+				g_GameState = GAME_MAIN;
+				reset = 0;
 			}
 			
 			g_MenuTime = 20;
@@ -162,5 +168,5 @@ void DrawGameOver(void) {			//ゲームオーバー描画処理
 
 	DrawTriangle(60, 365 + g_OvreY, 80, 400 + g_OvreY,
 		60, 435 + g_OvreY, GetColor(255, 0, 0), TRUE);
-	DrawFormatString(0, 0, 0xffffff, "mouseX = %d   Y = %d", g_MouseX, g_MouseY);
+	//DrawFormatString(0, 0, 0xffffff, "mouseX = %d   Y = %d", g_MouseX, g_MouseY);
 }

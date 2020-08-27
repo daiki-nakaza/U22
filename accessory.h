@@ -53,7 +53,7 @@ struct Lock
 	void Move(int eeee);             //鎖の移動処理
 	void Throw();            //鎖が飛んでいく処理
 	void Gravity();			 //鎖の重力処理
-	void Cheat();//鉄球をもっているときのチート処理
+	void Cheat(int jn);//鉄球をもっているときのチート処理
 };
 
 

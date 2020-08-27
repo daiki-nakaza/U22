@@ -106,7 +106,8 @@ int PlayerMoveCheck(ShootEnemy enemy) {
 		if (enemy.x - NewX - Map_NewX < CHA_SIZE_X
 			&& enemy.y - NewY - Map_NewY < CHA_SIZE_Y - 1
 			&& enemy.x - NewX - Map_NewX > 0 - enemy.w
-			&& enemy.y - NewY - Map_NewY > 0 - enemy.h) {
+			&& enemy.y - NewY - Map_NewY > 0 - enemy.h
+			) {
 			return 1;
 		}
 	}
@@ -139,10 +140,11 @@ int PlayerMoveCheck(TankEnemy enemy) {
 
 int PlayerMoveCheck(RazerEnemy enemy) {
 	if (enemy.Life > 0) {
-		if (enemy.x - NewX - Map_NewX < CHA_SIZE_X
+		if (enemy.x - NewX - Map_NewX - CHA_SIZE_X < 0
 			&& enemy.y - NewY - Map_NewY < CHA_SIZE_Y - 1
 			&& enemy.x - NewX - Map_NewX > 0 - enemy.w
-			&& enemy.y - NewY - Map_NewY > 0 - enemy.h) {
+			&& enemy.y - NewY - Map_NewY > 0 - enemy.h
+			) {
 			return 1;
 		}
 	}
@@ -153,99 +155,104 @@ int PlayerMoveCheck(RazerEnemy enemy) {
 
 //敵キャラに攻撃を当てる
 //敵の構造体の種類分オーバーロードで作ります
-void PlayerAttackCheck(WalkEnemy enemy) {
-	if (enemy.Life > 0) {					//敵のライフが０じゃないなら座標をみる
-		if (Bectl == 0 && enemy.outtime == 0) {						//右向き
-			if (enemy.x - PlayerX - Map_PlayerX < CHA_SIZE_X * 2
-				&& enemy.x - PlayerX - Map_PlayerX > 0) {
-				enemy.Life--;
-				enemy.outtime = 30;
+void PlayerAttackCheck(WalkEnemy *enemy) {
+	if (enemy->Life > 0) {					//敵のライフが０じゃないなら座標をみる
+		if (Bectl == 0 && enemy->outtime == 0) {						//右向き
+			//DrawLine(enemy.x-Map_PlayerX, 0, enemy.x - Map_PlayerX, 0,true);
+			if (enemy->x  < PlayerX + Map_PlayerX + CHA_SIZE_X * 2 +8
+				&& enemy->x  > PlayerX + Map_PlayerX) {
+				enemy->Life--;
+				enemy->outtime = 30;
 			}
 		}
-		else if (Bectl == 1) {						//右向き
-			if (enemy.x - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X
-				&& enemy.x - PlayerX - Map_PlayerX < 0) {
-				enemy.Life--;
-				enemy.outtime = 30;
-			}
-		}
-
-	}
-}
-void PlayerAttackCheck(ShootEnemy enemy) {
-	if (enemy.Life > 0) {					//敵のライフが０じゃないなら座標をみる
-		if (Bectl == 0 && enemy.outtime == 0) {						//右向き
-			if (enemy.x - PlayerX - Map_PlayerX < CHA_SIZE_X * 2
-				&& enemy.x - PlayerX - Map_PlayerX > 0) {
-				enemy.Life--;
-				enemy.outtime = 30;
-			}
-		}
-		else if (Bectl == 1) {						//右向き
-			if (enemy.x - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X
-				&& enemy.x - PlayerX - Map_PlayerX < 0) {
-				enemy.Life--;
-				enemy.outtime = 30;
+		else if (Bectl == 1 && enemy->outtime == 0) {						//左向き
+			if (enemy->x + enemy->w - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X - 8
+				&& enemy->x - PlayerX - Map_PlayerX < 0) {
+				enemy->Life--;
+				enemy->outtime = 30;
 			}
 		}
 
 	}
 }
-
-void PlayerAttackCheck(LockShootEnemy enemy) {
-	if (enemy.Life > 0) {					//敵のライフが０じゃないなら座標をみる
-		if (Bectl == 0 && enemy.outtime == 0) {						//右向き
-			if (enemy.x - PlayerX - Map_PlayerX < CHA_SIZE_X * 2
-				&& enemy.x - PlayerX - Map_PlayerX > 0) {
-				enemy.Life--;
-				enemy.outtime = 30;
+void PlayerAttackCheck(ShootEnemy *enemy) {
+	if (enemy->Life > 0) {					//敵のライフが０じゃないなら座標をみる
+		if (Bectl == 0 && enemy->outtime == 0) {						//右向き
+			//DrawLine(enemy.x-Map_PlayerX, 0, enemy.x - Map_PlayerX, 0,true);
+			if (enemy->x  < PlayerX + Map_PlayerX + CHA_SIZE_X * 2 + 8
+				&& enemy->x  > PlayerX + Map_PlayerX) {
+				enemy->Life--;
+				enemy->outtime = 30;
 			}
 		}
-		else if (Bectl == 1) {						//右向き
-			if (enemy.x - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X
-				&& enemy.x - PlayerX - Map_PlayerX < 0) {
-				enemy.Life--;
-				enemy.outtime = 30;
+		else if (Bectl == 1 && enemy->outtime == 0) {						//左向き
+			if (enemy->x + enemy->w - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X - 8
+				&& enemy->x - PlayerX - Map_PlayerX < 0) {
+				enemy->Life--;
+				enemy->outtime = 30;
 			}
 		}
 
 	}
 }
 
-void PlayerAttackCheck(TankEnemy enemy) {
-	if (enemy.Life > 0) {					//敵のライフが０じゃないなら座標をみる
-		if (Bectl == 0 && enemy.outtime == 0) {						//右向き
-			if (enemy.x - PlayerX - Map_PlayerX < CHA_SIZE_X * 2
-				&& enemy.x - PlayerX - Map_PlayerX > 0) {
-				enemy.Life--;
-				enemy.outtime = 30;
+void PlayerAttackCheck(LockShootEnemy *enemy) {
+	if (enemy->Life > 0) {					//敵のライフが０じゃないなら座標をみる
+		if (Bectl == 0 && enemy->outtime == 0) {						//右向き
+			//DrawLine(enemy.x-Map_PlayerX, 0, enemy.x - Map_PlayerX, 0,true);
+			if (enemy->x  < PlayerX + Map_PlayerX + CHA_SIZE_X * 2 + 8
+				&& enemy->x  > PlayerX + Map_PlayerX) {
+				enemy->Life--;
+				enemy->outtime = 30;
 			}
 		}
-		else if (Bectl == 1) {						//右向き
-			if (enemy.x - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X
-				&& enemy.x - PlayerX - Map_PlayerX < 0) {
-				enemy.Life--;
-				enemy.outtime = 30;
+		else if (Bectl == 1 && enemy->outtime == 0) {						//左向き
+			if (enemy->x + enemy->w - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X - 8
+				&& enemy->x - PlayerX - Map_PlayerX < 0) {
+				enemy->Life--;
+				enemy->outtime = 30;
 			}
 		}
 
 	}
 }
 
-void PlayerAttackCheck(RazerEnemy enemy) {
-	if (enemy.Life > 0) {					//敵のライフが０じゃないなら座標をみる
-		if (Bectl == 0 && enemy.outtime == 0) {						//右向き
-			if (enemy.x - PlayerX - Map_PlayerX < CHA_SIZE_X * 2
-				&& enemy.x - PlayerX - Map_PlayerX > 0) {
-				enemy.Life--;
-				enemy.outtime = 30;
+void PlayerAttackCheck(TankEnemy *enemy) {
+	if (enemy->Life > 0) {					//敵のライフが０じゃないなら座標をみる
+		if (Bectl == 0 && enemy->outtime == 0) {						//右向き
+			//DrawLine(enemy.x-Map_PlayerX, 0, enemy.x - Map_PlayerX, 0,true);
+			if (enemy->x  < PlayerX + Map_PlayerX + CHA_SIZE_X * 2 + 8
+				&& enemy->x  > PlayerX + Map_PlayerX) {
+				enemy->Life--;
+				enemy->outtime = 30;
 			}
 		}
-		else if (Bectl == 1) {						//右向き
-			if (enemy.x - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X
-				&& enemy.x - PlayerX - Map_PlayerX < 0) {
-				enemy.Life--;
-				enemy.outtime = 30;
+		else if (Bectl == 1 && enemy->outtime == 0) {						//左向き
+			if (enemy->x + enemy->w - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X - 8
+				&& enemy->x - PlayerX - Map_PlayerX < 0) {
+				enemy->Life--;
+				enemy->outtime = 30;
+			}
+		}
+
+	}
+}
+
+void PlayerAttackCheck(RazerEnemy *enemy) {
+	if (enemy->Life > 0) {					//敵のライフが０じゃないなら座標をみる
+		if (Bectl == 0 && enemy->outtime == 0) {						//右向き
+			//DrawLine(enemy.x-Map_PlayerX, 0, enemy.x - Map_PlayerX, 0,true);
+			if (enemy->x  < PlayerX + Map_PlayerX + CHA_SIZE_X * 2 + 8
+				&& enemy->x  > PlayerX + Map_PlayerX) {
+				enemy->Life--;
+				enemy->outtime = 30;
+			}
+		}
+		else if (Bectl == 1 && enemy->outtime == 0) {						//左向き
+			if (enemy->x + enemy->w - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X - 8
+				&& enemy->x - PlayerX - Map_PlayerX < 0) {
+				enemy->Life--;
+				enemy->outtime = 30;
 			}
 		}
 

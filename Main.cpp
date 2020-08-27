@@ -32,11 +32,11 @@ int g_KeyFlg2;
 int g_MouseX;//マウスｘ座標
 int g_MouseY;//マウスｙ座標
 
-int g_Title; //タイトルbgm
-int g_GameOver; // ゲームオーバーbgm
-
 
 int g_GameState = GAME_TITLE;//ゲームモード
+
+int g_Title;
+int g_GameOver;
 
 
 
@@ -120,6 +120,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			break;
 		case GAME_MAIN:
 			StopSoundMem(g_Title);
+			StopSoundMem(g_GameOver);
 			DrawGameMain();
 			break;
 		case GAME_HELP:
@@ -159,7 +160,9 @@ int LoadImages() {
 	//マップチップ
 	MapTip = LoadGraph("images/kenkyu7.png");
 	//背景
-	if ((g_BackGroundImage = LoadGraph("images/haikei2.png")) == -1) return -1;
+	if ((g_BackGroundImage1 = LoadGraph("images/haikei.png")) == -1) return -1;
+	if ((g_BackGroundImage2 = LoadGraph("images/haikei2.png")) == -1) return -1;
+	if ((g_BackGroundImage3 = LoadGraph("images/haikei3.png")) == -1) return -1;
 
 	//プレイヤー画像
 	LoadDivGraph("images/shujin.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic);

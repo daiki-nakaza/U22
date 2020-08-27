@@ -322,8 +322,8 @@ void Lock::MoveCheck() {
 
 		//}//移動失敗。人のほうを動かす。エラーするかも
 		//else {
-		//	/*NewX += LenkaX;
-		//	HenkaX += LenkaX;*/
+		//	NewX += LenkaX;
+		//	HenkaX += LenkaX;
 		//}
 	}
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1342,6 +1342,7 @@ void Lock::MoveCheck() {
 				break;
 			}
 			if (HI != 0 && (PlayerX + 16 + Map_PlayerX) - New_x[i] <= 0) {
+				Cheat(i);
 				continue;
 			}
 			if (FP != 0 && (PlayerX + 16 + Map_PlayerX) - (New_x[i] + HenkaX) <= 0) {
@@ -1563,6 +1564,7 @@ void Lock::MoveCheck() {
 				break;
 			}
 			if (HI != 0 && (PlayerX + 16 + Map_PlayerX) - New_x[i] >= 0) {
+				Cheat(i);
 				continue;
 			}
 			if (FP != 0 && (PlayerX + 16 + Map_PlayerX) - (New_x[i] + HenkaX) >= 0) {
@@ -2228,19 +2230,25 @@ void Lock::Gravity() {
 }
 
 
-void Lock::Cheat() {
-	for (int i = 0; i < LOCK_MAX ; i++) {
+void Lock::Cheat(int jn) {
+	for (int i = 0; i < jn ; i++) {
 		if (i == 0) {
 			x[i] = PlayerX + Map_PlayerX + 16;
 			y[i] = PlayerY + 58;
+			New_x[i] = PlayerX + Map_PlayerX + 16;
+			New_y[i] = PlayerY + 58;
 		}
 		else if (i == LOCK_MAX - 1) {
 			x[i] = PlayerX + Map_PlayerX + 16;
 			y[i] = g_IronBall.y;
+			New_x[i] = PlayerX + Map_PlayerX + 16;
+			New_y[i] = g_IronBall.y;
 		}
 		else {
 			x[i] = PlayerX + Map_PlayerX + 16;
-			y[i] = PlayerY + 58 - ((PlayerY + 58) - g_IronBall.y)/(LOCK_MAX - 1)* i;
+			y[i] = PlayerY + 58 - ((PlayerY + 58) - (PlayerY  - g_IronBall.r / 3 * 2))/(LOCK_MAX - 1)* i;
+			New_x[i] = PlayerX + Map_PlayerX + 16;
+			New_y[i] = PlayerY + 58 - ((PlayerY + 58) - (PlayerY - g_IronBall.r / 3 * 2)) / (LOCK_MAX - 1) * i;
 		}
 	}
 }
@@ -2257,18 +2265,17 @@ void IronBallDisp() {
 
 
 void IronBallMove() {
-	static bool initflg = true;
+	/*static bool initflg = true;
 
 	if (initflg) {
-		g_IronBall.Init();
-		Locka.Init();
+		
 		initflg = false;
-	}
+	}*/
 
 	Locka.Gravity();
 	g_IronBall.Move();
 	Locka.Move(6);
 	if (g_IronBall.HoldFlg == true) {
-		Locka.Cheat();
+		Locka.Cheat(LOCK_MAX);
 	}
 }

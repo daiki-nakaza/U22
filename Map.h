@@ -23,8 +23,12 @@ extern int MapX, MapY;                    //マップのｘ、ｙ
 extern int g_MapChip[HEIGHT * MAP_LONG][WIDTH];
 
 extern int MapTip;	//マップチップ画像変数
-extern int g_BackGroundImage;//背景画像
+extern int g_BackGroundImage1;//背景画像
+extern int g_BackGroundImage2;//背景画像
+extern int g_BackGroundImage3;//背景画像
 extern int g_Door[3];//クリア用のドア画像
+
+extern int Stage;//ステージ変数
 
 
 
@@ -35,7 +39,6 @@ extern int g_Stage3; // ステージ3の曲格納変数
 extern int g_Title;  // タイトルbgm
 extern int g_GameOver; // ゲームオーバー
 extern int g_BossSound;	 // ボス戦の曲格納変数
-
 
 // ↓敵の効果音等↓ //
 extern int g_ColorL; // 2色の弾を空中に打ち上げるSE格納変数

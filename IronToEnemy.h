@@ -27,8 +27,8 @@ int PlayerMoveCheck(TankEnemy enemy);
 int PlayerMoveCheck(RazerEnemy enemy);
 
 //ÉvÉåÉCÉÑÅ[ÇÃçUåÇîªíË
-void PlayerAttackCheck(WalkEnemy enemy);
-void PlayerAttackCheck(ShootEnemy enemy);
-void PlayerAttackCheck(LockShootEnemy enemy);
-void PlayerAttackCheck(TankEnemy enemy);
-void PlayerAttackCheck(RazerEnemy enemy);
+void PlayerAttackCheck(WalkEnemy *enemy);
+void PlayerAttackCheck(ShootEnemy *enemy);
+void PlayerAttackCheck(LockShootEnemy *enemy);
+void PlayerAttackCheck(TankEnemy *enemy);
+void PlayerAttackCheck(RazerEnemy *enemy);

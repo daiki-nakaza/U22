@@ -38,13 +38,13 @@ void enemyInfo::Move() {
 	/******************************************************
 		*勝手に書きました
 		******************************************************/
-	if (CheckHitPlayer() && Attack > 0 && outtime == 0) {		//プレイヤーが攻撃していたら
-		outtime = 60;
-		if (Life-- <= 0)DispFlg = false;
-	}
-	else {		//プレイヤーの体力を減らす
+	//if (CheckHitPlayer() && Attack > 0 && outtime == 0) {		//プレイヤーが攻撃していたら
+	//	outtime = 60;
+	//	if (Life-- <= 0)DispFlg = false;
+	//}
+	//else {		//プレイヤーの体力を減らす
 
-	}
+	//}
 	if (outtime > 0) {
 		if (outtime-- < 0) outtime = 0;
 	}
@@ -72,7 +72,9 @@ bool enemyInfo::CheckHitBall() {
 		&& y + h - MapDrawPointY - MapY * MAP_SIZE >(g_IronBall.y + MapDrawPointY - MapY * MAP_SIZE) - g_IronBall.r) {
 		if ((x + MapDrawPointX - MapX * MAP_SIZE) < ((g_IronBall.x + MapDrawPointX - MapX * MAP_SIZE) + g_IronBall.r)
 			&& (x + w + MapDrawPointX - MapX * MAP_SIZE) > ((g_IronBall.x + MapDrawPointX - MapX * MAP_SIZE) - g_IronBall.r)) {
-			return true;
+			if (g_IronBall.HoldFlg == false) {
+				return true;
+			}
 		}
 	}
 	return false;
@@ -634,7 +636,7 @@ void enemyDisp() {
 void enemyMove() {
 	static bool Initflg = true;
 	if (Initflg) {
-		enemyInit();
+		/*enemyInit();*/
 		Initflg = false;
 	}
 	if (g_Boss.CheckWindow()) {
@@ -678,8 +680,8 @@ bool EnemyCheckHit(int x, int y, int direct) {
 
 	if (direct == 1)			//右向きの処理
 	{
-		if (g_MapChip[(y) / MAP_SIZE + l + j][(x + WALK_ENEMY_SIZE) / MAP_SIZE - k - w] != 1	//右上
-			|| g_MapChip[(y +(WALK_ENEMY_SIZE /2) ) / MAP_SIZE + l + j][(x + WALK_ENEMY_SIZE) / MAP_SIZE - k - w] != 1){	//右下
+		if (g_MapChip[(y) / MAP_SIZE + l + j][(x + WALK_ENEMY_SIZE) / MAP_SIZE - k - i] != 1	//右上
+			|| g_MapChip[(y +(WALK_ENEMY_SIZE /2) ) / MAP_SIZE + l + j][(x + WALK_ENEMY_SIZE) / MAP_SIZE - k - i] != 1){	//右下
 			return true;
 		}
 	}
