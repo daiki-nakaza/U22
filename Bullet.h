@@ -74,8 +74,11 @@ struct ChargeBullet : public BulletInfo
 
 struct RazerBullet : public BulletInfo			//”g“®–C
 {
+	const int RazerX = 37, RazerY = 23;
+
 	int BWidth;		//ƒŒ[ƒU[‚Ì’·‚³‚Ì’²®
-	int pic;
+	int pic[3];
+	int EndFlg;
 
 	void Init(const int Ex, const int Ey);			//’eŠÛ‚Ì‰Šú‰»ˆ—
 	void Move(const int dir);			//’eŠÛ‚Ìˆ—

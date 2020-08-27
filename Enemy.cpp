@@ -376,8 +376,11 @@ void LockShootEnemy::LockShootMove() {			//撃つ敵の処理
 
 //戦車の敵(上に向かって弾を飛ばす奴)
 void TankEnemy::Init(int Tempx, int Tempy) {
-	x = Tempx * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
-	y = Tempy * MAP_SIZE - (TANK_ENEMY_SIZE - MAP_SIZE);								    // 敵のY座標の初期位置(マップチップの場所)
+	int SetX = Tempx * MAP_SIZE + (((Tempy / HEIGHT) * WIDTH) * WIDTH), SetY = (Tempy % HEIGHT) * MAP_SIZE;
+
+
+	x = SetX;										// 敵のX座標の初期位置(マップチップの場所)
+	y = SetY - (TANK_ENEMY_SIZE - MAP_SIZE);		// 敵のY座標の初期位置(マップチップの場所)
 
 	w = TANK_ENEMY_SIZE;						//敵の横幅
 	h = TANK_ENEMY_SIZE;						//敵の縦幅
@@ -472,11 +475,13 @@ void TankEnemy::Disp() {
 
 //波動砲を撃つ敵の関数定義
 void RazerEnemy::Init(int Tempx, int Tempy){
-	x = Tempx * MAP_SIZE;							 // 敵のX座標の初期位置(マップチップの場所)
-	y = Tempy * MAP_SIZE - (RAZER_ENEMY_SIZE - MAP_SIZE);								    // 敵のY座標の初期位置(マップチップの場所)
+	int SetX = Tempx * MAP_SIZE + (((Tempy / HEIGHT) * WIDTH) * WIDTH), SetY = (Tempy % HEIGHT) * MAP_SIZE;
 
-	w = TANK_ENEMY_SIZE;						//敵の横幅
-	h = TANK_ENEMY_SIZE;						//敵の縦幅
+	x = SetX;										// 敵のX座標の初期位置(マップチップの場所)
+	y = SetY - (RAZER_ENEMY_SIZE - MAP_SIZE);		// 敵のY座標の初期位置(マップチップの場所)
+
+	w = RAZER_ENEMY_SIZE;						//敵の横幅
+	h = RAZER_ENEMY_SIZE;						//敵の縦幅
 
 	anm = 0;
 

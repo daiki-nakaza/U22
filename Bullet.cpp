@@ -200,7 +200,9 @@ void RazerBullet::Init(const int Ex, const int Ey) {
 
 	BWidth = 0;
 
-	pic = LoadGraph("images/Laser.png");
+	EndFlg = false;
+
+	LoadDivGraph("images/Laser.png", 3, 3, 1, RazerX, RazerY, pic);
 
 	DispFlg = true;			//表示フラグをオンにする
 }
@@ -220,6 +222,7 @@ void RazerBullet::Move(int direct) {
 		if (CheckHitPlayer() && Playerouttime == 0) {		//プレイヤーにあたっていたら
 			PlayerDamage();
 		}
+		if (BWidth >= rangeX) EndFlg = true;
 	}
 }
 
@@ -247,8 +250,15 @@ void RazerBullet::Disp() {			//上にむっかていく弾丸の表示処理
 	if (DispFlg) {
 		//DrawBox(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE,
 		//	x + BWidth + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, 0x00ff00, true);
+		DrawExtendGraph(x + MapDrawPointX - MapX * MAP_SIZE - RazerX, y - MapDrawPointY - MapY * MAP_SIZE,		//出だしの弾
+		x + RazerX + MapDrawPointX - MapX * MAP_SIZE - RazerX, y + h - MapDrawPointY - MapY * MAP_SIZE, pic[0], true);
+
 		DrawExtendGraph(x + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE,
-			x + BWidth + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, pic, true);
+			x + BWidth + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, pic[1], true);	//中間の弾
+		if (EndFlg) {
+			DrawExtendGraph(x + BWidth + MapDrawPointX - MapX * MAP_SIZE, y - MapDrawPointY - MapY * MAP_SIZE,		//出だしの弾
+				x + RazerX + BWidth + MapDrawPointX - MapX * MAP_SIZE, y + h - MapDrawPointY - MapY * MAP_SIZE, pic[2], true);
+		}
 	}
 }
 
