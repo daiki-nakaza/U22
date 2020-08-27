@@ -9,6 +9,8 @@ int g_MenuNumber = 0;
 int titleTime = 0;
 int g_MenuY = 0;
 
+int g_GameTitleImage;
+
 
 void DrawGameTitle() {		//ゲームタイトル描画処理
 	//メニューカーソル移動処理
@@ -38,6 +40,8 @@ void DrawGameTitle() {		//ゲームタイトル描画処理
 	}
 
 	//タイトル画像表示
+	DrawGraph(0, 0, g_GameTitleImage, FALSE);
+
 	if (++titleTime >= 60) {
 		titleTime = 0;
 	}
@@ -61,12 +65,12 @@ void DrawGameTitle() {		//ゲームタイトル描画処理
 	}*/
 
 	//メニューカーソル（三角形）の表示
-	g_MenuY = g_MenuNumber * 52;
+	g_MenuY = g_MenuNumber * 111;
 
-	DrawString(265, 263, "ゲームスタート", 0xffffff);
-	DrawString(265, 315, "ゲームヘルプ", 0xffffff);
-	DrawString(265, 367, "終了", 0xffffff);
+	//DrawString(265, 263, "ゲームスタート", 0xffffff);
+	//DrawString(265, 315, "ゲームヘルプ", 0xffffff);
+	//DrawString(265, 367, "終了", 0xffffff);
 
-	DrawTriangle(240, 255 + g_MenuY, 260, 270 + g_MenuY,
-		240, 285 + g_MenuY, GetColor(255, 0, 0), TRUE);
+	DrawTriangle(25, 370 + g_MenuY, 75, 395 + g_MenuY,
+		25, 420 + g_MenuY, GetColor(255, 0, 0), TRUE);
 }

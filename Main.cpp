@@ -65,7 +65,7 @@ int LoadSounds();//音声読み込み
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
 	ChangeWindowMode(TRUE);//ウィンドウモードで起動
-	SetMainWindowText("");//タイトルを設定
+	SetMainWindowText("Prisoner");//タイトルを設定
 	SetGraphMode(1024, 700, 16);
 
 
@@ -82,7 +82,9 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 	if (LoadSounds() == -1) {
 		return -1;
 	}
-	
+	if (DebugMode) {
+		g_GameState = GAME_MAIN;//ゲームモード
+	}
 
 
 	//DrawInit();
@@ -100,7 +102,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 		g_OldKey2 = g_NowKey2;
 		g_NowKey2 = GetMouseInput();
 		g_KeyFlg2 = g_NowKey2 & g_OldKey2;
-
+		
 		//マウスの位置を取得
 		GetMousePoint(&g_MouseX, &g_MouseY);
 
@@ -149,7 +151,9 @@ int LoadImages() {
 	//マップチップ
 	MapTip = LoadGraph("images/kenkyu7.png");
 	//背景
-	if ((g_BackGroundImage = LoadGraph("images/haikei2.png")) == -1) return -1;
+	if ((g_BackGroundImage1 = LoadGraph("images/haikei.png")) == -1) return -1;
+	if ((g_BackGroundImage2 = LoadGraph("images/haikei2.png")) == -1) return -1;
+	if ((g_BackGroundImage3 = LoadGraph("images/haikei3.png")) == -1) return -1;
 
 	//プレイヤー画像
 	LoadDivGraph("images/shujin.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic);
@@ -160,15 +164,51 @@ int LoadImages() {
 	Player_Pic_Down_R = LoadGraph("images/shagami2.png", true);
 	LoadDivGraph("images/motu.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_Hold);
 	LoadDivGraph("images/motu2.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic_Hold_R);
+	Player_HP[0] = LoadGraph("images/Life bar.png", true);//プレイヤーHPの画像
+	Player_HP[1] = LoadGraph("images/Life bar1.png", true);//プレイヤーHPの画像
+	Player_HP[2] = LoadGraph("images/Life bar2.png", true);//プレイヤーHPの画像
+	Player_HP[3] = LoadGraph("images/Life bar3.png", true);//プレイヤーHPの画像
+	Player_HP[4] = LoadGraph("images/Life bar4.png", true);//プレイヤーHPの画像
+	Player_HP[5] = LoadGraph("images/Life bar5.png", true);//プレイヤーHPの画像
+	Player_HP[6] = LoadGraph("images/Life bar6.png", true);//プレイヤーHPの画像
+	Player_HP[7] = LoadGraph("images/Life bar7.png", true);//プレイヤーHPの画像
 
 
+
+	//ゲームタイトル背景
+	if ((g_GameTitleImage = LoadGraph("images/Title.png")) == -1) return -1;
 	//ゲームオーバー背景
 	if ((g_GameOverImage = LoadGraph("images/GameOver.png")) == -1) return -1;
+	//クリア用ドア画像
+	if (( LoadDivGraph("images/Door.png",3,3,1,128,128,g_Door)) == -1) return -1;
+	//ゲームクリア背景
+	if ((g_GameClearImage = LoadGraph("images/GameClear.png")) == -1)return -1;
 
 
 	return 0;
 
 }
 int LoadSounds() {
+
+	g_Stage1 = LoadSoundMem("bgm,se/BGM/Stage1.mp3"); //g_Stage1～3 g_BossはMap.hで宣言してる
+	g_Stage2 = LoadSoundMem("bgm,se/BGM/Stage2.mp3");
+	g_Stage3 = LoadSoundMem("bgm,se/BGM/Stage3.mp3");
+	g_BossSound = LoadSoundMem("bgm,se/BGM/BossBattle.mp3");
+
+	g_ColorL = LoadSoundMem("bgm,se/Enemy_SE/color_laser.mp3");
+	g_Hadou = LoadSoundMem("bgm,se/Enemy_SE/hadou.mp3");
+	g_Kakusan = LoadSoundMem("bgm,se/Enemy_SE/kakusan.mp3");
+	g_Shot = LoadSoundMem("bgm,se/Enemy_SE/laser.mp3");
+	g_Warp = LoadSoundMem("bgm,se/Enemy_SE/warp.mp3");
+
+	//g_IronDamage = LoadSoundMem("bgm,se/Player_SE/iron_damage.mp3");
+	g_IronSlide = LoadSoundMem("bgm,se/Player_SE/iron_slide.mp3");
+	g_IronSwing = LoadSoundMem("bgm,se/Player_SE/iron_swing.mp3");
+	//g_Landing = LoadSoundMem("bgm,se/Player_SE/landing.mp3"); // 使わないかも
+	//g_Player_Damage = LoadSoundMem("bgm,se/Player_SE/player_damage.mp3");
+	//g_Player_Jump = LoadSoundMem("bgm,se/Player_SE/player_jump.mp3");
+	//g_Sword_Damage = LoadSoundMem("bgm,se/Player_SE/sword_damage.mp3");
+	//g_Sword_Swing = LoadSoundMem("bgm,se/Player_SE/sword_swing.mp3");
+
 	return 0;
 }

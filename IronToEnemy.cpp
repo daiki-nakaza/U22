@@ -79,7 +79,7 @@ bool EnemyCheckDir(enemyInfo enemy) {
 }
 
 int GetPlayerX() {
-	return PlayerX + Map_NewX;
+	return PlayerX + Map_PlayerX;
 }
 
 
