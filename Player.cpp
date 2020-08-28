@@ -379,14 +379,13 @@ void PlayerDisp() {
 
 
 	//HPの表示
-
 	DrawExtendGraph(10, 10, 112, 42, Player_HP[7 - PlayerLife], true);
 
 
 
 	// プレイヤーの描画右
 	if (Playerouttime == 0 || Playerouttime % 2 == 1) {
-		if (g_NowKey & PAD_INPUT_RIGHT && Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
+		if (g_NowKey & PAD_INPUT_RIGHT && Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false && g_GameState==GAME_MAIN) {
 			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic[i / 10], true);
 			if (++i >= 40) {
 				i = 0;
@@ -396,9 +395,8 @@ void PlayerDisp() {
 			i = 0;
 			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic[0], true);
 		}
-
 		// プレイヤーの描画左
-		else if (g_NowKey & PAD_INPUT_LEFT && Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false) {
+		else if (g_NowKey & PAD_INPUT_LEFT && Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == false && g_GameState == GAME_MAIN) {
 			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_R[3 - i / 10], true);
 			if (++i >= 40) {
 				i = 0;
@@ -409,7 +407,7 @@ void PlayerDisp() {
 			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_R[3], true);
 		}
 		//プレイヤーが鉄球をもっている画像右
-		else if (g_NowKey & PAD_INPUT_RIGHT && Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true) {
+		else if (g_NowKey & PAD_INPUT_RIGHT && Bectl == 0 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true && g_GameState == GAME_MAIN) {
 			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Hold[i / 10], true);
 			if (++i >= 40) {
 				i = 0;
@@ -421,7 +419,7 @@ void PlayerDisp() {
 		}
 
 		//プレイヤーが鉄球をもっている画像右
-		else if (g_NowKey & PAD_INPUT_LEFT && Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true) {
+		else if (g_NowKey & PAD_INPUT_LEFT && Bectl == 1 && Attack < 10 && Down_flg == 0 && g_IronBall.HoldFlg == true && g_GameState == GAME_MAIN) {
 			DrawExtendGraph(PlayerX, PlayerY, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Hold_R[3 - i / 10], true);
 			if (++i >= 40) {
 				i = 0;
@@ -447,9 +445,9 @@ void PlayerDisp() {
 		}
 		else if (Bectl == 1 && Attack < 10 && Down_flg == 1 && g_IronBall.HoldFlg == false) {
 			DrawExtendGraph(PlayerX, PlayerY + 16, PlayerX + CHA_SIZE_X, PlayerY + CHA_SIZE_Y, Player_Pic_Down_R, true);
-		}
-		
+		}	
 	}
+
 	if (DebugMode) {
 		DrawCircle(Locka.x[0] + MapDrawPointX - MapX * MAP_SIZE, Locka.y[0] - MapDrawPointY - MapY * MAP_SIZE, 4, GetColor(252, 252, 252), true);
 		DrawCircle(Locka.x[1] + MapDrawPointX - MapX * MAP_SIZE, Locka.y[1] - MapDrawPointY - MapY * MAP_SIZE, 4, GetColor(252, 50, 252), true);
