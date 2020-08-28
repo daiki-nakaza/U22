@@ -2,6 +2,7 @@
 
 
 #include "GameMain.h"
+#include "GameMenu.h"
 #include "Map.h"
 #include "Enemy.h"
 #include "Player.h"
@@ -21,10 +22,12 @@ void DrawGameMain() {
 		g_IronBall.ThrowFlg = false; 
 		g_IronBall.Init();
 		Locka.Init();
-		PlaySoundMem(g_Stage1, DX_PLAYTYPE_LOOP); //
+		PlaySoundMem(g_Stage1, DX_PLAYTYPE_LOOP,true); //
 	}
 	else if (reset++ == 5) {//ライフ以外のリセット
 	}
+
+
 
 	MapDisp();			//マップの描画
 	MapMove();			//スクリーンの処理
@@ -44,5 +47,13 @@ void DrawGameMain() {
 
 	HUDDisp();
 
+
+	if (g_KeyFlg & PAD_INPUT_8) {//Wキー
+		if (PoseTime <= 0) {
+			g_GameState = GAME_MENU;
+			PoseTime = 90;
+		}
+	}
+	PoseTime--;
 }
 

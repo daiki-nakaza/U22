@@ -67,6 +67,7 @@ int LoadSounds();//音声読み込み
 //プログラムはWinMainから始まります//
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
 {
+
 	ChangeWindowMode(TRUE);//ウィンドウモードで起動
 	SetMainWindowText("Prisoner");//タイトルを設定
 	SetGraphMode(1024, 700, 16);
@@ -94,10 +95,11 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 
 	SetDrawScreen(DX_SCREEN_BACK);
 
+	PlaySoundMem(g_Title, DX_PLAYTYPE_LOOP, FALSE);
+
 	while (ProcessMessage() == 0 && g_GameState != END && !(g_KeyFlg & PAD_INPUT_START)) {
 
-		PlaySoundMem(g_Title, DX_PLAYTYPE_LOOP, FALSE);
-
+		
 		g_OldKey = g_NowKey;
 		g_NowKey = GetJoypadInputState(DX_INPUT_KEY_PAD1);
 		g_KeyFlg = g_NowKey & g_OldKey;
@@ -130,6 +132,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
 			DrawEnd();
 			break;
 		case GAME_MENU:
+			StopSoundMem(g_Stage1);
 			DrawMenu();
 			break;
 		case GAME_INIT:
