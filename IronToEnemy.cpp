@@ -3,6 +3,8 @@
 #include "IronToEnemy.h"
 #include "Map.h"
 
+int g_Sword_Damage;
+
 
 bool IronToEnemy(enemyInfo enemy) {
 
@@ -161,6 +163,7 @@ void PlayerAttackCheck(WalkEnemy *enemy) {
 			//DrawLine(enemy.x-Map_PlayerX, 0, enemy.x - Map_PlayerX, 0,true);
 			if (enemy->x  < PlayerX + Map_PlayerX + CHA_SIZE_X * 2 +8
 				&& enemy->x  > PlayerX + Map_PlayerX) {
+				PlaySoundMem(g_Sword_Damage, DX_PLAYTYPE_BACK);
 				enemy->Life--;
 				enemy->outtime = 30;
 			}
@@ -168,6 +171,7 @@ void PlayerAttackCheck(WalkEnemy *enemy) {
 		else if (Bectl == 1 && enemy->outtime == 0) {						//¶Œü‚«
 			if (enemy->x + enemy->w - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X - 8
 				&& enemy->x - PlayerX - Map_PlayerX < 0) {
+				PlaySoundMem(g_Sword_Damage, DX_PLAYTYPE_BACK);
 				enemy->Life--;
 				enemy->outtime = 30;
 			}
@@ -181,6 +185,7 @@ void PlayerAttackCheck(ShootEnemy *enemy) {
 			//DrawLine(enemy.x-Map_PlayerX, 0, enemy.x - Map_PlayerX, 0,true);
 			if (enemy->x  < PlayerX + Map_PlayerX + CHA_SIZE_X * 2 + 8
 				&& enemy->x  > PlayerX + Map_PlayerX) {
+				PlaySoundMem(g_Sword_Damage, DX_PLAYTYPE_BACK);
 				enemy->Life--;
 				enemy->outtime = 30;
 			}
@@ -188,6 +193,7 @@ void PlayerAttackCheck(ShootEnemy *enemy) {
 		else if (Bectl == 1 && enemy->outtime == 0) {						//¶Œü‚«
 			if (enemy->x + enemy->w - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X - 8
 				&& enemy->x - PlayerX - Map_PlayerX < 0) {
+				PlaySoundMem(g_Sword_Damage, DX_PLAYTYPE_BACK);
 				enemy->Life--;
 				enemy->outtime = 30;
 			}
@@ -202,6 +208,7 @@ void PlayerAttackCheck(LockShootEnemy *enemy) {
 			//DrawLine(enemy.x-Map_PlayerX, 0, enemy.x - Map_PlayerX, 0,true);
 			if (enemy->x  < PlayerX + Map_PlayerX + CHA_SIZE_X * 2 + 8
 				&& enemy->x  > PlayerX + Map_PlayerX) {
+				PlaySoundMem(g_Sword_Damage, DX_PLAYTYPE_BACK);
 				enemy->Life--;
 				enemy->outtime = 30;
 			}
@@ -209,6 +216,7 @@ void PlayerAttackCheck(LockShootEnemy *enemy) {
 		else if (Bectl == 1 && enemy->outtime == 0) {						//¶Œü‚«
 			if (enemy->x + enemy->w - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X - 8
 				&& enemy->x - PlayerX - Map_PlayerX < 0) {
+				PlaySoundMem(g_Sword_Damage, DX_PLAYTYPE_BACK);
 				enemy->Life--;
 				enemy->outtime = 30;
 			}
@@ -223,6 +231,7 @@ void PlayerAttackCheck(TankEnemy *enemy) {
 			//DrawLine(enemy.x-Map_PlayerX, 0, enemy.x - Map_PlayerX, 0,true);
 			if (enemy->x  < PlayerX + Map_PlayerX + CHA_SIZE_X * 2 + 8
 				&& enemy->x  > PlayerX + Map_PlayerX) {
+				PlaySoundMem(g_Sword_Damage, DX_PLAYTYPE_BACK);
 				enemy->Life--;
 				enemy->outtime = 30;
 			}
@@ -230,6 +239,7 @@ void PlayerAttackCheck(TankEnemy *enemy) {
 		else if (Bectl == 1 && enemy->outtime == 0) {						//¶Œü‚«
 			if (enemy->x + enemy->w - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X - 8
 				&& enemy->x - PlayerX - Map_PlayerX < 0) {
+				PlaySoundMem(g_Sword_Damage, DX_PLAYTYPE_BACK);
 				enemy->Life--;
 				enemy->outtime = 30;
 			}
@@ -244,6 +254,7 @@ void PlayerAttackCheck(RazerEnemy *enemy) {
 			//DrawLine(enemy.x-Map_PlayerX, 0, enemy.x - Map_PlayerX, 0,true);
 			if (enemy->x  < PlayerX + Map_PlayerX + CHA_SIZE_X * 2 + 8
 				&& enemy->x  > PlayerX + Map_PlayerX) {
+				PlaySoundMem(g_Sword_Damage, DX_PLAYTYPE_BACK);
 				enemy->Life--;
 				enemy->outtime = 30;
 			}
@@ -251,6 +262,7 @@ void PlayerAttackCheck(RazerEnemy *enemy) {
 		else if (Bectl == 1 && enemy->outtime == 0) {						//¶Œü‚«
 			if (enemy->x + enemy->w - PlayerX - Map_PlayerX > 0 - CHA_SIZE_X - 8
 				&& enemy->x - PlayerX - Map_PlayerX < 0) {
+				PlaySoundMem(g_Sword_Damage, DX_PLAYTYPE_BACK);
 				enemy->Life--;
 				enemy->outtime = 30;
 			}

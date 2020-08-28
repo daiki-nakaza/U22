@@ -46,6 +46,7 @@ extern int g_Hadou;  // ”g“®–C‚ÌSEŠi”[•Ï”
 extern int g_Kakusan;// ŠgU’e‚ÌSEŠi”[•Ï”
 extern int g_Shot;   // ’Êí’e‚ÌSEŠi”[•Ï”(ƒ{ƒX‚ÆG‹›“G)
 extern int g_Warp;   // ƒ{ƒX‚Ìƒ[ƒvSEŠi”[•Ï”
+extern int g_Sword_Damage;    // Œ•‚Å“G‚ğØ‚Á‚½SEŠi”[•Ï”
 
 extern int g_Cursor;
 extern int g_Cursor2; // ƒQ[ƒ€ƒGƒ“ƒh

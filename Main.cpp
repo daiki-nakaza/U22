@@ -218,7 +218,7 @@ int LoadSounds() {
 	//g_Landing = LoadSoundMem("bgm,se/Player_SE/landing.mp3"); // Žg‚í‚È‚¢‚©‚à
 	g_Player_Damage = LoadSoundMem("bgm,se/Player_SE/player_damage.mp3");
 	g_Player_Jump = LoadSoundMem("bgm,se/Player_SE/player_jump.mp3");
-	//g_Sword_Damage = LoadSoundMem("bgm,se/Player_SE/sword_damage.mp3");
+	g_Sword_Damage = LoadSoundMem("bgm,se/Player_SE/sword_damage.mp3");
 	g_Sword_Swing = LoadSoundMem("bgm,se/Player_SE/sword_swing.mp3");
 
 	g_Cursor = LoadSoundMem("bgm,se/Player_SE/cursor-01.wav");
