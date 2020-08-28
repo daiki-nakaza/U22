@@ -55,6 +55,8 @@ struct ShootEnemy : public enemyInfo
 	int BulletCnt = 0;		//３発連続で弾を発射させる
 	int ReloadCnt = 0;		//リロードの時間カウント
 
+	bool Reloadflg = false;
+
 	NormalBullet Bullet[Bullet_MAX];			//真っすぐ撃つ敵が使う弾丸３発
 
 	void Init(int Tempx, int Tempy);			//撃つ敵の初期化処理
@@ -71,6 +73,8 @@ struct LockShootEnemy : public enemyInfo
 	int BulletCnt = 0;		//３発連続で弾を発射させる
 	int ReloadCnt = 0;		//リロードの時間カウント
 
+	bool Reloadflg = false;
+
 	LockBullet Bullet[Bullet_MAX];			//弾丸3発
 
 	void Init(int Tempx, int Tempy);			//狙い撃つ敵の初期化処理
@@ -86,6 +90,7 @@ struct TankEnemy : public enemyInfo
 	int Firecnt = 0;		 //発射のカウント
 	int BulletCnt = 0;		//３発連続で弾を発射させる
 	int ReloadCnt = 0;		//リロードの時間カウント
+
 	ChargeBullet Bullet[Bullet_MAX];		//弾丸3発
 
 	void Init(int Tempx, int Tempy);			//戦車の初期化処理
@@ -114,6 +119,13 @@ void enemyMove();			//敵の動き
 void enemyInit();			//敵の初期化処理
 
 bool EnemyCheckHit(int x,int y,int direct);		//敵側の当たり判定チェック
+
+void EnemyBreak(WalkEnemy* enemy);
+void EnemyBreak(ShootEnemy* enemy);
+void EnemyBreak(LockShootEnemy* enemy);
+void EnemyBreak(TankEnemy* enemy);
+void EnemyBreak(RazerEnemy* enemy);
+
 
 //void EnemyShoot();
 

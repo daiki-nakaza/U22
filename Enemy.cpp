@@ -9,6 +9,8 @@
 #include "PlayerAndIronBall.h"
 #include "IronToEnemy.h"
 
+#include <time.h>
+
 
 /**************************************************
 *		変数の宣言
@@ -92,6 +94,10 @@ bool enemyInfo::CheckHitPlayer() {
 	}
 	return false;
 }
+
+
+
+
 //////////////////////////////////////////////
 /////////////歩く敵の処理////////////////////
 /////////////////////////////////////////////
@@ -245,9 +251,8 @@ void ShootEnemy::ShootMove() {		//撃つ敵の処理
 	const int FrmMax = 10;		//アニメーションフレームの間
 
 	const int Rate = 20;		//発射レート
-	const int ReloadTime = 180;			//リロード時間　大体３秒
 
-
+	int ReloadTime = time(NULL);			//今の時間を取得
 
 
 	if (DispFlg && CheckWindow()) {//
@@ -256,20 +261,24 @@ void ShootEnemy::ShootMove() {		//撃つ敵の処理
 		else picDir = true;					//右向きなら
 
 
-		if (Firecnt++ >= Rate
-			&& BulletCnt < Bullet_MAX
-			&& !Bullet[BulletCnt].DispFlg) {
-			Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
-			BulletCnt++;
-			Firecnt = 0;
-			if (BulletCnt >= Bullet_MAX - 1) ReloadCnt = 0;
+		if (Firecnt++ >= Rate) {
+			if(BulletCnt < Bullet_MAX
+				&& !Bullet[BulletCnt].DispFlg) {
+				Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
+				BulletCnt++;
+				Firecnt = 0;
+				if (BulletCnt >= Bullet_MAX) {
+					ReloadCnt = time(NULL);				//リロードの開始時間を取得
+					Reloadflg = true;
+				}
+			}
 		}
 
-		if (!Bullet[0].DispFlg
-			&& !Bullet[1].DispFlg
-			&& !Bullet[2].DispFlg
-			&& ReloadCnt++ > ReloadTime) {
-			BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
+		if (Reloadflg) {
+			if (ReloadTime - ReloadCnt > 3) {
+				BulletCnt = 0;		//リロードが完了したら
+				Reloadflg = false;
+			}
 
 		}
 
@@ -330,50 +339,45 @@ void LockShootEnemy::LockShootMove() {			//撃つ敵の処理
 
 	const int FrmMax = 10;		//アニメーションフレームの間
 
-	const int Rate = 20;		//発射レート
-	const int ReloadTime = 180;			//リロード時間　大体３秒
+	const int Rate = 25;		//発射レート
+
+	int ReloadTime = time(NULL);			//今の時間を取得
 
 
 	if (DispFlg && CheckWindow()) {//
-
-		//if(DirCheck)
 
 		if (direct < 0) picDir = false;		//左向きなら
 		else picDir = true;					//右向きなら
 
 
+		if (Firecnt++ >= Rate) {
+			if (BulletCnt < Bullet_MAX
+				&& !Bullet[BulletCnt].DispFlg) {
+				Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
+				BulletCnt++;
+				Firecnt = 0;
+				if (BulletCnt >= Bullet_MAX) {
+					ReloadCnt = time(NULL);				//リロードの開始時間を取得
+					Reloadflg = true;
+				}
+			}
+		}
 
-		if (++AnmCnt >= FrmMax) {				//アニメーションフレーム
-			if (++anm > 3) anm = 0;
-			AnmCnt = 0;
-		}
-		if (Firecnt++ >= Rate
-			&& BulletCnt < Bullet_MAX) {
-			Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
-			BulletCnt++;
-			Firecnt = 0;
-			if (BulletCnt >= Bullet_MAX - 1) ReloadCnt = 0;
-		}
+		if (Reloadflg) {
+			if (ReloadTime - ReloadCnt > 3) {
+				BulletCnt = 0;		//リロードが完了したら
+				Reloadflg = false;
+			}
 
-		if (!Bullet[0].DispFlg
-			&& !Bullet[1].DispFlg
-			&& !Bullet[2].DispFlg
-			&& ReloadCnt > ReloadTime) {
-			BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
-			ReloadCnt = 0;
 		}
-		if (ReloadCnt++ <= ReloadTime) {}
 
 		for (int i = 0; i < Bullet_MAX; i++) {
 			Bullet[i].Disp();
 			Bullet[i].Move(direct);			//弾丸の処理
-			if (DebugMode) DrawFormatString(100, 140 + i * 30, 0x000000, "%f", Bullet[i].SpeedY);
 		}
 
 		Move();			//敵共通の関数
-
 	}
-
 }
 
 //戦車の敵(上に向かって弾を飛ばす奴)
@@ -438,16 +442,16 @@ void TankEnemy::TankMove() {
 			Bullet[BulletCnt].Init(x, y + h / 2);			//弾を飛ばす間隔
 			BulletCnt++;
 			Firecnt = 0;
+			if (BulletCnt >= Bullet_MAX - 1) ReloadCnt = time(NULL);
 		}
 
 		if (!Bullet[0].DispFlg
 			&& !Bullet[1].DispFlg
-			&& !Bullet[2].DispFlg
-			&& ReloadCnt > ReloadTime) {
-			BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
-			ReloadCnt = 0;
+			&& !Bullet[2].DispFlg) {
+			if (ReloadCnt++ >= ReloadTime) {
+				BulletCnt = 0;		//弾の表示フラグがすべてoffなら撃てるようになる
+			}
 		}
-		if (ReloadCnt++ <= ReloadTime) {}
 
 		for (int i = 0; i < Bullet_MAX; i++) {
 			Bullet[i].Disp();
@@ -552,7 +556,15 @@ void RazerEnemy::Disp() {
 
 void enemyInit() {			//敵の初期化処理
 	SetTP = 0;
-	 
+	for (int i = 0; i < ENEMY_MAX; i++) {		//敵の情報をいったんリセット
+		EnemyBreak(&g_WalkEnemy[i]);
+		EnemyBreak(&g_ShootEnemy[i]);
+		EnemyBreak(&g_LockShootEnemy[i]);
+		EnemyBreak(&g_TankEnemy[i]);
+		EnemyBreak(&g_RazerEnemy[i]);
+	}
+
+
 	for (int y = 0; y < HEIGHT * MAP_LONG; y++) {
 		for (int x = 0; x < WIDTH; x++) {
 			if (g_MapChip[y][x] == 3) {		//歩く雑魚
@@ -704,4 +716,82 @@ bool enemyInfo::CheckWindow() {
 	}
 
 	return false;
+}
+
+
+
+void EnemyBreak(WalkEnemy* enemy) {
+
+	enemy->x = -999;
+	enemy->y = -999;
+	enemy->w = -999;
+	enemy->h = -999;
+
+	enemy->Life = -999;
+
+	enemy->speed = -999;
+	enemy->type = -1;
+
+	enemy->DispFlg = false;
+}
+
+void EnemyBreak(ShootEnemy* enemy) {
+
+	enemy->x = -999;
+	enemy->y = -999;
+	enemy->w = -999;
+	enemy->h = -999;
+
+	enemy->Life = -999;
+
+	enemy->speed = -999;
+	enemy->type = -1;
+
+	enemy->DispFlg = false;
+}
+
+
+void EnemyBreak(LockShootEnemy* enemy) {
+
+	enemy->x = -999;
+	enemy->y = -999;
+	enemy->w = -999;
+	enemy->h = -999;
+
+	enemy->Life = -999;
+
+	enemy->speed = -999;
+	enemy->type = -1;
+
+	enemy->DispFlg = false;
+}
+
+void EnemyBreak(TankEnemy* enemy) {
+
+	enemy->x = -999;
+	enemy->y = -999;
+	enemy->w = -999;
+	enemy->h = -999;
+
+	enemy->Life = -999;
+
+	enemy->speed = -999;
+	enemy->type = -1;
+
+	enemy->DispFlg = false;
+}
+
+void EnemyBreak(RazerEnemy* enemy) {
+
+	enemy->x = -999;
+	enemy->y = -999;
+	enemy->w = -999;
+	enemy->h = -999;
+
+	enemy->Life = -999;
+
+	enemy->speed = -999;
+	enemy->type = -1;
+
+	enemy->DispFlg = false;
 }
