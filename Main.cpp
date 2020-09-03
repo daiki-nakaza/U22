@@ -166,6 +166,7 @@ int LoadImages() {
 	if ((g_BackGroundImage1 = LoadGraph("images/haikei.png")) == -1) return -1;
 	if ((g_BackGroundImage2 = LoadGraph("images/haikei2.png")) == -1) return -1;
 	if ((g_BackGroundImage3 = LoadGraph("images/haikei3.png")) == -1) return -1;
+	if ((g_PoseImage = LoadGraph("images/pause.png")) == -1) return -1;
 
 	//プレイヤー画像
 	LoadDivGraph("images/shujin.png", 4, 4, 1, CHA_SIZE_X, CHA_SIZE_Y, Player_Pic);
@@ -195,8 +196,6 @@ int LoadImages() {
 	if (( LoadDivGraph("images/Door.png",3,3,1,128,128,g_Door)) == -1) return -1;
 	//ゲームクリア背景
 	if ((g_GameClearImage = LoadGraph("images/GameClear.png")) == -1)return -1;
-	//ステージクリア背景
-	if ((g_StageClearImage = LoadGraph("images/StageClear.png")) == -1)return -1;
 
 
 	return 0;

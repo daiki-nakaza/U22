@@ -10,6 +10,7 @@
 #include "Enemy.h"
 
 int PoseTime = 30;
+int g_PoseImage;
 
 void DrawMenu() {			//ゲームメニュー描画処理
 
@@ -17,6 +18,8 @@ void DrawMenu() {			//ゲームメニュー描画処理
 	IronBallDisp();		//鉄球の描画処理
 	PlayerDisp();
 	enemyDisp();
+	DrawGraph(0, 0, g_PoseImage, FALSE);
+
 
 	if (g_KeyFlg & PAD_INPUT_8) {//Wキー
 		if (PoseTime <= 0) {

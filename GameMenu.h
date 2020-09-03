@@ -4,5 +4,6 @@
 
 
 extern int PoseTime;
+extern int g_PoseImage;
 
 void DrawMenu(void);		//ƒQ[ƒ€ƒƒjƒ…[•`‰æˆ—

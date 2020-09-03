@@ -98,6 +98,8 @@ void Lock::MoveCheck() {
 	bool Gr = true;//ローカル変数、HenkaYのところで使用。すべての鎖が地面についているならHenkaYをなくす。
 	int FP = 0;//鎖を引っ張ったとき用HenkaYのところで数字をかえる。HenkaXのところで使用
 	int EL = 0;//ローカル変数、HenkaXのところで使用
+	int exe = 0;//whileの中でばぐったらbreak用変数
+
 	//HenkaY = 0;
 	//LenkaY = 0;
 	for (int i = 0; i < LOCK_MAX; i++) {
@@ -135,7 +137,16 @@ void Lock::MoveCheck() {
 
 				//１個前の鎖が上下に移動したら移動
 				EnY2 = EnY;
+
+				exe = 0;
+
 				while (EnY > 0) {
+					 
+					if (exe++ == 1000) {
+						g_IronBall.HoldFlg = true;
+						g_IronBall.ThrowFlg = false;
+						break;
+					}
 					New_y[i]++;
 					EnY--;
 					if (HitCheck(i) == true) {//
@@ -148,7 +159,13 @@ void Lock::MoveCheck() {
 						}
 					}
 				}
+				exe = 0;
 				while (EnY < 0) {
+					if (exe++ == 1000) {
+						g_IronBall.HoldFlg = true;
+						g_IronBall.ThrowFlg = false;
+						break;
+					}
 					New_y[i]--;
 					EnY++;
 					if (HitCheck(i) == true) {//
@@ -208,13 +225,19 @@ void Lock::MoveCheck() {
 					
 				}
 
+				exe = 0;
+
 				while (i != LOCK_MAX - 1
 					&& New_x[i + 1] - New_x[i] >= 0
 					&& pow((double)New_x[i + 1] - (double)New_x[i], 2.0) + pow((double)New_y[i + 1] - (double)New_y[i], 2.0) >= pow(IRONBALL_R, 2.0)
 					) {
 					New_x[i]++;
 					nn = 1;
-
+					if (exe++ == 1000) {
+						g_IronBall.HoldFlg = true;
+						g_IronBall.ThrowFlg = false;
+						break;
+					}
 					if (HitCheck(i) == true) {//壁に当たっているので上に上昇させる
 						nn = 0;
 						New_x[i]--;
@@ -248,16 +271,30 @@ void Lock::MoveCheck() {
 					continue;
 				}
 
+				exe = 0;
+
 				EnY2 = EnY;//すべてを保存
 			//１個前の鎖が上下に移動したら移動
 				while (EnY > 0) {
+					if (exe++ == 1000) {
+						g_IronBall.HoldFlg = true;
+						g_IronBall.ThrowFlg = false;
+						break;
+					}
 					New_y[i]++;
 					EnY--;
 					if (HitCheck(i) == true) {//
 						New_y[i]--;
 					}
 				}
+				exe = 0;
+
 				while (EnY < 0) {
+					if (exe++ == 1000) {
+						g_IronBall.HoldFlg = true;
+						g_IronBall.ThrowFlg = false;
+						break;
+					}
 					New_y[i]--;
 					EnY++;
 					if (HitCheck(i) == true) {//
@@ -290,6 +327,8 @@ void Lock::MoveCheck() {
 					}
 				}
 
+				exe = 0;
+
 				while (i != LOCK_MAX - 1
 					&& New_x[i] - New_x[i + 1] >= 0
 					&& pow((double)New_x[i] - (double)New_x[i + 1], 2.0) + pow((double)New_y[i] - (double)New_y[i + 1], 2.0) >= pow(IRONBALL_R, 2.0)
@@ -297,6 +336,11 @@ void Lock::MoveCheck() {
 					) {
 					New_x[i]--;
 					nn = 1;
+					if (exe++ == 1000) {
+						g_IronBall.HoldFlg = true;
+						g_IronBall.ThrowFlg = false;
+						break;
+					}
 
 					if (HitCheck(i) == true) {//壁に当たっているので上に上昇させる
 						New_x[i]++;
@@ -340,8 +384,16 @@ void Lock::MoveCheck() {
 			}
 			//鎖の差を図る
 		//	oy = /*abs(x[i] - x[i + 1])*/  New_y[i + 1] - New_y[i];
+
+			exe = 0;
+
 			//座標移動
 			while (LenkaY < 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]--;
 				//oy++;
 				LenkaY++;
@@ -359,11 +411,18 @@ void Lock::MoveCheck() {
 				}
 			}
 
+			exe = 0;
+
 			while (i != LOCK_MAX - 1
 				&& New_y[i] - New_y[i + 1] >= 0
 				&& pow((double)New_x[i] - (double)New_x[i + 1], 2.0) + pow((double)New_y[i] - (double)New_y[i + 1], 2.0) >= pow(IRONBALL_R, 2.0)
 				) {
 				New_y[i]--;
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				//oy++;
 				//HenkaY++;
 				if (HitCheck(i) == true) {//壁に当たっているので左か右に移動させる。ここ考えるべき
@@ -612,9 +671,16 @@ void Lock::MoveCheck() {
 			}
 
 
+			exe = 0;
+
 			//１個前の鎖が上下に移動したら移動
 			EnY2 = EnY;
 			while (EnY > 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]++;
 				EnY--;
 				if (HitCheck(i) == true) {//
@@ -627,7 +693,14 @@ void Lock::MoveCheck() {
 					}
 				}
 			}
+			exe = 0;
+
 			while (EnY < 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]--;
 				EnY++;
 				if (HitCheck(i) == true) {//
@@ -642,8 +715,15 @@ void Lock::MoveCheck() {
 			}
 			EnY = EnY2;
 
+			exe = 0;
+
 			//座標移動
 			while (LenkaX > 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_x[i]++;
 				nn = 1;
 				//	ox ++;
@@ -718,10 +798,17 @@ void Lock::MoveCheck() {
 				//}
 			}
 
+			exe = 0;
+
 			while (i != LOCK_MAX - 1
 				&& New_x[i + 1] - New_x[i] >= 0
 				&& pow((double)New_x[i + 1] - (double)New_x[i], 2.0) + pow((double)New_y[i + 1] - (double)New_y[i], 2.0) >= pow(IRONBALL_R, 2.0)
 				) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_x[i]++;
 				nn = 1;
 				//	ox ++;
@@ -802,16 +889,30 @@ void Lock::MoveCheck() {
 				break;
 			}
 
+			exe = 0;
+
 			EnY2 = EnY;//すべてを保存
 			//１個前の鎖が上下に移動したら移動
 			while (EnY > 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]++;
 				EnY--;
 				if (HitCheck(i) == true) {//
 					New_y[i]--;
 				}
 			}
+			exe = 0;
+
 			while (EnY < 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]--;
 				EnY++;
 				if (HitCheck(i) == true) {//
@@ -820,8 +921,15 @@ void Lock::MoveCheck() {
 			}
 			EnY = EnY2;
 
+			exe = 0;
+
 			//座標移動
 			while (LenkaX < 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_x[i]--;
 				nn = 1;
 				//	ox++;
@@ -877,11 +985,18 @@ void Lock::MoveCheck() {
 
 			}
 
+			exe = 0;
+
 			while (i != LOCK_MAX - 1
 				&& New_x[i] - New_x[i + 1] >= 0
 				&& pow((double)New_x[i] - (double)New_x[i + 1], 2.0) + pow((double)New_y[i] - (double)New_y[i + 1], 2.0) >= pow(IRONBALL_R, 2.0)
 
 				) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_x[i]--;
 				nn = 1;
 				//	ox++;
@@ -1012,8 +1127,16 @@ void Lock::MoveCheck() {
 			}
 			//鎖の差を図る
 		//	oy = /*abs(x[i] - x[i + 1])*/  New_y[i + 1] - New_y[i];
+
+			exe = 0;
+
 			//座標移動
 			while (HenkaY < 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]--;
 				//oy++;
 				HenkaY++;
@@ -1031,10 +1154,17 @@ void Lock::MoveCheck() {
 				}
 			}
 
+			exe = 0;
+
 			while (i != 0
 				&& New_y[i] - New_y[i - 1] >= 0
 				&& pow((double)New_x[i] - (double)New_x[i - 1], 2.0) + pow((double)New_y[i] - (double)New_y[i - 1], 2.0) >= pow(IRONBALL_R, 2.0)
 				) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]--;
 				//oy++;
 			//	HenkaY++;
@@ -1084,8 +1214,16 @@ void Lock::MoveCheck() {
 				}
 				//鎖の差を図る
 			//	oy = /*abs(x[i] - x[i + 1])*/  New_y[i + 1] - New_y[i];
+
+				exe = 0;
+
 				//座標移動
 				while (HenkaY > 0) {
+					if (exe++ == 1000) {
+						g_IronBall.HoldFlg = true;
+						g_IronBall.ThrowFlg = false;
+						break;
+					}
 					New_y[i]++;
 					//oy++;
 					HenkaY--;
@@ -1109,10 +1247,17 @@ void Lock::MoveCheck() {
 					}
 				}
 
+				exe = 0;
+
 				while (i != 0
 					&& New_y[i - 1] - New_y[i] >= 0
 					&& pow((double)New_x[i - 1] - (double)New_x[i], 2.0) + pow((double)New_y[i - 1] - (double)New_y[i], 2.0) >= pow(IRONBALL_R, 2.0)
 					) {
+					if (exe++ == 1000) {
+						g_IronBall.HoldFlg = true;
+						g_IronBall.ThrowFlg = false;
+						break;
+					}
 					New_y[i]++;
 					//oy++;
 				//	HenkaY++;
@@ -1356,9 +1501,16 @@ void Lock::MoveCheck() {
 
 		//	ox = (New_x[i] - New_x[i + 1]); //+ //abs(New_y[i] - New_y[i + 1]);	//鎖の差を図る
 
+			exe = 0;
+
 			//１個前の鎖が上下に移動したら移動
 			EnY2 = EnY;
 			while (EnY > 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]++;
 				EnY--;
 				if (HitCheck(i) == true) {//
@@ -1371,7 +1523,14 @@ void Lock::MoveCheck() {
 					}
 				}
 			}
+			exe = 0;
+
 			while (EnY < 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]--;
 				EnY++;
 				if (HitCheck(i) == true) {//
@@ -1386,8 +1545,15 @@ void Lock::MoveCheck() {
 			}
 			EnY = EnY2;
 
+			exe = 0;
+
 			//座標移動
 			while (HenkaX > 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_x[i]++;
 				nn = 1;
 			//	ox ++;
@@ -1460,11 +1626,18 @@ void Lock::MoveCheck() {
 					
 				}
 			}
-			
+
+			exe = 0;
+
 			while (i != 0
 				&& New_x[i - 1] - New_x[i] >= 0
 				&& pow((double)New_x[i - 1] - (double)New_x[i], 2.0) + pow((double)New_y[i - 1] - (double)New_y[i], 2.0) >= pow(IRONBALL_R, 2.0)
 				) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_x[i]++;
 				nn = 1;
 				//	ox ++;
@@ -1578,16 +1751,30 @@ void Lock::MoveCheck() {
 		//	ox = New_x[i + 1] - New_x[i];// + abs(New_y[i] - New_y[i + 1]);		//鎖の差を図る
 
 
+			exe = 0;
+
 			EnY2 = EnY;//すべてを保存
 			//１個前の鎖が上下に移動したら移動
 			while (EnY > 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]++;
 				EnY--;
 				if (HitCheck(i) == true) {//
 					New_y[i]--;
 				}
 			}
+			exe = 0;
+
 			while (EnY < 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_y[i]--;
 				EnY++;
 				if (HitCheck(i) == true) {//
@@ -1596,8 +1783,15 @@ void Lock::MoveCheck() {
 			}
 			EnY = EnY2;
 
+			exe = 0;
+
 			//座標移動
 			while (HenkaX < 0) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_x[i]--;
 				nn = 1;
 			//	ox++;
@@ -1653,11 +1847,18 @@ void Lock::MoveCheck() {
 				
 			}
 
+			exe = 0;
+
 			while (i != 0
 				&& New_x[i] - New_x[i - 1] >= 0
 				&& pow((double)New_x[i] - (double)New_x[i - 1], 2.0) + pow((double)New_y[i] - (double)New_y[i - 1], 2.0) >= pow(IRONBALL_R, 2.0)
 
 				) {
+				if (exe++ == 1000) {
+					g_IronBall.HoldFlg = true;
+					g_IronBall.ThrowFlg = false;
+					break;
+				}
 				New_x[i]--;
 				nn = 1;
 				//	ox++;
@@ -1825,6 +2026,12 @@ void Lock::Move(int eeee) {
 			break;
 		}
 	}
+	/*if (eee != 0) {
+		
+		g_IronBall.HoldFlg = true;
+		g_IronBall.ThrowFlg = false;
+		
+	}*/
 
 	for (int i = 0; i < LOCK_MAX; i++) {
 		x[i] = New_x[i];
