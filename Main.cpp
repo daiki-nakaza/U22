@@ -195,6 +195,8 @@ int LoadImages() {
 	if (( LoadDivGraph("images/Door.png",3,3,1,128,128,g_Door)) == -1) return -1;
 	//ゲームクリア背景
 	if ((g_GameClearImage = LoadGraph("images/GameClear.png")) == -1)return -1;
+	//ステージクリア背景
+	if ((g_StageClearImage = LoadGraph("images/StageClear.png")) == -1)return -1;
 
 
 	return 0;

@@ -14,6 +14,7 @@ int g_OverTime = 0;
 
 int g_GameOverImage;
 int g_GameClearImage;
+int g_StageClearImage;
 
 int ClearTime = 0;
 int g_Cursor2;
@@ -35,57 +36,109 @@ void DrawEnd() {			//
 }
 
 
-void DrawClear(void) {				//ゲームクリア描画処理
+void DrawClear(void) {	//ゲームクリア描画処理
 	if (ClearTime > 60) {
-		DrawGraph(0, 0, g_GameClearImage, FALSE);
+		 if (Stage == 1) {
+			 DrawGraph(0, 0, g_StageClearImage, FALSE);
 
-		//メニューカーソル移動処理
-		if (--g_OverTime <= 0) {
-			if (g_KeyFlg & PAD_INPUT_DOWN) {
+			 //メニューカーソル移動処理
+			 if (--g_OverTime <= 0) {
+				 if (g_KeyFlg & PAD_INPUT_DOWN) {
 
-				if (++g_OverNumber > 1) {
-					g_OverNumber = 0;
-				}
-				g_OverTime = 10;
-			}
-			if (g_KeyFlg & PAD_INPUT_UP) {
-				if (--g_OverNumber < 0) {
-					g_OverNumber = 1;
-				}
-				g_OverTime = 10;
-			}
+					 if (++g_OverNumber > 1) {
+						 g_OverNumber = 0;
+					 }
+					 g_OverTime = 10;
+				 }
+				 if (g_KeyFlg & PAD_INPUT_UP) {
+					 if (--g_OverNumber < 0) {
+						 g_OverNumber = 1;
+					 }
+					 g_OverTime = 10;
+				 }
 
-		}
+			 }
 
-		//ｚキーでメニュー選択
-		if (--g_OverTime <= 0) {
-			if (g_KeyFlg & PAD_INPUT_A) {
-				if (g_OverNumber == 1) {
-					g_GameState = GAME_END;
-					ClearTime = 0;
-					reset = 0;
-				}
-				else {
-					g_GameState = GAME_TITLE;
-					ClearTime = 0;
-					reset = 0;
-				}
+			 //ｚキーでメニュー選択
+			 if (--g_OverTime <= 0) {
+				 if (g_KeyFlg & PAD_INPUT_A) {
+					 if (g_OverNumber == 1) {
+						 g_GameState = GAME_TITLE;
+						 ClearTime = 0;
+						 reset = 0;
+					 }
+					 else {
+						 g_GameState = GAME_MAIN;
+						 ClearTime = 0;
+						 reset = 3;
+						 Stage = 2;
+					 }
 
-				g_MenuTime = 20;
-			}
-		}
+					 g_MenuTime = 20;
+				 }
+			 }
 
-		//メニューカーソル（三角形）の表示
-		g_OvreY = g_OverNumber * 130;
+			 //メニューカーソル（三角形）の表示
+			 g_OvreY = g_OverNumber * 120;
 
-		/*DrawString(265, 263, "ゲームスタート", 0xffffff);
-		DrawString(265, 315, "ゲームヘルプ", 0xffffff);
-		DrawString(265, 367, "終了", 0xffffff);*/
+			 /*DrawString(265, 263, "ゲームスタート", 0xffffff);
+			 DrawString(265, 315, "ゲームヘルプ", 0xffffff);
+			 DrawString(265, 367, "終了", 0xffffff);*/
 
-		DrawTriangle(40, 335 + g_OvreY, 80, 370 + g_OvreY,
-			40, 405 + g_OvreY, GetColor(255, 0, 0), TRUE);
-		DrawFormatString(0, 0, 0xffffff, "mouseX = %d   Y = %d", g_MouseX, g_MouseY);
+			 DrawTriangle(3, 425 + g_OvreY, 50, 460 + g_OvreY,
+				 3, 495 + g_OvreY, GetColor(255, 0, 0), TRUE);
+			 DrawFormatString(0, 0, 0xffffff, "mouseX = %d   Y = %d", g_MouseX, g_MouseY);
+		 }
+		 else if (Stage == 2) {
+			 DrawGraph(0, 0, g_GameClearImage, FALSE);
 
+			 //メニューカーソル移動処理
+			 if (--g_OverTime <= 0) {
+				 if (g_KeyFlg & PAD_INPUT_DOWN) {
+
+					 if (++g_OverNumber > 1) {
+						 g_OverNumber = 0;
+					 }
+					 g_OverTime = 10;
+				 }
+				 if (g_KeyFlg & PAD_INPUT_UP) {
+					 if (--g_OverNumber < 0) {
+						 g_OverNumber = 1;
+					 }
+					 g_OverTime = 10;
+				 }
+
+			 }
+
+			 //ｚキーでメニュー選択
+			 if (--g_OverTime <= 0) {
+				 if (g_KeyFlg & PAD_INPUT_A) {
+					 if (g_OverNumber == 1) {
+						 g_GameState = GAME_END;
+						 ClearTime = 0;
+						 reset = 0;
+					 }
+					 else {
+						 g_GameState = GAME_TITLE;
+						 ClearTime = 0;
+						 reset = 0;
+					 }
+
+					 g_MenuTime = 20;
+				 }
+			 }
+
+			 //メニューカーソル（三角形）の表示
+			 g_OvreY = g_OverNumber * 130;
+
+			 /*DrawString(265, 263, "ゲームスタート", 0xffffff);
+			 DrawString(265, 315, "ゲームヘルプ", 0xffffff);
+			 DrawString(265, 367, "終了", 0xffffff);*/
+
+			 DrawTriangle(40, 335 + g_OvreY, 80, 370 + g_OvreY,
+				 40, 405 + g_OvreY, GetColor(255, 0, 0), TRUE);
+			 DrawFormatString(0, 0, 0xffffff, "mouseX = %d   Y = %d", g_MouseX, g_MouseY);
+		 }
 	}
 	else if (ClearTime <= 60) {
 		MapDisp();

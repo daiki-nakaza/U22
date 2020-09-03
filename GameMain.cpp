@@ -13,7 +13,8 @@ int reset = 0;
 
 void DrawGameMain() {
 	//static int i = 0;
-	if (reset++ == 0) {
+	if (reset == 0) {
+		reset = 1;
 		Stage = 1;
 		PlayerInit();
 		MapChipInit();
@@ -24,7 +25,16 @@ void DrawGameMain() {
 		Locka.Init();
 		PlaySoundMem(g_Stage1, DX_PLAYTYPE_LOOP,true); //
 	}
-	else if (reset++ == 5) {//ライフ以外のリセット
+	else if (reset == 3) {//ライフ以外のリセット
+		reset = 4;
+		PlayerInit();
+		MapChipInit();
+		enemyInit();
+		g_IronBall.HoldFlg = false;
+		g_IronBall.ThrowFlg = false;
+		g_IronBall.Init();
+		Locka.Init();
+		PlaySoundMem(g_Stage1, DX_PLAYTYPE_LOOP, true); //
 	}
 
 
